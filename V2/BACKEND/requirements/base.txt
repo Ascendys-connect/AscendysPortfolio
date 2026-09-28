@@ -1,0 +1,28 @@
+# Core Django
+Django==5.0.1
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
+
+# Database (utiliser psycopg3 pour Python 3.14+)
+psycopg[binary]>=3.2.0
+
+# CORS
+django-cors-headers==4.3.1
+
+# Filtering
+django-filter==23.5
+
+# API Documentation
+drf-spectacular==0.27.0
+
+# Image handling (utiliser wheel précompilé)
+Pillow>=11.0.0
+
+# Environment variables
+python-decouple==3.8
+
+# Rate limiting
+django-ratelimit==4.1.0
+
+# Timezone
+pytz==2024.1

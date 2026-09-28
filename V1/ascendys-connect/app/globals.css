@@ -1,0 +1,339 @@
+@import "tailwindcss";
+
+/* ─── BRAND TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  /* Brand Colors */
+  --violet-principal: #9800BF;
+  --violet-profond:   #4208A1;
+  --or:               #FFC000;
+  --blanc:            #FFFFFF;
+  --noir:             #1A1A1A;
+  --gris-neutre:      #ABABAB;
+
+  /* Semantic */
+  --background:       #FFFFFF;
+  --foreground:       #1A1A1A;
+  --muted:            #F5F5F7;
+  --muted-fg:         #6B6B6B;
+  --border:           #E8E8E8;
+
+  /* Brand Gradient */
+  --gradient-brand: linear-gradient(135deg, #4208A1 0%, #9800BF 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #3606891 0%, #7a00a0 100%);
+  --gradient-hero: linear-gradient(135deg, #1a0050 0%, #4208A1 40%, #9800BF 100%);
+
+  /* Typography scale */
+  --font-sans: var(--font-plus-jakarta), 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --color-brand-violet: var(--violet-principal);
+  --color-brand-deep: var(--violet-profond);
+  --color-brand-gold: var(--or);
+  --color-brand-gray: var(--gris-neutre);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+}
+
+/* ─── GLOBAL RESET & BASE ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── TYPOGRAPHY ────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--noir);
+}
+
+/* ─── SELECTION ─────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--violet-principal);
+  color: white;
+}
+
+/* ─── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f0f0f0; }
+::-webkit-scrollbar-thumb {
+  background: var(--violet-principal);
+  border-radius: 99px;
+}
+
+/* ─── UTILITY CLASSES ───────────────────────────────────────────────────── */
+
+/* Brand gradient backgrounds */
+.bg-gradient-brand {
+  background: var(--gradient-brand);
+}
+.bg-gradient-hero {
+  background: var(--gradient-hero);
+}
+
+/* Gold accent line (used under headings) */
+.gold-underline {
+  position: relative;
+  display: block;
+  width: fit-content;
+}
+.gold-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 48px;
+  height: 3px;
+  background: var(--or);
+  border-radius: 2px;
+}
+
+/* Section spacing */
+.section-py {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+/* Container */
+.container-xl {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (min-width: 768px) {
+  .container-xl {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+/* ─── CARD HOVER LIFT ────────────────────────────────────────────────────── */
+.card-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px -10px rgba(152, 0, 191, 0.18);
+}
+
+/* ─── BUTTON STYLES ─────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--gradient-brand);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--or);
+  color: var(--noir);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-gold:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 27px;
+  background: transparent;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-outline:hover {
+  border-color: white;
+  background: rgba(255,255,255,0.08);
+}
+
+.btn-outline-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 27px;
+  background: transparent;
+  color: var(--violet-principal);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--violet-principal);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-outline-dark:hover {
+  background: var(--violet-principal);
+  color: white;
+}
+
+/* ─── NOISE OVERLAY (Subtle texture for hero) ──────────────────────────── */
+.hero-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ─── BADGE ──────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badge-violet {
+  background: rgba(152, 0, 191, 0.08);
+  color: var(--violet-principal);
+  border: 1px solid rgba(152, 0, 191, 0.2);
+}
+.badge-gold {
+  background: rgba(255, 192, 0, 0.12);
+  color: #a07800;
+  border: 1px solid rgba(255, 192, 0, 0.3);
+}
+.badge-white {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* ─── FORM INPUTS ────────────────────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--violet-principal);
+  box-shadow: 0 0 0 3px rgba(152, 0, 191, 0.1);
+}
+.form-input::placeholder {
+  color: var(--gris-neutre);
+}
+
+/* Custom select styling */
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239800BF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 44px;
+  cursor: pointer;
+}
+
+select.form-input::-ms-expand {
+  display: none;
+}
+
+/* ─── DIVIDER ────────────────────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+}
+
+/* ─── PROSE ─────────────────────────────────────────────────────────────── */
+.prose p { margin-bottom: 1em; color: var(--muted-fg); }
+.prose ul { list-style: none; padding: 0; }
+.prose ul li {
+  padding-left: 1.5em;
+  position: relative;
+  margin-bottom: 0.5em;
+  color: var(--muted-fg);
+}
+.prose ul li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--violet-principal);
+  font-weight: 700;
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}

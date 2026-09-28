@@ -1,0 +1,74 @@
+# Global .gitignore for Ascendys Connect Project
+
+# Environment variables (SENSIBLE - NE JAMAIS COMMITER)
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.pyc
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets & Keys (SENSIBLE)
+*.pem
+*.key
+*.cert
+secrets.json
+credentials.json
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Coverage & Tests
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
