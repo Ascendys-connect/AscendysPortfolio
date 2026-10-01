@@ -4,18 +4,18 @@ Training models for course management.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel
+from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel
 
 User = get_user_model()
 
 
-class TrainingCategory(TimeStampedModel):
+class TrainingCategory(TimeStampedModel, SoftDeleteModel):
     """
     Category for grouping trainings.
     """
     name = models.CharField(max_length=100, verbose_name="Nom")
     slug = models.SlugField(max_length=150, unique=True, verbose_name="Slug")
-    description = models.TextField(blank=True, verbose_name="Description")
+    description = models.TextField(verbose_name="Description")
     image = models.ImageField(
         upload_to='training_categories/',
         blank=True,
@@ -23,12 +23,11 @@ class TrainingCategory(TimeStampedModel):
         verbose_name="Image"
     )
     is_active = models.BooleanField(default=True, verbose_name="Actif")
-    order = models.IntegerField(default=0, verbose_name="Ordre")
 
     class Meta:
         verbose_name = "Catégorie de formation"
         verbose_name_plural = "Catégories de formation"
-        ordering = ['order', 'name']
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -39,7 +38,7 @@ class TrainingCategory(TimeStampedModel):
         super().save(*args, **kwargs)
 
 
-class Training(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
+class Training(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
     """
     Training/Course model.
     """
@@ -64,8 +63,7 @@ class Training(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     # Category
     category = models.ForeignKey(
         TrainingCategory,
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.PROTECT,
         related_name='trainings',
         verbose_name="Catégorie"
     )
@@ -73,9 +71,7 @@ class Training(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     # Images
     image = models.ImageField(
         upload_to='trainings/',
-        blank=True,
-        null=True,
-        verbose_name="Image"
+        verbose_name="Image de couverture"
     )
     banner = models.ImageField(
         upload_to='trainings/banners/',
@@ -87,23 +83,19 @@ class Training(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     # Training Details
     objectives = models.JSONField(
         default=list,
-        blank=True,
         help_text="Liste des objectifs de la formation",
         verbose_name="Objectifs"
     )
     prerequisites = models.JSONField(
         default=list,
-        blank=True,
         help_text="Liste des prérequis",
         verbose_name="Prérequis"
     )
     target_audience = models.TextField(
-        blank=True,
         verbose_name="Public cible"
     )
     syllabus = models.JSONField(
         default=list,
-        blank=True,
         help_text="Programme de la formation (modules/chapitres)",
         verbose_name="Programme"
     )
@@ -136,20 +128,15 @@ class Training(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     
     # Schedule
     start_date = models.DateField(
-        null=True,
-        blank=True,
         verbose_name="Date de début"
     )
     end_date = models.DateField(
-        null=True,
-        blank=True,
         verbose_name="Date de fin"
     )
     
     # Location & Mode
     location = models.CharField(
         max_length=200,
-        blank=True,
         verbose_name="Lieu"
     )
     training_mode = models.CharField(
@@ -171,8 +158,7 @@ class Training(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     
     # Capacity
     capacity = models.IntegerField(
-        null=True,
-        blank=True,
+        default=20,
         help_text="Nombre maximum de participants",
         verbose_name="Capacité"
     )

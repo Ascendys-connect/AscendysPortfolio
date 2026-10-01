@@ -23,7 +23,6 @@ class TrainingCategorySerializer(serializers.ModelSerializer):
             'description',
             'image',
             'is_active',
-            'order',
             'trainings_count',
             'created_at',
             'updated_at',
@@ -31,8 +30,8 @@ class TrainingCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
     
     def get_trainings_count(self, obj):
-        """Return count of published trainings in this category."""
-        return obj.trainings.filter(status='PUBLISHED').count()
+        """Return count of published and non-deleted trainings in this category."""
+        return obj.trainings.filter(status='PUBLISHED', is_deleted=False).count()
 
 
 class TrainingCategoryCreateUpdateSerializer(serializers.ModelSerializer):
@@ -46,7 +45,6 @@ class TrainingCategoryCreateUpdateSerializer(serializers.ModelSerializer):
             'description',
             'image',
             'is_active',
-            'order',
         ]
 
 
@@ -83,7 +81,9 @@ class TrainingListSerializer(serializers.ModelSerializer):
             'training_mode',
             'is_featured',
             'start_date',
+            'status',
             'views_count',
+            'created_at',
         ]
 
 
@@ -133,10 +133,6 @@ class TrainingSerializer(serializers.ModelSerializer):
             'status_display',
             'is_featured',
             'views_count',
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'og_image',
             'published_at',
             'created_at',
             'updated_at',
@@ -174,10 +170,6 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
             'certification',
             'status',
             'is_featured',
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'og_image',
         ]
 
     def validate_title(self, value):
@@ -185,6 +177,16 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
         if not value or not value.strip():
             raise serializers.ValidationError("Le titre ne peut pas être vide.")
         return value.strip()
+
+    def validate_start_date(self, value):
+        """Validate that start_date is not in the past."""
+        from django.utils import timezone
+        from datetime import date
+        
+        today = timezone.now().date()
+        if value < today:
+            raise serializers.ValidationError("La date de début ne peut pas être antérieure à aujourd'hui.")
+        return value
 
     def validate(self, data):
         """Validate that end_date is after start_date."""

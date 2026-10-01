@@ -39,6 +39,17 @@ class SEOModel(models.Model):
         abstract = True
 
 
+class SoftDeleteModel(models.Model):
+    """
+    Abstract base class for soft delete functionality.
+    """
+    is_deleted = models.BooleanField(default=False, verbose_name="Supprimé")
+    deleted_at = models.DateTimeField(null=True, blank=True, verbose_name="Date de suppression")
+
+    class Meta:
+        abstract = True
+
+
 class PublishableModel(models.Model):
     """
     Abstract base class for publishable content.

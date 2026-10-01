@@ -10,11 +10,11 @@ class TrainingCategoryAdmin(admin.ModelAdmin):
     """
     Admin for TrainingCategory model.
     """
-    list_display = ['name', 'slug', 'is_active', 'order', 'created_at']
+    list_display = ['name', 'slug', 'is_active', 'created_at']
     list_filter = ['is_active', 'created_at']
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
-    ordering = ['order', 'name']
+    ordering = ['name']
 
 
 @admin.register(Training)
@@ -71,10 +71,6 @@ class TrainingAdmin(admin.ModelAdmin):
         }),
         ('Publication', {
             'fields': ('status', 'is_featured', 'published_at')
-        }),
-        ('SEO', {
-            'fields': ('seo_title', 'seo_description', 'seo_keywords', 'og_image'),
-            'classes': ('collapse',)
         }),
         ('Métadonnées', {
             'fields': ('views_count', 'created_by'),
