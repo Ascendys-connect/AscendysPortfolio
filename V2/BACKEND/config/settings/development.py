@@ -15,8 +15,9 @@ DEBUG = True
 # Allow all hosts in development
 ALLOWED_HOSTS = ['*']
 
-# Console email backend for development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email backend - use .env configuration
+# Comment this line to use EMAIL_BACKEND from .env (SMTP for real emails)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Development database (can override with .env)
 # DATABASES = {

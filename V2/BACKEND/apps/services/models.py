@@ -3,10 +3,13 @@ Service model for company offerings.
 """
 from django.db import models
 from django.utils.text import slugify
-from apps.core.models import UUIDModel, TimeStampedModel, SEOModel
+from django.contrib.auth import get_user_model
+from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel
+
+User = get_user_model()
 
 
-class Service(UUIDModel, TimeStampedModel, SEOModel):
+class Service(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     """
     Model representing a service offered by the company.
     """
@@ -37,13 +40,16 @@ class Service(UUIDModel, TimeStampedModel, SEOModel):
         help_text="Ordre d'affichage (croissant)",
         verbose_name="Ordre"
     )
-    is_featured = models.BooleanField(
-        default=False,
-        verbose_name="Mis en avant"
-    )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Actif"
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='services_created',
+        verbose_name="Créé par"
     )
 
     class Meta:

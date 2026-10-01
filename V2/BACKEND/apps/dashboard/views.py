@@ -22,6 +22,7 @@ class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
     Admin only - read-only endpoints:
     - list: Get all activity logs
     - retrieve: Get activity log detail
+    - clear: Delete all activity logs (POST)
     """
     queryset = ActivityLog.objects.all()
     serializer_class = ActivityLogSerializer
@@ -49,6 +50,26 @@ class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
             'message': 'Logs d\'activité récupérés avec succès',
             'data': serializer.data
         })
+    
+    @action(detail=False, methods=['post'], url_path='clear')
+    def clear(self, request):
+        """
+        Delete all activity logs.
+        Only super admins can clear logs.
+        """
+        if request.user.role != 'SUPER_ADMIN':
+            return Response({
+                'success': False,
+                'message': 'Seuls les super administrateurs peuvent effacer les logs'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        count = ActivityLog.objects.count()
+        ActivityLog.objects.all().delete()
+        
+        return Response({
+            'success': True,
+            'message': f'{count} log(s) d\'activité supprimé(s) avec succès'
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

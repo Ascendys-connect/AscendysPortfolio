@@ -4,16 +4,16 @@ Event model for company events.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, SEOModel
+from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel
 
 User = get_user_model()
 
 
-class Event(UUIDModel, TimeStampedModel, SEOModel):
+class Event(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     """
     Model for company events (conferences, workshops, webinars, etc.).
     """
-    STATUS_CHOICES = [
+    EVENT_STATUS_CHOICES = [
         ('UPCOMING', 'À venir'),
         ('ONGOING', 'En cours'),
         ('COMPLETED', 'Terminé'),
@@ -68,16 +68,12 @@ class Event(UUIDModel, TimeStampedModel, SEOModel):
         verbose_name="Capacité"
     )
     
-    status = models.CharField(
+    event_status = models.CharField(
         max_length=20,
-        choices=STATUS_CHOICES,
+        choices=EVENT_STATUS_CHOICES,
         default='UPCOMING',
-        verbose_name="Statut"
-    )
-    
-    is_featured = models.BooleanField(
-        default=False,
-        verbose_name="Mis en avant"
+        verbose_name="Statut de l'événement",
+        help_text="Statut du déroulement de l'événement (À venir, En cours, Terminé)"
     )
     
     created_by = models.ForeignKey(

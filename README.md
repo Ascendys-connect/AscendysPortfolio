@@ -1,34 +1,36 @@
-# 🌐 Ascendys Connect - Site Web Officiel
+# Ascendys Connect - Site Web Officiel
 
-> Plateforme institutionnelle de formation et de conseil IT en Côte d'Ivoire
+> Plateforme institutionnelle de formation et de conseil IT au Togo
 
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
-[![Django](https://img.shields.io/badge/Django-5.0.1-green.svg)](https://www.djangoproject.com/)
-[![React](https://img.shields.io/badge/React-19-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![Django](https://img.shields.io/badge/Django-5.0.1-092E20?logo=django)](https://www.djangoproject.com/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 
 ---
 
-## 📋 À propos
+## À propos
 
-**Ascendys Connect** est une plateforme web complète dédiée à la formation professionnelle en technologies de l'information en Côte d'Ivoire. Ce repository contient le code source complet du site web officiel de l'entreprise.
+**Ascendys Connect** est une plateforme web complète dédiée à la formation professionnelle en technologies de l'information au Togo. Ce repository contient le code source complet du site web officiel de l'entreprise.
 
-### 🎯 Objectifs de la plateforme
+### Objectifs de la plateforme
 
-- 🎓 **Formation** : Catalogue de formations IT (développement, data science, cybersécurité, cloud, etc.)
-- 📝 **Blog** : Articles techniques et actualités IT
-- 📅 **Événements** : Webinaires, ateliers, conférences
-- 💼 **Services** : Accompagnement stratégique et conseil IT
-- 🤝 **Témoignages** : Retours d'expérience clients
-- 📞 **Contact** : Formulaire de contact et newsletter
+- **Formation** : Catalogue de formations IT (développement, data science, cybersécurité, cloud, etc.)
+- **Blog** : Articles techniques et actualités IT
+- **Événements** : Webinaires, ateliers, conférences
+- **Services** : Accompagnement stratégique et conseil IT
+- **Témoignages** : Retours d'expérience clients
+- **Contact** : Formulaire de contact et newsletter
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 Le projet est structuré en **2 versions** :
 
-### 📁 Structure du repository
+### Structure du repository
 
 ```
 ASCENDYS-CONNECT Portfolio/
@@ -60,7 +62,7 @@ ASCENDYS-CONNECT Portfolio/
 
 ---
 
-## 🚀 Version 1 - Site Vitrine (Next.js)
+## Version 1 - Site Vitrine (Next.js)
 
 ### Technologies
 - **Framework** : Next.js 15 (App Router)
@@ -69,13 +71,13 @@ ASCENDYS-CONNECT Portfolio/
 - **Déploiement** : Vercel / Netlify
 
 ### Caractéristiques
-- ✅ Site institutionnel statique
-- ✅ Pages : Accueil, Formations, Services, À propos, Contact
-- ✅ SEO optimisé
-- ✅ Responsive design
-- ✅ Performance optimale
+- Site institutionnel statique
+- Pages : Accueil, Formations, Services, À propos, Contact
+- SEO optimisé
+- Responsive design
+- Performance optimale
 
-### 📦 Installation
+### Installation
 
 ```bash
 cd V1/ascendys-connect
@@ -84,7 +86,7 @@ npm run dev
 # Ouvrir http://localhost:3000
 ```
 
-### 🔧 Configuration
+### Configuration
 
 Créer un fichier `.env.local` :
 
@@ -95,9 +97,9 @@ NEXT_PUBLIC_CONTACT_EMAIL=contact@ascendysconnect.com
 
 ---
 
-## 🚀 Version 2 - Plateforme Full-Stack (Django + React)
+## Version 2 - Plateforme Full-Stack (Django + React)
 
-### 🎨 Frontend - Admin Dashboard
+### Frontend - Admin Dashboard
 
 **Stack technique** :
 - **Framework** : React 19 + Vite
@@ -108,14 +110,14 @@ NEXT_PUBLIC_CONTACT_EMAIL=contact@ascendysconnect.com
 - **HTTP Client** : Axios
 
 **Caractéristiques** :
-- ✅ Dashboard dynamique (2 niveaux : SUPER_ADMIN, ADMIN)
-- ✅ Gestion utilisateurs (CRUD)
-- ✅ Gestion contenus (formations, blog, événements, services, témoignages)
-- ✅ Médiathèque (upload fichiers)
-- ✅ Paramètres système (SEO, SMTP, etc.)
-- ✅ Journaux d'activité
-- ✅ Dark mode
-- ✅ Responsive
+- Dashboard dynamique (2 niveaux : SUPER_ADMIN, ADMIN)
+- Gestion utilisateurs (CRUD)
+- Gestion contenus (formations, blog, événements, services, témoignages)
+- Médiathèque (upload fichiers)
+- Paramètres système (SEO, SMTP, etc.)
+- Journaux d'activité
+- Dark mode
+- Responsive
 
 **Installation** :
 
@@ -136,7 +138,7 @@ VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
 
 ---
 
-### ⚙️ Backend - API REST
+### Backend - API REST
 
 **Stack technique** :
 - **Framework** : Django 5.0.1
@@ -229,29 +231,29 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 
 ---
 
-## 👥 Rôles & Permissions
+## Rôles & Permissions
 
 | Fonctionnalité | USER | ADMIN | SUPER_ADMIN |
 |----------------|------|-------|-------------|
-| Voir dashboard | ❌ | ✅ | ✅ |
-| Gérer formations | ❌ | ✅ | ✅ |
-| Gérer blog | ❌ | ✅ | ✅ |
-| Gérer événements | ❌ | ✅ | ✅ |
-| Gérer services | ❌ | ✅ | ✅ |
-| Gérer témoignages | ❌ | ✅ | ✅ |
-| **Gérer utilisateurs** | ❌ | ❌ | ✅ |
-| **Médiathèque** | ❌ | ❌ | ✅ |
-| **Infos entreprise** | ❌ | ❌ | ✅ |
-| **Journaux d'activité** | ❌ | ❌ | ✅ |
-| **Paramètres système** | ❌ | ❌ | ✅ |
+| Voir dashboard | ✗ | ✓ | ✓ |
+| Gérer formations | ✗ | ✓ | ✓ |
+| Gérer blog | ✗ | ✓ | ✓ |
+| Gérer événements | ✗ | ✓ | ✓ |
+| Gérer services | ✗ | ✓ | ✓ |
+| Gérer témoignages | ✗ | ✓ | ✓ |
+| **Gérer utilisateurs** | ✗ | ✗ | ✓ |
+| **Médiathèque** | ✗ | ✗ | ✓ |
+| **Infos entreprise** | ✗ | ✗ | ✓ |
+| **Journaux d'activité** | ✗ | ✗ | ✓ |
+| **Paramètres système** | ✗ | ✗ | ✓ |
 
 ---
 
-## 🔒 Sécurité
+## Sécurité
 
 ### Credentials par défaut
 
-**⚠️ À CHANGER EN PRODUCTION !**
+> **IMPORTANT** : À CHANGER EN PRODUCTION !
 
 ```
 Email: admin@ascendysconnect.com
@@ -260,19 +262,19 @@ Password: admin123
 
 ### Bonnes pratiques appliquées
 
-- ✅ JWT avec refresh tokens
-- ✅ Mots de passe hashés (PBKDF2)
-- ✅ CORS configuré
-- ✅ CSRF protection
-- ✅ Rate limiting (à configurer)
-- ✅ Validation des entrées
-- ✅ Permissions basées sur les rôles
-- ✅ Logs d'activité
-- ✅ Variables sensibles dans .env (jamais commitées)
+- JWT avec refresh tokens
+- Mots de passe hashés (PBKDF2)
+- CORS configuré
+- CSRF protection
+- Rate limiting (à configurer)
+- Validation des entrées
+- Permissions basées sur les rôles
+- Logs d'activité
+- Variables sensibles dans .env (jamais commitées)
 
 ---
 
-## 📊 Base de données
+## Base de données
 
 ### Modèle de données (28 tables)
 
@@ -300,7 +302,7 @@ Password: admin123
 
 ---
 
-## 📚 Documentation API
+## Documentation API
 
 Après lancement du backend :
 
@@ -310,7 +312,7 @@ Après lancement du backend :
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ### Backend
 ```bash
@@ -326,7 +328,7 @@ npm run test  # (à configurer)
 
 ---
 
-## 📦 Déploiement
+## Déploiement
 
 ### Production Checklist
 
@@ -373,7 +375,7 @@ npm run test  # (à configurer)
 
 ---
 
-## 🛠️ Technologies utilisées
+## Technologies utilisées
 
 ### Frontend
 - React 19
@@ -402,17 +404,17 @@ npm run test  # (à configurer)
 
 ---
 
-## 📞 Contact & Support
+## Contact & Support
 
 **Entreprise** : Ascendys Connect  
 **Site web** : https://ascendysconnect.com  
 **Email** : contact@ascendysconnect.com  
-**Téléphone** : +225 XX XX XX XX XX  
-**Localisation** : Abidjan, Côte d'Ivoire
+**Téléphone** : +228 XX XX XX XX XX  
+**Localisation** : Lomé, Togo
 
 ---
 
-## 📄 Licence
+## Licence
 
 **Proprietary** - © 2024 Ascendys Connect. Tous droits réservés.
 
@@ -420,34 +422,34 @@ Ce code est la propriété exclusive d'Ascendys Connect. Toute reproduction, dis
 
 ---
 
-## 👨‍💻 Équipe de développement
+## Équipe de développement
 
-Développé avec ❤️ par l'équipe Ascendys Connect.
+Développé avec soin par l'équipe Ascendys Connect.
 
 **Stack utilisée** : Django REST Framework + React + TypeScript + PostgreSQL
 
 ---
 
-## 📝 Notes de version
+## Notes de version
 
 ### V2.0.0 (Actuelle)
-- ✅ Backend Django REST complet (13 apps)
-- ✅ Frontend React admin dashboard
-- ✅ Authentification JWT
-- ✅ Gestion multi-rôles
-- ✅ CRUD complet sur toutes les entités
-- ✅ Médiathèque avec upload
-- ✅ Paramètres système
-- ✅ Journaux d'activité
+- Backend Django REST complet (13 apps)
+- Frontend React admin dashboard
+- Authentification JWT
+- Gestion multi-rôles
+- CRUD complet sur toutes les entités
+- Médiathèque avec upload
+- Paramètres système
+- Journaux d'activité
 
 ### V1.0.0
-- ✅ Site vitrine Next.js
-- ✅ Pages institutionnelles
-- ✅ SEO optimisé
+- Site vitrine Next.js
+- Pages institutionnelles
+- SEO optimisé
 
 ---
 
-## 🚧 Roadmap
+## Roadmap
 
 ### Phase 3 (À venir)
 - [ ] Frontend public (site vitrine dynamique)

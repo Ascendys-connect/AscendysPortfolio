@@ -130,3 +130,46 @@ class EventViewSet(viewsets.ModelViewSet):
             data=serializer.data,
             status_code=status.HTTP_200_OK
         )
+
+    @extend_schema(
+        summary="Publier un événement (Admin)",
+        description="Publie un événement en brouillon"
+    )
+    @action(detail=True, methods=['post'])
+    def publish(self, request, slug=None):
+        """
+        Publish a draft event (admin only).
+        """
+        instance = self.get_object()
+        instance.status = 'PUBLISHED'
+        instance.published_at = timezone.now()
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return api_response(
+            success=True,
+            message="Événement publié avec succès.",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        summary="Archiver un événement (Admin)",
+        description="Archive un événement publié"
+    )
+    @action(detail=True, methods=['post'])
+    def archive(self, request, slug=None):
+        """
+        Archive a published event (admin only).
+        """
+        instance = self.get_object()
+        instance.status = 'ARCHIVED'
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return api_response(
+            success=True,
+            message="Événement archivé avec succès.",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )

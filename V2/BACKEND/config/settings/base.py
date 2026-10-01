@@ -4,8 +4,11 @@ These settings are common to all environments.
 """
 
 from pathlib import Path
-from decouple import config, Csv
+from decouple import Config, RepositoryEnv, Csv
 from datetime import timedelta
+
+# Initialize config with project root
+config = Config(RepositoryEnv(Path(__file__).resolve().parent.parent.parent / '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

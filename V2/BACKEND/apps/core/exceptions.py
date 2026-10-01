@@ -8,10 +8,19 @@ from rest_framework.response import Response
 def custom_exception_handler(exc, context):
     """
     Custom exception handler that returns a consistent error response format.
+    Special handling for authentication workflows (OTP, password change).
     """
     response = exception_handler(exc, context)
 
     if response is not None:
+        # Check if this is an authentication workflow response (OTP or password change)
+        # These should NOT be wrapped in the standard error format
+        if isinstance(response.data, dict):
+            if 'requires_otp' in response.data or 'requires_password_change' in response.data:
+                # Return the response as-is for authentication workflows
+                return response
+        
+        # Standard error wrapping for all other cases
         custom_response = {
             'success': False,
             'message': 'Une erreur est survenue.',
