@@ -18,9 +18,10 @@ class EventAdmin(admin.ModelAdmin):
         'end_datetime',
         'status',
         'is_featured',
+        'is_deleted',
         'created_at'
     ]
-    list_filter = ['event_type', 'status', 'is_featured', 'start_datetime']
+    list_filter = ['event_type', 'status', 'is_featured', 'is_deleted', 'start_datetime']
     search_fields = ['title', 'description', 'location']
     prepopulated_fields = {'slug': ('title',)}
     ordering = ['-start_datetime']
@@ -42,12 +43,8 @@ class EventAdmin(admin.ModelAdmin):
         ('Configuration', {
             'fields': ('status', 'is_featured')
         }),
-        ('SEO', {
-            'fields': ('seo_title', 'seo_description', 'seo_keywords', 'og_image'),
-            'classes': ('collapse',)
-        }),
         ('Métadonnées', {
-            'fields': ('created_by',),
+            'fields': ('created_by', 'is_deleted', 'deleted_at'),
             'classes': ('collapse',)
         }),
     )

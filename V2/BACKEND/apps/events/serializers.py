@@ -2,6 +2,7 @@
 Serializers for Event model.
 """
 from rest_framework import serializers
+from django.utils import timezone
 from .models import Event
 
 
@@ -24,9 +25,11 @@ class EventListSerializer(serializers.ModelSerializer):
             'type_display',
             'start_datetime',
             'end_datetime',
+            'capacity',
             'status',
             'status_display',
             'is_featured',
+            'created_at',
         ]
 
 
@@ -60,10 +63,6 @@ class EventSerializer(serializers.ModelSerializer):
             'is_featured',
             'is_upcoming',
             'is_ongoing',
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'og_image',
             'created_by',
             'created_by_name',
             'created_at',
@@ -98,10 +97,6 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
             'capacity',
             'status',
             'is_featured',
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'og_image',
         ]
 
     def validate_title(self, value):
@@ -110,10 +105,18 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Le titre ne peut pas être vide.")
         return value.strip()
 
+    def validate_start_datetime(self, value):
+        """Validate that start_datetime is not in the past for new events."""
+        if not self.instance and value < timezone.now():
+            raise serializers.ValidationError(
+                "La date de début ne peut pas être antérieure à aujourd'hui."
+            )
+        return value
+
     def validate(self, data):
         """Validate that end_datetime is after start_datetime."""
-        start_datetime = data.get('start_datetime')
-        end_datetime = data.get('end_datetime')
+        start_datetime = data.get('start_datetime') or (self.instance.start_datetime if self.instance else None)
+        end_datetime = data.get('end_datetime') or (self.instance.end_datetime if self.instance else None)
         
         if start_datetime and end_datetime and end_datetime <= start_datetime:
             raise serializers.ValidationError({

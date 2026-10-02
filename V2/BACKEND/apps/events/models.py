@@ -4,22 +4,17 @@ Event model for company events.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel
 
 User = get_user_model()
 
 
-class Event(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
+class Event(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
     """
     Model for company events (conferences, workshops, webinars, etc.).
     """
-    EVENT_STATUS_CHOICES = [
-        ('UPCOMING', 'À venir'),
-        ('ONGOING', 'En cours'),
-        ('COMPLETED', 'Terminé'),
-        ('CANCELLED', 'Annulé'),
-    ]
-    
     TYPE_CHOICES = [
         ('CONFERENCE', 'Conférence'),
         ('WORKSHOP', 'Atelier'),
@@ -42,7 +37,6 @@ class Event(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     
     location = models.CharField(
         max_length=200,
-        blank=True,
         verbose_name="Lieu"
     )
     
@@ -62,18 +56,15 @@ class Event(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     )
     
     capacity = models.IntegerField(
-        null=True,
-        blank=True,
+        default=50,
         help_text="Nombre maximum de participants",
         verbose_name="Capacité"
     )
     
-    event_status = models.CharField(
-        max_length=20,
-        choices=EVENT_STATUS_CHOICES,
-        default='UPCOMING',
-        verbose_name="Statut de l'événement",
-        help_text="Statut du déroulement de l'événement (À venir, En cours, Terminé)"
+    is_featured = models.BooleanField(
+        default=False,
+        verbose_name="Mettre en avant",
+        help_text="Afficher cet événement en tant qu'événement mis en avant"
     )
     
     created_by = models.ForeignKey(
@@ -97,13 +88,28 @@ class Event(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    def clean(self):
+        """Validate that end_datetime is after start_datetime and start is not in the past."""
+        super().clean()
+        
+        if self.start_datetime and self.end_datetime:
+            if self.end_datetime <= self.start_datetime:
+                raise ValidationError({
+                    'end_datetime': 'La date de fin doit être postérieure à la date de début.'
+                })
+        
+        # Only check if start_datetime is in the past for new events
+        if not self.pk and self.start_datetime:
+            if self.start_datetime < timezone.now():
+                raise ValidationError({
+                    'start_datetime': 'La date de début ne peut pas être antérieure à aujourd\'hui.'
+                })
+
     def is_upcoming(self):
         """Check if event is upcoming."""
-        from django.utils import timezone
         return self.start_datetime > timezone.now()
 
     def is_ongoing(self):
         """Check if event is currently ongoing."""
-        from django.utils import timezone
         now = timezone.now()
         return self.start_datetime <= now <= self.end_datetime
