@@ -220,6 +220,20 @@ class OfferViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @action(detail=True, methods=['post'], url_path='set-to-draft')
+    def set_to_draft(self, request, slug=None):
+        instance = self.get_object()
+        instance.status = 'DRAFT'
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return api_response(
+            success=True,
+            message="Offre remise en brouillon avec succès.",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
     @extend_schema(
         summary="Archiver une offre (Admin)",
         description="Archive une offre publiée"

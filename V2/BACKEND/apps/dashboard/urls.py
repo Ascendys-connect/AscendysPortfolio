@@ -3,7 +3,7 @@ URL configuration for dashboard app.
 """
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ActivityLogViewSet, dashboard_stats, dashboard_charts
+from .views import ActivityLogViewSet, dashboard_stats, dashboard_charts, global_analytics
 
 app_name = 'dashboard'
 
@@ -14,4 +14,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('stats/', dashboard_stats, name='dashboard-stats'),
     path('charts/', dashboard_charts, name='dashboard-charts'),
+    path('global-analytics/', global_analytics, name='dashboard-global-analytics'),
 ]

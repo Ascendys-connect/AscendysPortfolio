@@ -35,10 +35,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['is_featured', 'is_active']
+    filterset_fields = ['is_active']
     search_fields = ['title', 'short_description', 'description']
-    ordering_fields = ['order', 'created_at', 'title']
-    ordering = ['order', '-created_at']
+    ordering_fields = ['created_at', 'title']
+    ordering = ['-created_at']
     lookup_field = 'slug'
 
     def get_serializer_class(self):

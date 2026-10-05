@@ -275,21 +275,18 @@ const AppSidebar: React.FC = () => {
       >
         <Link to="/dashboard">
           {isExpanded || isHovered || isMobileOpen ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center">
               <img
                 src="/ascendys_logo-removebg-preview.png"
                 alt="Ascendys Connect"
-                className="h-21 w-auto"
+                className="h-20 w-auto brightness-100 dark:brightness-0 dark:invert"
               />
-              <span className="text-l font-semibold text-gray-900 dark:text-white">
-                Ascendys Connect
-              </span>
             </div>
           ) : (
             <img
               src="/ascendys_logo-removebg-preview.png"
               alt="Logo"
-              className="h-18 w-auto"
+              className="h-15 w-auto brightness-100 dark:brightness-0 dark:invert"
             />
           )}
         </Link>

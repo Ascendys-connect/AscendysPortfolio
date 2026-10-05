@@ -95,25 +95,25 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
       {
         name: "Articles",
         key: "blogPosts",
-        path: "/blog",
+        path: "/admin/blog/posts",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
       {
         name: "Créer un article",
         key: "createPost",
-        path: "/blog/create",
+        path: "/admin/blog/posts/create",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
       {
         name: "Catégories",
         key: "blogCategories",
-        path: "/blog/categories",
+        path: "/admin/blog/categories",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
       {
         name: "Tags",
         key: "blogTags",
-        path: "/blog/tags",
+        path: "/admin/blog/tags",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
     ],
@@ -153,13 +153,13 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
       {
         name: "Liste des services",
         key: "servicesList",
-        path: "/services",
+        path: "/admin/services",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
       {
         name: "Créer un service",
         key: "createService",
-        path: "/services/create",
+        path: "/admin/services/create",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
     ],
@@ -188,7 +188,7 @@ export const CONTENT_MENU_ITEMS: MenuItem[] = [
     icon: <BoxCubeIcon fontSize={24} />,
     name: "Offres d'emploi",
     key: "offers",
-    path: "/offers",
+    path: "/admin/offers",
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   },
   {
@@ -217,6 +217,13 @@ export const CONTENT_MENU_ITEMS: MenuItem[] = [
  * System menu items (Only for SUPER_ADMIN)
  */
 export const SYSTEM_MENU_ITEMS: MenuItem[] = [
+  {
+    icon: <PieChartIcon fontSize={24} />,
+    name: "Statistiques Globales",
+    key: "globalAnalytics",
+    path: "/analytics",
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+  },
   {
     icon: <PieChartIcon fontSize={24} />,
     name: "Médiathèque",

@@ -4,7 +4,7 @@ Blog models for articles, categories, and tags.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel
+from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel
 
 User = get_user_model()
 
@@ -53,7 +53,7 @@ class Tag(models.Model):
         super().save(*args, **kwargs)
 
 
-class BlogPost(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
+class BlogPost(UUIDModel, TimeStampedModel, PublishableModel):
     """
     Blog post model.
     """
@@ -67,6 +67,13 @@ class BlogPost(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
         blank=True,
         null=True,
         verbose_name="Image de couverture"
+    )
+    
+    video = models.FileField(
+        upload_to='blog/videos/',
+        blank=True,
+        null=True,
+        verbose_name="Vidéo descriptive"
     )
     
     author = models.ForeignKey(

@@ -64,10 +64,6 @@ class OfferSerializer(serializers.ModelSerializer):
             'status_display',
             'is_featured',
             'is_active',
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'og_image',
             'published_at',
             'created_by',
             'created_by_name',
@@ -98,10 +94,6 @@ class OfferCreateUpdateSerializer(serializers.ModelSerializer):
             'end_date',
             'status',
             'is_featured',
-            'seo_title',
-            'seo_description',
-            'seo_keywords',
-            'og_image',
         ]
 
     def validate_title(self, value):

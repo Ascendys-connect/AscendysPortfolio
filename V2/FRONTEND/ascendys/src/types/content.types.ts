@@ -144,3 +144,57 @@ export interface EventFormData {
   status?: ContentStatus | string;
   is_featured: boolean;
 }
+
+// Blog Types
+export interface BlogCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  is_active: boolean;
+  posts_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+  slug: string;
+  posts_count: number;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  cover_image: string | null;
+  video: string | null;
+  category: number | null;
+  category_name?: string;
+  category_slug?: string;
+  author_name?: string;
+  tags: Tag[];
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  status_display?: string;
+  is_featured: boolean;
+  reading_time: number;
+  views_count: number;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlogFormData {
+  title: string;
+  excerpt: string;
+  content: string;
+  cover_image?: File | null;
+  video?: File | null;
+  category: number | null;
+  tags_ids: number[];
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  is_featured: boolean;
+}

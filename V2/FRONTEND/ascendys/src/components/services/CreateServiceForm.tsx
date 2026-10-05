@@ -20,7 +20,6 @@ export default function CreateServiceForm({
     icon: null as File | null,
     is_featured: false,
     is_active: true,
-    order: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -40,10 +39,6 @@ export default function CreateServiceForm({
       newErrors.description = "La description doit contenir au moins 10 caractères";
     }
 
-    if (formData.order < 0) {
-      newErrors.order = "L'ordre doit être un nombre positif";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -60,7 +55,6 @@ export default function CreateServiceForm({
       submitData.append("description", formData.description);
       submitData.append("is_featured", formData.is_featured.toString());
       submitData.append("is_active", formData.is_active.toString());
-      submitData.append("order", formData.order.toString());
       
       if (formData.icon) {
         submitData.append("icon", formData.icon);
@@ -133,26 +127,7 @@ export default function CreateServiceForm({
         </p>
       </div>
 
-      {/* Order */}
-      <div>
-        <Label htmlFor="order">Ordre d'affichage</Label>
-        <input
-          id="order"
-          type="number"
-          min="0"
-          value={formData.order}
-          onChange={(e) =>
-            setFormData({ ...formData, order: parseInt(e.target.value) || 0 })
-          }
-          className="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          disabled={isSubmitting}
-        />
-        {errors.order && (
-          <p className="mt-1 text-xs text-error-600 dark:text-error-400">
-            {errors.order}
-          </p>
-        )}
-      </div>
+
 
       {/* Checkboxes */}
       <div className="space-y-3">

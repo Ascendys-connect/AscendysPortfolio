@@ -23,7 +23,7 @@ export default function AuthLayout({
                   height={60}
                   src="/ascendys_logo-removebg-preview.png"
                   alt="Ascendys Connect"
-                  className="h-auto w-full"
+                  className="h-auto w-full brightness-0 invert"
                 />
               </Link>
 

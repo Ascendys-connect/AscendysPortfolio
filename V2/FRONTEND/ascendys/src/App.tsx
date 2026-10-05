@@ -23,24 +23,31 @@ import EditTraining from "./pages/Trainings/EditTraining";
 import TrainingCategories from "./pages/Trainings/TrainingCategories";
 import CreateTrainingCategory from "./pages/Trainings/CreateTrainingCategory";
 import EditTrainingCategory from "./pages/Trainings/EditTrainingCategory";
-import BlogList from "./pages/Blog/BlogList";
+import BlogPostsList from "./pages/Blog/BlogPostsList";
 import CreateBlogPost from "./pages/Blog/CreateBlogPost";
-import BlogCategories from "./pages/Blog/BlogCategories";
-import BlogTags from "./pages/Blog/BlogTags";
+import EditBlogPost from "./pages/Blog/EditBlogPost";
+import CategoriesList from "./pages/Blog/CategoriesList";
+import CategoryForm from "./pages/Blog/CategoryForm";
+import TagsList from "./pages/Blog/TagsList";
+import TagForm from "./pages/Blog/TagForm";
 import EventsList from "./pages/Events/EventsList";
 import CreateEvent from "./pages/Events/CreateEvent";
 import EditEvent from "./pages/Events/EditEvent";
 import EventsCalendar from "./pages/Events/EventsCalendar";
+import OffersList from "./pages/Services/OffersList";
+import CreateOffer from "./pages/Services/CreateOffer";
+import EditOffer from "./pages/Services/EditOffer";
 import ServicesList from "./pages/Services/ServicesList";
 import CreateService from "./pages/Services/CreateService";
+import EditService from "./pages/Services/EditService";
 import TestimonialsList from "./pages/Content/TestimonialsList";
 import PartnersList from "./pages/Content/PartnersList";
-import OffersList from "./pages/Content/OffersList";
 import ContactMessages from "./pages/Messages/ContactMessages";
 import Newsletter from "./pages/Messages/Newsletter";
 import MediaLibrary from "./pages/System/MediaLibrary";
 import CompanyInfo from "./pages/System/CompanyInfo";
 import ActivityLogs from "./pages/System/ActivityLogs";
+import GlobalAnalytics from "./pages/Analytics/GlobalAnalytics";
 import Settings from "./pages/System/Settings";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/OtherPage/Blank";
@@ -166,15 +173,15 @@ export default function App() {
 
             {/* Blog Management (SUPER_ADMIN + ADMIN + EDITOR) */}
             <Route
-              path="/blog"
+              path="/admin/blog/posts"
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
-                  <BlogList />
+                  <BlogPostsList />
                 </RoleGuard>
               }
             />
             <Route
-              path="/blog/create"
+              path="/admin/blog/posts/create"
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
                   <CreateBlogPost />
@@ -182,18 +189,58 @@ export default function App() {
               }
             />
             <Route
-              path="/blog/categories"
+              path="/admin/blog/posts/edit/:slug"
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
-                  <BlogCategories />
+                  <EditBlogPost />
                 </RoleGuard>
               }
             />
             <Route
-              path="/blog/tags"
+              path="/admin/blog/categories"
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
-                  <BlogTags />
+                  <CategoriesList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/blog/categories/create"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <CategoryForm />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/blog/categories/edit/:slug"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <CategoryForm />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/blog/tags"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <TagsList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/blog/tags/create"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <TagForm />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/blog/tags/edit/:slug"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <TagForm />
                 </RoleGuard>
               }
             />
@@ -234,7 +281,7 @@ export default function App() {
 
             {/* Services Management (SUPER_ADMIN + ADMIN + EDITOR) */}
             <Route
-              path="/services"
+              path="/admin/services"
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
                   <ServicesList />
@@ -242,10 +289,44 @@ export default function App() {
               }
             />
             <Route
-              path="/services/create"
+              path="/admin/services/create"
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
                   <CreateService />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/services/edit/:slug"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <EditService />
+                </RoleGuard>
+              }
+            />
+
+            {/* Offers Management (SUPER_ADMIN + ADMIN) */}
+            <Route
+              path="/admin/offers"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <OffersList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/offers/create"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <CreateOffer />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/offers/edit/:slug"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <EditOffer />
                 </RoleGuard>
               }
             />
@@ -308,6 +389,14 @@ export default function App() {
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN]}>
                   <CompanyInfo />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <GlobalAnalytics />
                 </RoleGuard>
               }
             />

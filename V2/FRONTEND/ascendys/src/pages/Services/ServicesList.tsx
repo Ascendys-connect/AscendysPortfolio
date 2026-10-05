@@ -1,279 +1,168 @@
-import { useState, useCallback } from "react";
-import PageMeta from "@/components/common/PageMeta";
-import PageHeader from "@/components/common/PageHeader";
-import DataTable, { type Column } from "@/components/common/DataTable";
-import SearchBar from "@/components/common/SearchBar";
-import StatusBadge from "@/components/common/StatusBadge";
-import FormModal from "@/components/common/FormModal";
-import ConfirmDialog from "@/components/common/ConfirmDialog";
-import CreateServiceForm from "@/components/services/CreateServiceForm";
-import Button from "@/components/ui/button/Button";
+import { Link } from "react-router";
+import { servicesService, type Service } from "@/services/services.service";
 import { useApi } from "@/hooks/useApi";
-import { servicesService } from "@/services/services.service";
-import type { Service } from "@/types/content.types";
+import PageBreadCrumb from "@/components/common/PageBreadCrumb";
+import { PlusIcon, PencilIcon, TrashBinIcon } from "@/icons";
+import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
+import { useState } from "react";
+
+const getMediaUrl = (path?: string | null) => {
+  if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const backendBase = "http://127.0.0.1:8000";
+  return `${backendBase}${path.startsWith("/") ? "" : "/"}${path}`;
+};
 
 export default function ServicesList() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { data: rawServices, isLoading, refetch } = useApi<{ results: Service[] } | Service[]>(
+    "/services/",
+    { defaultValue: { results: [] } as any }
+  );
 
-  // Fetch services from API
-  const { data: services, isLoading, refetch } = useApi<Service[]>("/services/services/", {
-    defaultValue: [],
+  // DRF may return { count, results: [...] } or a plain array
+  const services: Service[] = Array.isArray(rawServices)
+    ? rawServices
+    : (rawServices as any)?.results ?? [];
+
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; service: Service | null }>({
+    isOpen: false,
+    service: null,
   });
 
-  // Filter services based on search
-  const filteredServices = services.filter((service) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      service.title.toLowerCase().includes(query) ||
-      service.description.toLowerCase().includes(query)
-    );
-  });
-
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query);
-  }, []);
-
-  const handleCreateService = async (data: any) => {
+  const handleDelete = async () => {
+    if (!deleteModal.service) return;
     try {
-      await servicesService.create(data);
-      setIsCreateModalOpen(false);
+      await servicesService.delete(deleteModal.service.slug);
+      setDeleteModal({ isOpen: false, service: null });
       refetch();
     } catch (error) {
-      console.error("Error creating service:", error);
-      throw error;
+      console.error("Erreur:", error);
     }
   };
-
-  const handleDeleteService = async () => {
-    if (!serviceToDelete) return;
-    setIsDeleting(true);
-    try {
-      await servicesService.delete(serviceToDelete.id);
-      setServiceToDelete(null);
-      refetch();
-    } catch (error) {
-      console.error("Error deleting service:", error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  // Table columns definition
-  const columns: Column<Service>[] = [
-    {
-      key: "title",
-      label: "Service",
-      sortable: true,
-      render: (service) => (
-        <div className="flex items-center gap-3">
-          {service.icon && (
-            <div className="flex size-12 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-950/30">
-              <img
-                src={service.icon}
-                alt={service.title}
-                className="size-6"
-              />
-            </div>
-          )}
-          <div className="max-w-md">
-            <div className="font-medium text-gray-800 dark:text-white">
-              {service.title}
-            </div>
-            <div className="mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
-              {service.description}
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "category",
-      label: "Catégorie",
-      sortable: true,
-      render: (service) => (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-          {service.category || "Non catégorisé"}
-        </span>
-      ),
-    },
-    {
-      key: "order",
-      label: "Ordre",
-      sortable: true,
-      render: (service) => (
-        <span className="text-sm text-gray-600 dark:text-gray-400">
-          {service.order}
-        </span>
-      ),
-    },
-    {
-      key: "is_active",
-      label: "Statut",
-      sortable: true,
-      render: (service) => (
-        <StatusBadge status={service.is_active ? "active" : "inactive"} />
-      ),
-    },
-    {
-      key: "created_at",
-      label: "Date de création",
-      sortable: true,
-      render: (service) => (
-        <span className="text-sm text-gray-600 dark:text-gray-400">
-          {new Date(service.created_at).toLocaleDateString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      label: "Actions",
-      render: () => (
-        <div className="flex items-center gap-2">
-          <button
-            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-            title="Modifier"
-          >
-            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              />
-            </svg>
-          </button>
-          <button
-            className="rounded-lg p-2 text-gray-400 transition hover:bg-success-50 hover:text-success-600 dark:hover:bg-success-950/30 dark:hover:text-success-400"
-            title="Déplacer vers le haut"
-          >
-            <svg
-              className="size-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 10l7-7m0 0l7 7m-7-7v18"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => setServiceToDelete(service)}
-            className="rounded-lg p-2 text-gray-400 transition hover:bg-error-50 hover:text-error-600 dark:hover:bg-error-950/30 dark:hover:text-error-400"
-            title="Supprimer"
-          >
-            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
-        </div>
-      ),
-    },
-  ];
 
   return (
     <>
-      <PageMeta
-        title="Gestion des services | Ascendys Connect"
-        description="Gérez les services proposés par la plateforme"
-      />
-
-      <PageHeader
-        title="Services"
-        description="Gérez vos offres de services"
-        actions={
-          <Button
-            size="sm"
-            className="inline-flex items-center gap-2"
-            onClick={() => setIsCreateModalOpen(true)}
+      <PageBreadCrumb pageTitle="Services" />
+      
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Services de l'entreprise</h2>
+          <Link
+            to="/admin/services/create"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
           >
-            <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Créer un service
-          </Button>
-        }
-      />
+            <PlusIcon className="size-4" />
+            Nouveau service
+          </Link>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-800 dark:text-white">
-            {services.length}
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Actifs</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-800 dark:text-white">
-            {services.filter((s) => s.is_active).length}
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Inactifs</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-800 dark:text-white">
-            {services.filter((s) => !s.is_active).length}
-          </p>
-        </div>
+        {isLoading ? (
+          <div className="p-6 text-center text-gray-500">Chargement...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th className="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500">Icône</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500">Image</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500">Nom</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500">Description</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium uppercase text-gray-500">Statut</th>
+                  <th className="px-6 py-3 text-end text-xs font-medium uppercase text-gray-500">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                {services.map((service) => (
+                  <tr key={service.id}>
+                    {/* Icône miniature */}
+                    <td className="px-6 py-4">
+                      {service.icon ? (
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-gray-100 p-2 ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+                          <img
+                            src={getMediaUrl(service.icon) || undefined}
+                            alt={`Icône ${service.title}`}
+                            className="size-full object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-gray-50 text-xs font-medium text-gray-400 ring-1 ring-dashed ring-gray-200 dark:bg-gray-800/40 dark:ring-gray-700">
+                          —
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Image miniature */}
+                    <td className="px-6 py-4">
+                      {service.image ? (
+                        <img
+                          src={getMediaUrl(service.image) || undefined}
+                          alt={service.title}
+                          className="size-12 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-gray-50 text-xs font-medium text-gray-400 ring-1 ring-dashed ring-gray-200 dark:bg-gray-800/40 dark:ring-gray-700">
+                          —
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Nom */}
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-gray-900 dark:text-white">{service.title}</div>
+                      {service.is_featured && (
+                        <span className="text-xs font-medium text-brand-500">⭐ En vedette</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                      {service.short_description}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                        service.is_active 
+                          ? "bg-success-50 text-success-700" 
+                          : "bg-gray-100 text-gray-600"
+                      }`}>
+                        {service.is_active ? "Actif" : "Inactif"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-end">
+                      <div className="flex justify-end gap-2">
+                        <Link 
+                          to={`/admin/services/edit/${service.slug}`} 
+                          className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                          title="Modifier"
+                        >
+                          <PencilIcon className="size-5" />
+                        </Link>
+                        <button
+                          onClick={() => setDeleteModal({ isOpen: true, service })}
+                          className="rounded-lg p-2 text-error-500 transition hover:bg-error-50 dark:hover:bg-error-950/20"
+                          title="Supprimer"
+                        >
+                          <TrashBinIcon className="size-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-4">
-        <SearchBar
-          placeholder="Rechercher un service..."
-          onSearch={handleSearch}
-        />
-      </div>
-
-      {/* Data Table */}
-      <DataTable
-        data={filteredServices}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage="Aucun service trouvé"
-      />
-
-      {/* Create Service Modal */}
-      <FormModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Créer un service"
-      >
-        <CreateServiceForm
-          onSubmit={handleCreateService}
-          onCancel={() => setIsCreateModalOpen(false)}
-        />
-      </FormModal>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={!!serviceToDelete}
-        onClose={() => setServiceToDelete(null)}
-        onConfirm={handleDeleteService}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, service: null })}
+        onConfirm={handleDelete}
         title="Supprimer le service"
-        message={`Êtes-vous sûr de vouloir supprimer le service "${serviceToDelete?.title}" ? Cette action est irréversible.`}
-        variant="danger"
-        isLoading={isDeleting}
+        message={`Êtes-vous sûr de vouloir supprimer le service "${deleteModal.service?.title}" ?`}
       />
     </>
   );

@@ -42,15 +42,95 @@ export interface UploadProgress {
   percentage: number;
 }
 
+export interface GrowthMetric {
+  this_month: number;
+  last_month: number;
+  growth_rate: number;
+  growth_formatted: string;
+  growth_direction: 'up' | 'down' | 'neutral';
+}
+
 // Dashboard Statistics
 export interface DashboardStats {
-  users_count: number;
-  trainings_count: number;
-  blog_posts_count: number;
-  events_count: number;
-  media_files_count: number;
-  contact_messages_count: number;
-  testimonials_count: number;
-  partners_count: number;
-  newsletter_subscribers_count: number;
+  // Flat counts for backwards compatibility
+  users_count?: number;
+  trainings_count?: number;
+  blog_posts_count?: number;
+  events_count?: number;
+  media_files_count?: number;
+  contact_messages_count?: number;
+  testimonials_count?: number;
+  partners_count?: number;
+  newsletter_subscribers_count?: number;
+  services_count?: number;
+  offers_count?: number;
+
+  trainings: GrowthMetric & {
+    total: number;
+    published: number;
+    draft: number;
+    archived?: number;
+    monthly_growth?: number;
+  };
+  blog_posts: GrowthMetric & {
+    total: number;
+    published: number;
+    draft: number;
+    monthly_growth?: number;
+  };
+  events: GrowthMetric & {
+    total: number;
+    published?: number;
+    draft?: number;
+    upcoming: number;
+    past: number;
+    monthly_growth?: number;
+  };
+  media_files?: GrowthMetric & {
+    total: number;
+    images: number;
+    documents: number;
+    videos: number;
+  };
+  contact_messages: GrowthMetric & {
+    total: number;
+    new: number;
+    in_progress?: number;
+    resolved?: number;
+    last_7_days?: number;
+    monthly_growth?: number;
+  };
+  newsletter_subscribers: GrowthMetric & {
+    total: number;
+    active: number;
+    monthly_growth?: number;
+  };
+  users: GrowthMetric & {
+    total: number;
+    admins: number;
+    super_admins: number;
+    editors?: number;
+    active?: number;
+    monthly_growth?: number;
+  };
+  testimonials: {
+    total: number;
+    published: number;
+  };
+  partners: {
+    total: number;
+    active: number;
+  };
+  services?: {
+    total: number;
+    active: number;
+  };
+  offers?: {
+    total: number;
+    active: number;
+  };
+  recent_activities?: {
+    last_7_days: number;
+    last_30_days: number;
+  };
 }

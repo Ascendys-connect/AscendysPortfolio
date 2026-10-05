@@ -10,12 +10,12 @@ class ServiceAdmin(admin.ModelAdmin):
     """
     Admin for Service model.
     """
-    list_display = ['title', 'slug', 'is_featured', 'is_active', 'order', 'created_at']
+    list_display = ['title', 'slug', 'is_featured', 'is_active', 'created_at']
     list_filter = ['is_featured', 'is_active', 'created_at']
     search_fields = ['title', 'short_description', 'description']
     prepopulated_fields = {'slug': ('title',)}
-    ordering = ['order', '-created_at']
-    
+    ordering = ['-created_at']
+
     fieldsets = (
         ('Informations principales', {
             'fields': ('title', 'slug', 'short_description', 'description')
@@ -27,7 +27,7 @@ class ServiceAdmin(admin.ModelAdmin):
             'fields': ('features',)
         }),
         ('Configuration', {
-            'fields': ('order', 'is_featured', 'is_active')
+            'fields': ('is_featured', 'is_active')
         }),
         ('SEO', {
             'fields': ('seo_title', 'seo_description', 'seo_keywords', 'og_image'),

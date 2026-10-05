@@ -238,3 +238,21 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             data=serializer.data,
             status_code=status.HTTP_200_OK
         )
+
+    @extend_schema(
+        summary="Mettre en brouillon (Admin)",
+        description="Remet un article en brouillon"
+    )
+    @action(detail=True, methods=['post'], url_path='set-to-draft')
+    def set_to_draft(self, request, slug=None):
+        instance = self.get_object()
+        instance.status = 'DRAFT'
+        instance.save()
+        
+        serializer = self.get_serializer(instance)
+        return api_response(
+            success=True,
+            message="Article remis en brouillon avec succès.",
+            data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )

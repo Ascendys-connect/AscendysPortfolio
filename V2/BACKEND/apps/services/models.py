@@ -17,10 +17,11 @@ class Service(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     slug = models.SlugField(max_length=250, unique=True, verbose_name="Slug")
     short_description = models.TextField(max_length=300, verbose_name="Description courte")
     description = models.TextField(verbose_name="Description complète")
-    icon = models.CharField(
-        max_length=100,
+    icon = models.FileField(
+        upload_to='services/icons/',
         blank=True,
-        help_text="Nom de l'icône (ex: 'FaCode', 'FaMobile')",
+        null=True,
+        help_text="Icône ou image du service (SVG, PNG, etc.)",
         verbose_name="Icône"
     )
     image = models.ImageField(
@@ -34,11 +35,6 @@ class Service(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
         blank=True,
         help_text="Liste des fonctionnalités du service",
         verbose_name="Fonctionnalités"
-    )
-    order = models.IntegerField(
-        default=0,
-        help_text="Ordre d'affichage (croissant)",
-        verbose_name="Ordre"
     )
     is_active = models.BooleanField(
         default=True,
@@ -55,7 +51,7 @@ class Service(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
     class Meta:
         verbose_name = "Service"
         verbose_name_plural = "Services"
-        ordering = ['order', '-created_at']
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.title

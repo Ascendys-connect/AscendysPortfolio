@@ -1,31 +1,37 @@
-import PageMeta from "@/components/common/PageMeta";
-import PageHeader from "@/components/common/PageHeader";
-import CreateServiceForm from "@/components/services/CreateServiceForm";
-import { servicesService } from "@/services/services.service";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useToast } from "@/context/ToastContext";
+import { servicesService, type ServiceFormData } from "@/services/services.service";
+import PageBreadCrumb from "@/components/common/PageBreadCrumb";
+import ServiceForm from "@/components/services/ServiceForm";
 
 export default function CreateService() {
   const navigate = useNavigate();
-  const { showSuccess, showError } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateService = async (data: any) => {
+  const handleSubmit = async (data: ServiceFormData) => {
+    setLoading(true);
     try {
       await servicesService.create(data);
-      showSuccess("Service créé", "Le service a été créé avec succès");
-      navigate("/services");
+      navigate("/admin/services");
     } catch (error: any) {
-      showError("Erreur de création", error.message || "Impossible de créer le service");
-      throw error;
+      console.error("Erreur création:", error);
+      const msg = error.response?.data?.message || error.message || "Erreur lors de la création du service";
+      const errorsObj = error.response?.data?.errors;
+      const details = errorsObj && typeof errorsObj === 'object'
+        ? Object.entries(errorsObj).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('\n')
+        : '';
+      alert(details ? `${msg}\n\n${details}` : msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <PageMeta title="Créer un service | Ascendys Connect" description="Créer un nouveau service" />
-      <PageHeader title="Créer un service" description="Ajoutez un nouveau service à votre catalogue" breadcrumbs={[{ label: "Services", path: "/services" }, { label: "Créer" }]} />
-      <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-        <CreateServiceForm onSubmit={handleCreateService} onCancel={() => navigate("/services")} />
+      <PageBreadCrumb pageTitle="Nouveau service" />
+      
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <ServiceForm onSubmit={handleSubmit} loading={loading} />
       </div>
     </>
   );
