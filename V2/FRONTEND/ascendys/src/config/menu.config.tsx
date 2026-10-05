@@ -7,6 +7,9 @@ import {
   PageIcon,
   BoxCubeIcon,
   PieChartIcon,
+  TaskIcon,
+  GroupIcon,
+  ChatIcon,
 } from "@/icons";
 
 export type MenuItem = {
@@ -171,25 +174,64 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
  */
 export const CONTENT_MENU_ITEMS: MenuItem[] = [
   {
-    icon: <BoxCubeIcon fontSize={24} />,
+    icon: <ChatIcon fontSize={24} />,
     name: "Témoignages",
     key: "testimonials",
-    path: "/testimonials",
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+    subItems: [
+      {
+        name: "Liste des témoignages",
+        key: "testimonialsList",
+        path: "/admin/testimonials",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+      {
+        name: "Ajouter un témoignage",
+        key: "createTestimonial",
+        path: "/admin/testimonials/create",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+    ],
   },
   {
-    icon: <BoxCubeIcon fontSize={24} />,
+    icon: <GroupIcon fontSize={24} />,
     name: "Partenaires",
     key: "partners",
-    path: "/partners",
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+    subItems: [
+      {
+        name: "Liste des partenaires",
+        key: "partnersList",
+        path: "/admin/partners",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+      {
+        name: "Ajouter un partenaire",
+        key: "createPartner",
+        path: "/admin/partners/create",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+    ],
   },
   {
-    icon: <BoxCubeIcon fontSize={24} />,
+    icon: <TaskIcon fontSize={24} />,
     name: "Offres d'emploi",
     key: "offers",
-    path: "/admin/offers",
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+    subItems: [
+      {
+        name: "Liste des offres",
+        key: "offersList",
+        path: "/admin/offers",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+      {
+        name: "Créer une offre",
+        key: "createOffer",
+        path: "/admin/offers/create",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+      },
+    ],
   },
   {
     icon: <PageIcon fontSize={24} />,

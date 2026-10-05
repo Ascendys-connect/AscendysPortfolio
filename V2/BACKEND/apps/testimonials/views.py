@@ -32,7 +32,7 @@ class TestimonialViewSet(viewsets.ModelViewSet):
     - toggle_published: Toggle published status
     - toggle_featured: Toggle featured status
     """
-    queryset = Testimonial.objects.all()
+    queryset = Testimonial.objects.filter(is_deleted=False)
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['is_featured', 'is_published', 'rating']
@@ -180,7 +180,7 @@ class TestimonialViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_object()
         testimonial_name = f"{instance.name} - {instance.company}"
-        self.perform_destroy(instance)
+        instance.soft_delete()
         return Response({
             'success': True,
             'message': f'Témoignage "{testimonial_name}" supprimé avec succès',

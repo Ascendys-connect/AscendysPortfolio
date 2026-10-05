@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { blogCategoriesService, type BlogCategory } from "@/services/blog.service";
 import { useApi } from "@/hooks/useApi";
+import { useToast } from "@/context/ToastContext";
 import PageBreadCrumb from "@/components/common/PageBreadCrumb";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { PlusIcon, PencilIcon, TrashBinIcon } from "@/icons";
 
 export default function CategoriesList() {
   const { data: categories = [], loading, refetch } = useApi<BlogCategory[]>("/blog/categories/", { defaultValue: [] });
+  const { showError, showWarning } = useToast();
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; category: BlogCategory | null }>({
     isOpen: false,
     category: null,
@@ -22,7 +24,10 @@ export default function CategoriesList() {
     
     // Check if category has posts
     if (deleteModal.category.posts_count > 0) {
-      alert(`Impossible de supprimer cette catégorie. Elle contient ${deleteModal.category.posts_count} article(s).`);
+      showWarning(
+        "Suppression impossible",
+        `Cette catégorie contient ${deleteModal.category.posts_count} article(s) et ne peut pas être supprimée.`
+      );
       setDeleteModal({ isOpen: false, category: null });
       return;
     }
@@ -33,7 +38,7 @@ export default function CategoriesList() {
       setDeleteModal({ isOpen: false, category: null });
     } catch (error) {
       console.error("Erreur suppression:", error);
-      alert("Erreur lors de la suppression de la catégorie.");
+      showError("Erreur de suppression", "Une erreur est survenue lors de la suppression de la catégorie.");
     }
   };
 

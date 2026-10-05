@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { type OfferFormData } from "@/services/offers.service";
+import { useToast } from "@/context/ToastContext";
 import ImageUploader from "@/components/form/ImageUploader";
 
 interface OfferFormProps {
@@ -9,28 +10,36 @@ interface OfferFormProps {
 }
 
 const TYPE_CHOICES = [
+  { value: 'RECRUITMENT', label: 'Recrutement / Emploi' },
   { value: 'TRAINING', label: 'Formation' },
   { value: 'PROMOTION', label: 'Promotion' },
   { value: 'EVENT', label: 'Événement' },
-  { value: 'RECRUITMENT', label: 'Recrutement' },
   { value: 'ANNOUNCEMENT', label: 'Annonce' },
   { value: 'OTHER', label: 'Autre' },
 ];
 
 export default function OfferForm({ initialData, onSubmit, loading }: OfferFormProps) {
+  const { showError } = useToast();
   const [formData, setFormData] = useState<OfferFormData>({
     title: "",
     short_description: "",
     description: "",
     image: null,
     banner: null,
-    type: "ANNOUNCEMENT",
+    type: "RECRUITMENT",
     start_date: "",
     end_date: "",
     status: "DRAFT",
     is_featured: false,
     ...initialData,
   });
+
+  // Track field-level errors
+  const [errors, setErrors] = useState<{
+    start_date?: string;
+    end_date?: string;
+    image?: string;
+  }>({});
 
   useEffect(() => {
     if (initialData) {
@@ -41,10 +50,54 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
     }
   }, [initialData]);
 
+  const hasImage = (): boolean => {
+    const img = formData.image;
+    const ban = formData.banner;
+    return !!(img && img !== "") || !!(ban && ban !== "");
+  };
+
+  const validate = (): boolean => {
+    const newErrors: typeof errors = {};
+
+    if (!formData.start_date) {
+      newErrors.start_date = "La date de début est obligatoire.";
+    }
+    if (!formData.end_date) {
+      newErrors.end_date = "La date de fin est obligatoire.";
+    }
+    if (formData.start_date && formData.end_date && formData.end_date < formData.start_date) {
+      newErrors.end_date = "La date de fin doit être postérieure à la date de début.";
+    }
+    if (!hasImage()) {
+      newErrors.image = "Veuillez ajouter au moins une image ou une bannière.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      showError(
+        "Formulaire incomplet",
+        Object.values(newErrors)[0]
+      );
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (validate()) {
+      onSubmit(formData);
+    }
   };
+
+  const inputClass = (hasError?: string) =>
+    `w-full rounded-lg border px-4 py-2 text-gray-900 dark:bg-gray-800 dark:text-white ${
+      hasError
+        ? "border-error-500 focus:ring-error-300 dark:border-error-500"
+        : "border-gray-200 dark:border-gray-800"
+    }`;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -60,7 +113,7 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              className={inputClass()}
             />
           </div>
 
@@ -75,7 +128,7 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
               required
               maxLength={300}
               rows={3}
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              className={inputClass()}
             />
             <p className="mt-1 text-xs text-gray-500">{formData.short_description?.length || 0}/300 caractères</p>
           </div>
@@ -90,7 +143,7 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
               rows={12}
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              className={inputClass()}
             />
           </div>
         </div>
@@ -105,7 +158,7 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               required
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              className={inputClass()}
             >
               {TYPE_CHOICES.map((type) => (
                 <option key={type.value} value={type.value}>{type.label}</option>
@@ -113,25 +166,43 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
             </select>
           </div>
 
-          {/* Dates */}
+          {/* Date de début */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Date de début</label>
+            <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+              Date de début <span className="text-error-500">*</span>
+            </label>
             <input
               type="date"
               value={formData.start_date}
-              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              onChange={(e) => {
+                setFormData({ ...formData, start_date: e.target.value });
+                if (errors.start_date) setErrors(prev => ({ ...prev, start_date: undefined }));
+              }}
+              className={inputClass(errors.start_date)}
             />
+            {errors.start_date && (
+              <p className="mt-1 text-xs text-error-500">{errors.start_date}</p>
+            )}
           </div>
 
+          {/* Date de fin */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Date de fin</label>
+            <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+              Date de fin <span className="text-error-500">*</span>
+            </label>
             <input
               type="date"
               value={formData.end_date}
-              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              min={formData.start_date || undefined}
+              onChange={(e) => {
+                setFormData({ ...formData, end_date: e.target.value });
+                if (errors.end_date) setErrors(prev => ({ ...prev, end_date: undefined }));
+              }}
+              className={inputClass(errors.end_date)}
             />
+            {errors.end_date && (
+              <p className="mt-1 text-xs text-error-500">{errors.end_date}</p>
+            )}
           </div>
 
           {/* Statut */}
@@ -140,7 +211,7 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              className="w-full rounded-lg border border-gray-200 px-4 py-2 text-gray-900 dark:border-gray-800 dark:bg-gray-800 dark:text-white"
+              className={inputClass()}
             >
               <option value="DRAFT">Brouillon</option>
               <option value="PUBLISHED">Publié</option>
@@ -160,19 +231,39 @@ export default function OfferForm({ initialData, onSubmit, loading }: OfferFormP
             <label htmlFor="is_featured" className="text-sm text-gray-900 dark:text-white">Offre en vedette</label>
           </div>
 
-          {/* Image */}
-          <ImageUploader
-            label="Image"
-            currentImage={typeof formData.image === 'string' ? formData.image : undefined}
-            onImageSelect={(file) => setFormData({ ...formData, image: file })}
-          />
+          {/* Image + Bannière — au moins une requise */}
+          <div className={`rounded-lg p-3 ${errors.image ? "border border-error-500 bg-error-50 dark:bg-error-900/10" : ""}`}>
+            <p className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Visuels <span className="text-error-500">*</span>
+              <span className="ml-1 text-xs font-normal text-gray-500">(au moins une image ou bannière)</span>
+            </p>
 
-          {/* Bannière */}
-          <ImageUploader
-            label="Bannière"
-            currentImage={typeof formData.banner === 'string' ? formData.banner : undefined}
-            onImageSelect={(file) => setFormData({ ...formData, banner: file })}
-          />
+            {/* Image */}
+            <div className="mb-3">
+              <ImageUploader
+                label="Image"
+                currentImage={typeof formData.image === 'string' ? formData.image : undefined}
+                onImageSelect={(file) => {
+                  setFormData({ ...formData, image: file });
+                  if (errors.image) setErrors(prev => ({ ...prev, image: undefined }));
+                }}
+              />
+            </div>
+
+            {/* Bannière */}
+            <ImageUploader
+              label="Bannière"
+              currentImage={typeof formData.banner === 'string' ? formData.banner : undefined}
+              onImageSelect={(file) => {
+                setFormData({ ...formData, banner: file });
+                if (errors.image) setErrors(prev => ({ ...prev, image: undefined }));
+              }}
+            />
+
+            {errors.image && (
+              <p className="mt-2 text-xs text-error-500">{errors.image}</p>
+            )}
+          </div>
 
           {/* Actions */}
           <button

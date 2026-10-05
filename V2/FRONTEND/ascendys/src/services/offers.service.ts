@@ -45,13 +45,13 @@ export const offersService = {
     formData.append('title', data.title);
     formData.append('short_description', data.short_description);
     formData.append('description', data.description);
-    if (data.image) formData.append('image', data.image);
-    if (data.banner) formData.append('banner', data.banner);
+    if (data.image instanceof File) formData.append('image', data.image);
+    if (data.banner instanceof File) formData.append('banner', data.banner);
     formData.append('type', data.type);
     if (data.start_date) formData.append('start_date', data.start_date);
     if (data.end_date) formData.append('end_date', data.end_date);
     formData.append('status', data.status);
-    formData.append('is_featured', data.is_featured.toString());
+    formData.append('is_featured', data.is_featured ? 'true' : 'false');
     
     return apiService.post<Offer>('/offers/', formData);
   },
@@ -61,13 +61,13 @@ export const offersService = {
     formData.append('title', data.title);
     formData.append('short_description', data.short_description);
     formData.append('description', data.description);
-    if (data.image) formData.append('image', data.image);
-    if (data.banner) formData.append('banner', data.banner);
+    if (data.image instanceof File) formData.append('image', data.image);
+    if (data.banner instanceof File) formData.append('banner', data.banner);
     formData.append('type', data.type);
     if (data.start_date) formData.append('start_date', data.start_date);
     if (data.end_date) formData.append('end_date', data.end_date);
     formData.append('status', data.status);
-    formData.append('is_featured', data.is_featured.toString());
+    formData.append('is_featured', data.is_featured ? 'true' : 'false');
     
     return apiService.put<Offer>(`/offers/${slug}/`, formData);
   },

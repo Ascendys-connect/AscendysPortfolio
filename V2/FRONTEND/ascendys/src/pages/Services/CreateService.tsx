@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { servicesService, type ServiceFormData } from "@/services/services.service";
+import { useToast } from "@/context/ToastContext";
 import PageBreadCrumb from "@/components/common/PageBreadCrumb";
 import ServiceForm from "@/components/services/ServiceForm";
 
 export default function CreateService() {
   const navigate = useNavigate();
+  const { showError } = useToast();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (data: ServiceFormData) => {
@@ -18,9 +20,9 @@ export default function CreateService() {
       const msg = error.response?.data?.message || error.message || "Erreur lors de la création du service";
       const errorsObj = error.response?.data?.errors;
       const details = errorsObj && typeof errorsObj === 'object'
-        ? Object.entries(errorsObj).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('\n')
+        ? Object.entries(errorsObj).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ')
         : '';
-      alert(details ? `${msg}\n\n${details}` : msg);
+      showError("Erreur de création", details ? `${msg} — ${details}` : msg);
     } finally {
       setLoading(false);
     }

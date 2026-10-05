@@ -1,193 +1,201 @@
 import { useState, type FormEvent } from "react";
-import Label from "@/components/form/Label";
-import Input from "@/components/form/input/InputField";
-import Button from "@/components/ui/button/Button";
-import RatingInput from "@/components/form/RatingInput";
+import { StarFill } from "@/icons";
 import ImageUploader from "@/components/form/ImageUploader";
-
-interface TestimonialFormData {
-  client_name: string;
-  client_position: string;
-  company: string;
-  content: string;
-  rating: number;
-  client_photo?: File | null;
-}
+import type { Testimonial, TestimonialFormData } from "@/types/content.types";
 
 interface CreateTestimonialFormProps {
   onSubmit: (data: TestimonialFormData) => Promise<void>;
   onCancel: () => void;
+  initialData?: Testimonial | Partial<TestimonialFormData> | null;
 }
 
-export default function CreateTestimonialForm({ onSubmit, onCancel }: CreateTestimonialFormProps) {
+export default function CreateTestimonialForm({ onSubmit, onCancel, initialData }: CreateTestimonialFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<TestimonialFormData>({
-    client_name: "",
-    client_position: "",
-    company: "",
-    content: "",
-    rating: 5,
-    client_photo: null,
+    name: initialData?.name || "",
+    role: initialData?.role || "",
+    company: initialData?.company || "",
+    content: initialData?.content || "",
+    rating: initialData?.rating ?? 5,
+    avatar: initialData?.avatar || null,
+    is_featured: initialData?.is_featured ?? false,
+    is_published: initialData?.is_published ?? true,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-
-    if (!formData.client_name || formData.client_name.trim().length < 3) {
-      newErrors.client_name = "Le nom doit contenir au moins 3 caractères";
-    }
-
-    if (!formData.company || formData.company.trim().length < 2) {
-      newErrors.company = "L'entreprise doit contenir au moins 2 caractères";
-    }
-
-    if (!formData.content || formData.content.trim().length < 20) {
-      newErrors.content = "Le témoignage doit contenir au moins 20 caractères";
-    }
-
-    if (formData.rating < 1 || formData.rating > 5) {
-      newErrors.rating = "La note doit être entre 1 et 5";
-    }
-
+    if (!formData.name.trim() || formData.name.trim().length < 2)
+      newErrors.name = "Le nom doit contenir au moins 2 caractères.";
+    if (!formData.role.trim())
+      newErrors.role = "La fonction/poste est obligatoire.";
+    if (!formData.content.trim() || formData.content.trim().length < 20)
+      newErrors.content = "Le témoignage doit contenir au moins 20 caractères.";
+    if (formData.rating < 1 || formData.rating > 5)
+      newErrors.rating = "La note doit être entre 1 et 5.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (!validate()) {
-      return;
-    }
-
+    if (!validate()) return;
     setIsLoading(true);
     try {
       await onSubmit(formData);
     } catch (error) {
-      console.error("Error creating testimonial:", error);
+      console.error("Erreur création témoignage:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = (field: keyof TestimonialFormData, value: any) => {
+  const set = (field: keyof TestimonialFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  const handlePhotoChange = (file: File | null, previewUrl: string | null) => {
-    setFormData((prev) => ({ ...prev, client_photo: file }));
-    setPhotoPreview(previewUrl);
-  };
+  const inputClass = (field?: string) =>
+    `w-full rounded-lg border px-3 py-2 text-sm text-gray-900 dark:bg-gray-800 dark:text-white ${
+      field && errors[field]
+        ? "border-error-500"
+        : "border-gray-200 dark:border-gray-700"
+    } focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50`;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Client Name */}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Nom */}
       <div>
-        <Label>
-          Nom du client <span className="text-error-500">*</span>
-        </Label>
-        <Input
+        <label className="mb-1 block text-sm font-medium text-gray-900 dark:text-white">
+          Nom <span className="text-error-500">*</span>
+        </label>
+        <input
           type="text"
-          value={formData.client_name}
-          onChange={(e) => handleChange("client_name", e.target.value)}
+          value={formData.name}
+          onChange={(e) => set("name", e.target.value)}
           placeholder="Ex: Jean Kouassi"
           disabled={isLoading}
+          className={inputClass("name")}
         />
-        {errors.client_name && (
-          <p className="mt-1 text-sm text-error-600 dark:text-error-400">{errors.client_name}</p>
-        )}
+        {errors.name && <p className="mt-1 text-xs text-error-500">{errors.name}</p>}
       </div>
 
-      {/* Position & Company */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {/* Poste & Entreprise */}
+      <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Poste</Label>
-          <Input
+          <label className="mb-1 block text-sm font-medium text-gray-900 dark:text-white">
+            Fonction <span className="text-error-500">*</span>
+          </label>
+          <input
             type="text"
-            value={formData.client_position}
-            onChange={(e) => handleChange("client_position", e.target.value)}
+            value={formData.role}
+            onChange={(e) => set("role", e.target.value)}
             placeholder="Directeur Général"
             disabled={isLoading}
+            className={inputClass("role")}
           />
+          {errors.role && <p className="mt-1 text-xs text-error-500">{errors.role}</p>}
         </div>
         <div>
-          <Label>
-            Entreprise <span className="text-error-500">*</span>
-          </Label>
-          <Input
+          <label className="mb-1 block text-sm font-medium text-gray-900 dark:text-white">Entreprise</label>
+          <input
             type="text"
             value={formData.company}
-            onChange={(e) => handleChange("company", e.target.value)}
+            onChange={(e) => set("company", e.target.value)}
             placeholder="Orange CI"
             disabled={isLoading}
+            className={inputClass()}
           />
-          {errors.company && (
-            <p className="mt-1 text-sm text-error-600 dark:text-error-400">{errors.company}</p>
-          )}
         </div>
       </div>
 
-      {/* Content */}
+      {/* Témoignage */}
       <div>
-        <Label>
+        <label className="mb-1 block text-sm font-medium text-gray-900 dark:text-white">
           Témoignage <span className="text-error-500">*</span>
-        </Label>
+        </label>
         <textarea
           value={formData.content}
-          onChange={(e) => handleChange("content", e.target.value)}
-          placeholder="Partagez votre expérience avec Ascendys Connect..."
-          rows={5}
+          onChange={(e) => set("content", e.target.value)}
+          placeholder="Partagez votre expérience..."
+          rows={4}
           disabled={isLoading}
-          className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+          className={inputClass("content")}
         />
-        {errors.content && (
-          <p className="mt-1 text-sm text-error-600 dark:text-error-400">{errors.content}</p>
-        )}
+        {errors.content && <p className="mt-1 text-xs text-error-500">{errors.content}</p>}
       </div>
 
-      {/* Rating */}
+      {/* Note (étoiles) */}
       <div>
-        <RatingInput
-          label="Note"
-          value={formData.rating}
-          onChange={(rating) => handleChange("rating", rating)}
-          disabled={isLoading}
-        />
-        {errors.rating && (
-          <p className="mt-1 text-sm text-error-600 dark:text-error-400">{errors.rating}</p>
-        )}
+        <label className="mb-1 block text-sm font-medium text-gray-900 dark:text-white">
+          Note <span className="text-error-500">*</span>
+        </label>
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => set("rating", star)}
+              disabled={isLoading}
+              className="p-0.5 transition-transform hover:scale-110"
+            >
+              <StarFill
+                className={`size-7 ${star <= formData.rating ? "text-warning-400" : "text-gray-200 dark:text-gray-700"}`}
+              />
+            </button>
+          ))}
+          <span className="ml-2 text-sm text-gray-500">{formData.rating}/5</span>
+        </div>
       </div>
 
-      {/* Client Photo */}
+      {/* Photo */}
       <div>
         <ImageUploader
-          label="Photo du client"
-          value={photoPreview || undefined}
-          onChange={handlePhotoChange}
-          accept="image/jpeg,image/png,image/webp"
-          maxSizeMB={2}
+          label="Photo du client (optionnel)"
+          value={typeof formData.avatar === "string" ? formData.avatar : undefined}
+          onImageSelect={(file) => set("avatar", file)}
         />
+      </div>
+
+      {/* Options */}
+      <div className="flex flex-wrap gap-4">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+          <input
+            type="checkbox"
+            checked={formData.is_published}
+            onChange={(e) => set("is_published", e.target.checked)}
+            className="size-4 rounded border-gray-300"
+          />
+          Publier immédiatement
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+          <input
+            type="checkbox"
+            checked={formData.is_featured}
+            onChange={(e) => set("is_featured", e.target.checked)}
+            className="size-4 rounded border-gray-300"
+          />
+          Mettre en avant
+        </label>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-end gap-3 pt-4">
-        <Button
+      <div className="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+        <button
           type="button"
-          variant="secondary"
-          size="sm"
           onClick={onCancel}
           disabled={isLoading}
+          className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300"
         >
           Annuler
-        </Button>
-        <Button type="submit" size="sm" disabled={isLoading}>
-          {isLoading ? "Création..." : "Ajouter le témoignage"}
-        </Button>
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50"
+        >
+          {isLoading ? "Enregistrement..." : initialData ? "Mettre à jour" : "Ajouter le témoignage"}
+        </button>
       </div>
     </form>
   );

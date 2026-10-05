@@ -1,4 +1,4 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router";
+import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import AppLayout from "./layout/AppLayout";
 import Home from "./pages/Public/Home";
@@ -42,6 +42,8 @@ import CreateService from "./pages/Services/CreateService";
 import EditService from "./pages/Services/EditService";
 import TestimonialsList from "./pages/Content/TestimonialsList";
 import PartnersList from "./pages/Content/PartnersList";
+import CreateTestimonialPage from "./pages/Content/CreateTestimonialPage";
+import CreatePartnerPage from "./pages/Content/CreatePartnerPage";
 import ContactMessages from "./pages/Messages/ContactMessages";
 import Newsletter from "./pages/Messages/Newsletter";
 import MediaLibrary from "./pages/System/MediaLibrary";
@@ -172,6 +174,10 @@ export default function App() {
             />
 
             {/* Blog Management (SUPER_ADMIN + ADMIN + EDITOR) */}
+            <Route
+              path="/admin/blog"
+              element={<Navigate to="/admin/blog/posts" replace />}
+            />
             <Route
               path="/admin/blog/posts"
               element={
@@ -331,7 +337,43 @@ export default function App() {
               }
             />
 
-            {/* Content Management (SUPER_ADMIN + ADMIN) */}
+            {/* Content Management — Testimonials */}
+            <Route
+              path="/admin/testimonials"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <TestimonialsList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/testimonials/create"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <CreateTestimonialPage />
+                </RoleGuard>
+              }
+            />
+
+            {/* Content Management — Partners */}
+            <Route
+              path="/admin/partners"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <PartnersList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/partners/create"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <CreatePartnerPage />
+                </RoleGuard>
+              }
+            />
+
+            {/* Legacy redirects */}
             <Route
               path="/testimonials"
               element={
@@ -345,14 +387,6 @@ export default function App() {
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
                   <PartnersList />
-                </RoleGuard>
-              }
-            />
-            <Route
-              path="/offers"
-              element={
-                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
-                  <OffersList />
                 </RoleGuard>
               }
             />

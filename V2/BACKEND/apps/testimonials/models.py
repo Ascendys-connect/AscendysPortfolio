@@ -3,10 +3,10 @@ Testimonial model for client feedback.
 """
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from apps.core.models import TimeStampedModel
+from apps.core.models import TimeStampedModel, SoftDeleteModel
 
 
-class Testimonial(TimeStampedModel):
+class Testimonial(TimeStampedModel, SoftDeleteModel):
     """
     Model for client testimonials.
     """

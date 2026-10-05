@@ -32,7 +32,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
     - partial_update: PATCH /api/v1/services/{id}/
     - destroy: DELETE /api/v1/services/{id}/
     """
-    queryset = Service.objects.all()
+    queryset = Service.objects.filter(is_deleted=False)
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['is_active']
@@ -198,11 +198,11 @@ class ServiceViewSet(viewsets.ModelViewSet):
         Delete a service (admin only).
         """
         instance = self.get_object()
-        instance.delete()
+        instance.soft_delete()
         return api_response(
             success=True,
             message="Service supprimé avec succès.",
-            status_code=status.HTTP_204_NO_CONTENT
+            status_code=status.HTTP_200_OK
         )
 
     @extend_schema(

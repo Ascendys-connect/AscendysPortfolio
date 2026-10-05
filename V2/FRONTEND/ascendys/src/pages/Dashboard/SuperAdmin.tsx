@@ -468,7 +468,7 @@ export default function SuperAdminDashboard() {
           </Link>
 
           <Link
-            to="/admin/blog"
+            to="/admin/blog/posts"
             className="group flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-5 text-center transition hover:border-orange-500 hover:shadow-theme-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-orange-500"
           >
             <div className="flex size-12 items-center justify-center rounded-xl bg-orange-50 text-orange-600 transition group-hover:scale-110 dark:bg-orange-950/40 dark:text-orange-400">

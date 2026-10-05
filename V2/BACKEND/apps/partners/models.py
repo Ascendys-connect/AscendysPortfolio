@@ -2,10 +2,10 @@
 Partner model for company partnerships.
 """
 from django.db import models
-from apps.core.models import TimeStampedModel
+from apps.core.models import TimeStampedModel, SoftDeleteModel
 
 
-class Partner(TimeStampedModel):
+class Partner(TimeStampedModel, SoftDeleteModel):
     """
     Model for company partners and clients.
     """

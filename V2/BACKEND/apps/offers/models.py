@@ -4,12 +4,12 @@ Offer model for announcements, promotions, and special offers.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel
+from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel
 
 User = get_user_model()
 
 
-class Offer(UUIDModel, TimeStampedModel, PublishableModel):
+class Offer(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
     """
     Model for company offers, announcements, and promotions.
     """

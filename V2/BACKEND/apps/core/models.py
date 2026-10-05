@@ -49,6 +49,17 @@ class SoftDeleteModel(models.Model):
     class Meta:
         abstract = True
 
+    def soft_delete(self):
+        from django.utils import timezone
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
+    def restore(self):
+        self.is_deleted = False
+        self.deleted_at = None
+        self.save(update_fields=['is_deleted', 'deleted_at'])
+
 
 class PublishableModel(models.Model):
     """

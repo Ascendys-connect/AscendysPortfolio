@@ -2,22 +2,29 @@ import { useState, useRef } from "react";
 
 interface ImageUploaderProps {
   value?: string;
-  onChange?: (file: File | null, previewUrl: string | null) => void;
+  currentImage?: string;
+  preview?: string;
+  onChange?: (file: File | null, previewUrl?: string | null) => void;
   onImageSelect?: (file: File | null) => void; // Alternative simplified callback
   label?: string;
   accept?: string;
   maxSizeMB?: number;
+  disabled?: boolean;
 }
 
 export default function ImageUploader({
   value,
+  currentImage,
+  preview: externalPreview,
   onChange,
   onImageSelect,
   label = "Image",
   accept = "image/jpeg,image/png,image/webp",
   maxSizeMB = 5,
+  disabled = false,
 }: ImageUploaderProps) {
-  const [preview, setPreview] = useState<string | null>(value || null);
+  const initialPreview = externalPreview || currentImage || value || null;
+  const [preview, setPreview] = useState<string | null>(initialPreview);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -133,7 +140,8 @@ export default function ImageUploader({
             <button
               type="button"
               onClick={handleRemove}
-              className="absolute inset-e-2 top-2 flex size-8 items-center justify-center rounded-full bg-error-500 text-white transition hover:bg-error-600"
+              disabled={disabled}
+              className="absolute inset-e-2 top-2 flex size-8 items-center justify-center rounded-full bg-error-500 text-white transition hover:bg-error-600 disabled:opacity-50"
             >
               <svg
                 className="size-5"
@@ -176,8 +184,9 @@ export default function ImageUploader({
               ref={fileInputRef}
               type="file"
               accept={accept}
+              disabled={disabled}
               onChange={handleInputChange}
-              className="absolute inset-0 cursor-pointer opacity-0"
+              className="absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
             />
           </div>
         )}

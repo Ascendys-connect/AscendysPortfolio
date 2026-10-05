@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { offersService, type OfferFormData } from "@/services/offers.service";
+import { useToast } from "@/context/ToastContext";
 import PageBreadCrumb from "@/components/common/PageBreadCrumb";
 import OfferForm from "@/components/offers/OfferForm";
 
 export default function EditOffer() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+  const { showError } = useToast();
   const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<Partial<OfferFormData> | null>(null);
 
@@ -44,10 +46,15 @@ export default function EditOffer() {
     setLoading(true);
     try {
       await offersService.update(slug, data);
-      navigate("/admin/services");
-    } catch (error) {
+      navigate("/admin/offers");
+    } catch (error: any) {
       console.error("Erreur mise à jour:", error);
-      alert("Erreur lors de la mise à jour de l'offre");
+      const msg = error.response?.data?.message || error.message || "Erreur lors de la mise à jour de l'offre";
+      const errorsObj = error.response?.data?.errors;
+      const details = errorsObj && typeof errorsObj === 'object'
+        ? Object.entries(errorsObj).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ')
+        : '';
+      showError("Erreur de mise à jour", details ? `${msg} — ${details}` : msg);
     } finally {
       setLoading(false);
     }
@@ -57,7 +64,7 @@ export default function EditOffer() {
 
   return (
     <>
-      <PageBreadCrumb pageTitle="Modifier l'offre" />
+      <PageBreadCrumb pageTitle="Modifier l'offre d'emploi" />
       
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <OfferForm

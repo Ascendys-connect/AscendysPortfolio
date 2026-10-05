@@ -5,9 +5,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+
+def health_check(request):
+    return JsonResponse({'status': 'healthy', 'service': 'ascendys-api'}, status=200)
+
+
 urlpatterns = [
+    # Health check endpoints (for IDE tunnels, reverse proxies, and keep-alives)
+    path('health', health_check, name='health_no_slash'),
+    path('health/', health_check, name='health'),
+
     # Admin
     path('admin/', admin.site.urls),
     

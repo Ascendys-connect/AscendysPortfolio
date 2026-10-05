@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { blogPostsService, type BlogFormData } from "@/services/blog.service";
 import { useApi } from "@/hooks/useApi";
+import { useToast } from "@/context/ToastContext";
 import PageBreadCrumb from "@/components/common/PageBreadCrumb";
 import BlogPostForm from "@/components/blog/BlogPostForm";
 
 export default function EditBlogPost() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+  const { showError } = useToast();
   const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<Partial<BlogFormData> | null>(null);
   const { data: categories = [] } = useApi("/blog/categories/", { defaultValue: [] });
@@ -54,7 +56,9 @@ export default function EditBlogPost() {
       navigate("/admin/blog/posts");
     } catch (error) {
       console.error("Erreur mise à jour:", error);
-      alert("Erreur lors de la mise à jour de l'article");
+      const err = error as any;
+      const msg = err.response?.data?.message || err.message || "Erreur lors de la mise à jour de l'article";
+      showError("Erreur de mise à jour", msg);
     } finally {
       setLoading(false);
     }

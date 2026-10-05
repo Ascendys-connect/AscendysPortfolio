@@ -43,7 +43,7 @@ export function useApi<T = any>(
       const response = await apiService.get<T>(endpoint);
       
       // Auto-unwrap response if it has { success, message, data } structure
-      let finalData: T;
+      let finalData: any;
       if (
         response && 
         typeof response === 'object' && 
@@ -51,18 +51,29 @@ export function useApi<T = any>(
         'success' in response
       ) {
         // Backend returns { success, message, data } - unwrap it
-        finalData = (response as any).data as T;
+        finalData = (response as any).data;
       } else {
         finalData = response;
       }
       
+      // If consumer expects an array (defaultValue is Array) and response is paginated DRF { results: [...] }
+      if (Array.isArray(defaultValue)) {
+        if (finalData && typeof finalData === 'object' && Array.isArray(finalData.results)) {
+          finalData = finalData.results;
+        } else if (finalData && typeof finalData === 'object' && Array.isArray(finalData.data)) {
+          finalData = finalData.data;
+        } else if (!Array.isArray(finalData)) {
+          finalData = defaultValue;
+        }
+      }
+
       // Ensure we always have a valid value (use defaultValue if finalData is null/undefined)
       if (finalData === null || finalData === undefined) {
         finalData = defaultValue as T;
       }
       
-      setData(finalData);
-      onSuccess?.(finalData);
+      setData(finalData as T);
+      onSuccess?.(finalData as T);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Unknown error');
       setError(error);

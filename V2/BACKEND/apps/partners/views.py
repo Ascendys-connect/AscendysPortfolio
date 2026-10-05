@@ -31,7 +31,7 @@ class PartnerViewSet(viewsets.ModelViewSet):
     - destroy: Delete partner
     - toggle_featured: Toggle featured status
     """
-    queryset = Partner.objects.all()
+    queryset = Partner.objects.filter(is_deleted=False)
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['is_featured', 'is_active']
@@ -162,7 +162,7 @@ class PartnerViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_object()
         partner_name = instance.name
-        self.perform_destroy(instance)
+        instance.soft_delete()
         return Response({
             'success': True,
             'message': f'Partenaire "{partner_name}" supprimé avec succès',

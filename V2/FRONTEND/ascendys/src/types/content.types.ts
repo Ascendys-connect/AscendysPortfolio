@@ -2,7 +2,6 @@
  * Content Types for publishable content
  */
 
-import type { User } from './auth.types';
 
 export enum ContentStatus {
   DRAFT = 'DRAFT',
@@ -197,4 +196,56 @@ export interface BlogFormData {
   tags_ids: number[];
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   is_featured: boolean;
+}
+
+// Testimonial Types
+export interface Testimonial {
+  id: string | number;
+  name: string;
+  role: string;
+  company: string;
+  avatar: string | null;
+  content: string;
+  rating: number;
+  is_featured: boolean;
+  is_published: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TestimonialFormData {
+  name: string;
+  role: string;
+  company?: string;
+  avatar?: File | null;
+  content: string;
+  rating: number;
+  is_featured?: boolean;
+  is_published?: boolean;
+  order?: number;
+}
+
+// Partner Types
+export interface Partner {
+  id: string | number;
+  name: string;
+  logo: string;
+  website: string;
+  description: string;
+  is_featured: boolean;
+  is_active: boolean;
+  order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PartnerFormData {
+  name: string;
+  logo?: File | null;
+  website?: string;
+  description?: string;
+  is_featured?: boolean;
+  is_active?: boolean;
+  order?: number;
 }

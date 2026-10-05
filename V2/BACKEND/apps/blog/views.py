@@ -81,7 +81,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     """
     ViewSet for BlogPost CRUD operations with publish/archive actions.
     """
-    queryset = BlogPost.objects.select_related('author', 'category').prefetch_related('tags').all()
+    queryset = BlogPost.objects.select_related('author', 'category').prefetch_related('tags').filter(is_deleted=False)
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'status', 'is_featured', 'author']
@@ -254,5 +254,18 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             success=True,
             message="Article remis en brouillon avec succès.",
             data=serializer.data,
+            status_code=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        summary="Supprimer un article (Soft delete)",
+        description="Supprime un article en soft delete (réservé aux administrateurs/éditeurs)"
+    )
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.soft_delete()
+        return api_response(
+            success=True,
+            message="Article supprimé avec succès.",
             status_code=status.HTTP_200_OK
         )

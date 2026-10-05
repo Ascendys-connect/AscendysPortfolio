@@ -4,7 +4,7 @@ Blog models for articles, categories, and tags.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel
+from apps.core.models import UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel
 
 User = get_user_model()
 
@@ -53,7 +53,7 @@ class Tag(models.Model):
         super().save(*args, **kwargs)
 
 
-class BlogPost(UUIDModel, TimeStampedModel, PublishableModel):
+class BlogPost(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
     """
     Blog post model.
     """

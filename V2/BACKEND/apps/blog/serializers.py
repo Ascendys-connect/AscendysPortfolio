@@ -13,6 +13,7 @@ class BlogCategorySerializer(serializers.ModelSerializer):
     Serializer for BlogCategory model.
     """
     posts_count = serializers.SerializerMethodField()
+    published_posts_count = serializers.SerializerMethodField()
     
     class Meta:
         model = BlogCategory
@@ -23,12 +24,28 @@ class BlogCategorySerializer(serializers.ModelSerializer):
             'description',
             'is_active',
             'posts_count',
+            'published_posts_count',
             'created_at',
             'updated_at',
         ]
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
     
     def get_posts_count(self, obj):
+        """
+        Return count of posts in this category.
+        If user is authenticated admin/staff, return all posts.
+        Otherwise, return published posts.
+        """
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated and (
+            getattr(request.user, 'is_admin', False) or 
+            request.user.is_staff or 
+            getattr(request.user, 'role', '') in ['ADMIN', 'SUPER_ADMIN']
+        ):
+            return obj.posts.count()
+        return obj.posts.filter(status='PUBLISHED').count()
+
+    def get_published_posts_count(self, obj):
         """Return count of published posts in this category."""
         return obj.posts.filter(status='PUBLISHED').count()
 
@@ -38,13 +55,29 @@ class TagSerializer(serializers.ModelSerializer):
     Serializer for Tag model.
     """
     posts_count = serializers.SerializerMethodField()
+    published_posts_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Tag
-        fields = ['id', 'name', 'slug', 'posts_count']
+        fields = ['id', 'name', 'slug', 'posts_count', 'published_posts_count']
         read_only_fields = ['id', 'slug']
     
     def get_posts_count(self, obj):
+        """
+        Return count of posts with this tag.
+        If user is authenticated admin/staff, return all posts.
+        Otherwise, return published posts.
+        """
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated and (
+            getattr(request.user, 'is_admin', False) or 
+            request.user.is_staff or 
+            getattr(request.user, 'role', '') in ['ADMIN', 'SUPER_ADMIN']
+        ):
+            return obj.posts.count()
+        return obj.posts.filter(status='PUBLISHED').count()
+
+    def get_published_posts_count(self, obj):
         """Return count of published posts with this tag."""
         return obj.posts.filter(status='PUBLISHED').count()
 

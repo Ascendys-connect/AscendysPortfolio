@@ -23,7 +23,7 @@ class OfferViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Offer CRUD operations with publish/archive actions.
     """
-    queryset = Offer.objects.select_related('created_by').all()
+    queryset = Offer.objects.select_related('created_by').filter(is_deleted=False)
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['type', 'status', 'is_featured']
@@ -157,11 +157,11 @@ class OfferViewSet(viewsets.ModelViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.delete()
+        instance.soft_delete()
         return api_response(
             success=True,
             message="Offre supprimée avec succès.",
-            status_code=status.HTTP_204_NO_CONTENT
+            status_code=status.HTTP_200_OK
         )
 
     @extend_schema(

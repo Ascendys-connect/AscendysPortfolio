@@ -30,7 +30,18 @@ class TrainingCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
     
     def get_trainings_count(self, obj):
-        """Return count of published and non-deleted trainings in this category."""
+        """
+        Return count of trainings in this category.
+        If user is authenticated admin/staff, return all non-deleted trainings.
+        Otherwise, return published non-deleted trainings.
+        """
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated and (
+            getattr(request.user, 'is_admin', False) or 
+            request.user.is_staff or 
+            getattr(request.user, 'role', '') in ['ADMIN', 'SUPER_ADMIN']
+        ):
+            return obj.trainings.filter(is_deleted=False).count()
         return obj.trainings.filter(status='PUBLISHED', is_deleted=False).count()
 
 

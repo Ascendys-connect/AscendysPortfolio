@@ -225,20 +225,6 @@ export default function CategoryModal({
           </div>
         </div>
 
-        <div>
-          <Label>Ordre d'affichage</Label>
-          <Input
-            type="number"
-            value={formData.order}
-            onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-            placeholder="0"
-            disabled={isSubmitting}
-          />
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Les catégories sont affichées par ordre croissant
-          </p>
-        </div>
-
         <div className="flex items-center gap-3">
           <input
             type="checkbox"

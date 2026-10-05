@@ -4,12 +4,12 @@ Service model for company offerings.
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel
+from apps.core.models import UUIDModel, TimeStampedModel, SEOModel, PublishableModel, SoftDeleteModel
 
 User = get_user_model()
 
 
-class Service(UUIDModel, TimeStampedModel, SEOModel, PublishableModel):
+class Service(UUIDModel, TimeStampedModel, SEOModel, PublishableModel, SoftDeleteModel):
     """
     Model representing a service offered by the company.
     """

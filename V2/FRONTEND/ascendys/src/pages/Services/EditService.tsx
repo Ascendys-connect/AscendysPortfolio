@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { servicesService, type ServiceFormData } from "@/services/services.service";
+import { useToast } from "@/context/ToastContext";
 import PageBreadCrumb from "@/components/common/PageBreadCrumb";
 import ServiceForm from "@/components/services/ServiceForm";
 
 export default function EditService() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+  const { showError } = useToast();
   const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<Partial<ServiceFormData> | null>(null);
 
@@ -48,9 +50,9 @@ export default function EditService() {
       const msg = error.response?.data?.message || error.message || "Erreur lors de la mise à jour du service";
       const errorsObj = error.response?.data?.errors;
       const details = errorsObj && typeof errorsObj === 'object'
-        ? Object.entries(errorsObj).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('\n')
+        ? Object.entries(errorsObj).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join(' | ')
         : '';
-      alert(details ? `${msg}\n\n${details}` : msg);
+      showError("Erreur de mise à jour", details ? `${msg} — ${details}` : msg);
     } finally {
       setLoading(false);
     }
