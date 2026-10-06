@@ -1,28 +1,25 @@
-import api from './api.service';
-import type { ActivityLog } from '@/types/content.types';
+import { apiService } from './api.service';
+import type { ActivityLog, PaginatedResponse } from '@/types/content.types';
+
+export interface LogsParams {
+  page?: number;
+  action?: string;
+  search?: string;
+}
 
 export const logsService = {
-  getAll: async (params?: {
-    user_id?: string;
-    model_name?: string;
-    action?: string;
-    start_date?: string;
-    end_date?: string;
-  }): Promise<ActivityLog[]> => {
-    const response = await api.get('/dashboard/activity-logs/', { params });
-    return response.data;
+  getAll: async (params?: LogsParams): Promise<PaginatedResponse<ActivityLog>> => {
+    const response = await apiService.get('/dashboard/activity-logs/', params as Record<string, string | number | boolean>);
+    // apiService.get() returns the raw JSON body — DRF paginated: { count, next, previous, results }
+    return response as unknown as PaginatedResponse<ActivityLog>;
   },
 
   getById: async (id: string): Promise<ActivityLog> => {
-    const response = await api.get(`/dashboard/activity-logs/${id}/`);
-    return response.data;
+    const response = await apiService.get(`/dashboard/activity-logs/${id}/`);
+    return response as unknown as ActivityLog;
   },
 
-  delete: async (id: string): Promise<void> => {
-    await api.delete(`/dashboard/activity-logs/${id}/`);
-  },
-
-  deleteAll: async (): Promise<void> => {
-    await api.post('/dashboard/activity-logs/clear/');
+  clearAll: async (): Promise<void> => {
+    await apiService.post('/dashboard/activity-logs/clear/');
   },
 };

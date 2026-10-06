@@ -269,3 +269,14 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@ascendysconne
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+
+# =================
+# FedaPay Configuration
+# =================
+FEDAPAY_MODE = config('FEDAPAY_MODE', default='sandbox')
+FEDAPAY_SECRET_KEY = config('FEDAPAY_SECRET_KEY', default='')
+FEDAPAY_PUBLIC_KEY = config('FEDAPAY_PUBLIC_KEY', default='')
+FEDAPAY_WEBHOOK_SECRET = config('FEDAPAY_WEBHOOK_SECRET', default='')
+FEDAPAY_CURRENCY = config('FEDAPAY_CURRENCY', default='XOF')
+FEDAPAY_CALLBACK_URL = config('FEDAPAY_CALLBACK_URL', default='http://localhost:5173')

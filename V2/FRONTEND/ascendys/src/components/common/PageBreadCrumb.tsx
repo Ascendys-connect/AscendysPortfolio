@@ -19,6 +19,7 @@ const SECTION_MAPPINGS: Record<string, { label: string; path: string }> = {
   events: { label: "Événements", path: "/admin/events" },
   blog: { label: "Blog", path: "/admin/blog/posts" },
   users: { label: "Utilisateurs", path: "/users" },
+  galleries: { label: "Médiathèques", path: "/admin/galleries" },
   system: { label: "Système", path: "/admin/system/settings" },
 };
 

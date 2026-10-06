@@ -249,3 +249,129 @@ export interface PartnerFormData {
   is_active?: boolean;
   order?: number;
 }
+
+// ── Gallery (Médiathèque) Types ──────────────────────────────────────────────
+
+export type GalleryType = 'PHOTOS' | 'VIDEO';
+
+export interface Gallery {
+  id: string;
+  title: string;
+  description: string;
+  gallery_type: GalleryType;
+  cover_image_url: string | null;
+  photo_1_url?: string | null;
+  photo_2_url?: string | null;
+  photo_3_url?: string | null;
+  photo_4_url?: string | null;
+  photo_5_url?: string | null;
+  video_url?: string | null;
+  photos_count?: number;
+  is_published: boolean;
+  created_by_name?: string | null;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface GalleryFormData {
+  title: string;
+  description: string;
+  gallery_type: GalleryType;
+  photos?: File[];          // up to 5, only when gallery_type === 'PHOTOS'
+  video?: File | null;      // only when gallery_type === 'VIDEO'
+  cover_image?: File | null;
+  is_published?: boolean;
+}
+
+// Legacy - kept for backward compat
+export interface MediaFile {
+  id: string;
+  title: string;
+  description?: string;
+  file: string;
+  file_url?: string;
+  media_type: string;
+  file_type?: string;
+  file_name: string;
+  file_size: number;
+  file_extension: string;
+  folder?: string;
+  tags?: string[];
+  created_at: string;
+  updated_at?: string;
+}
+
+// ── Company Info Types ───────────────────────────────────────────────────────
+
+export interface CompanyInfo {
+  id?: number;
+  name: string;
+  slogan?: string;
+  tagline?: string;
+  short_description?: string;
+  description?: string;
+  full_description?: string;
+  logo?: string | null;
+  logo_url?: string | null;
+  favicon?: string | null;
+  favicon_url?: string | null;
+  email: string;
+  phone?: string;
+  phones?: string[];
+  address: string;
+  city: string;
+  country: string;
+  postal_code?: string;
+  website: string;
+  social_links?: Record<string, string>;
+  facebook_url?: string;
+  twitter_url?: string;
+  linkedin_url?: string;
+  instagram_url?: string;
+  youtube_url?: string;
+  whatsapp_number?: string;
+  founded_year?: number | null;
+  mission?: string;
+  vision?: string;
+  values?: string[];
+  business_hours?: Record<string, string>;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// ── Activity Log Types ────────────────────────────────────────────────────────
+
+export type ActivityLogAction =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'VIEW'
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'EXPORT'
+  | 'IMPORT'
+  | 'OTHER';
+
+export interface ActivityLog {
+  id: string;
+  user: number | null;
+  user_name: string;
+  user_email: string | null;
+  user_avatar: string | null;
+  action: ActivityLogAction;
+  action_display: string;
+  description: string;
+  content_type: number | null;
+  content_type_name: string | null;
+  object_id: string | null;
+  ip_address: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}

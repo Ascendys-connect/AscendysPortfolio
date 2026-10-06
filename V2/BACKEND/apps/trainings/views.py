@@ -372,3 +372,179 @@ class TrainingViewSet(viewsets.ModelViewSet):
             message="Formation supprimée avec succès.",
             status_code=status.HTTP_200_OK
         )
+
+
+
+# ========================
+# Enrollment Views
+# ========================
+
+from rest_framework.decorators import api_view, permission_classes as decorators_permission_classes
+from rest_framework.permissions import AllowAny
+from .models import Enrollment
+from .serializers import (
+    EnrollmentSerializer,
+    EnrollmentCreateSerializer,
+    PaymentInitiationResponseSerializer
+)
+from .services import FedaPayService
+import json
+
+
+class EnrollmentViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet pour gérer les inscriptions aux formations.
+    """
+    queryset = Enrollment.objects.all()
+    permission_classes = [AllowAny]  # Accessible publiquement
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'training', 'education_level']
+    search_fields = ['full_name', 'email', 'phone']
+    ordering_fields = ['created_at', 'paid_at']
+    ordering = ['-created_at']
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return EnrollmentCreateSerializer
+        return EnrollmentSerializer
+    
+    def get_queryset(self):
+        """
+        Filtrer les enrollments selon les permissions.
+        Les admins voient tout, les autres ne voient que leurs propres inscriptions.
+        """
+        queryset = super().get_queryset()
+        
+        # Admin voit tout
+        if self.request.user.is_authenticated and (
+            hasattr(self.request.user, 'is_admin') and self.request.user.is_admin
+        ):
+            return queryset
+        
+        # Public : accès par ID uniquement (via retrieve)
+        if self.action == 'retrieve':
+            return queryset
+        
+        # Par défaut, rien
+        return queryset.none()
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Crée une inscription avec status PENDING.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        enrollment = serializer.save()
+        
+        # Retourner l'enrollment complet
+        response_serializer = EnrollmentSerializer(enrollment)
+        
+        return Response({
+            'success': True,
+            'message': 'Inscription créée avec succès. Veuillez procéder au paiement.',
+            'data': response_serializer.data
+        }, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['post'], url_path='initiate-payment')
+    def initiate_payment(self, request, pk=None):
+        """
+        Initie le paiement FedaPay pour une inscription.
+        
+        POST /api/v1/enrollments/{id}/initiate-payment/
+        """
+        enrollment = self.get_object()
+        
+        # Vérifier que le paiement est possible
+        if not enrollment.can_retry_payment():
+            return Response({
+                'success': False,
+                'message': 'Cette inscription ne peut plus être payée (expirée ou déjà payée).'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Créer la transaction FedaPay
+            payment_data = FedaPayService.create_transaction(enrollment)
+            
+            response_data = {
+                'checkout_url': payment_data['checkout_url'],
+                'transaction_id': payment_data['transaction_id'],
+                'enrollment_id': str(enrollment.id)
+            }
+            
+            return Response({
+                'success': True,
+                'message': 'Transaction créée avec succès.',
+                'data': response_data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=True, methods=['post'], url_path='retry-payment')
+    def retry_payment(self, request, pk=None):
+        """
+        Réessayer le paiement pour une inscription échouée.
+        
+        POST /api/v1/enrollments/{id}/retry-payment/
+        """
+        enrollment = self.get_object()
+        
+        # Vérifier que le retry est possible
+        if not enrollment.can_retry_payment():
+            return Response({
+                'success': False,
+                'message': 'Cette inscription ne peut plus être payée.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Réinitialiser le statut
+        enrollment.status = 'PENDING'
+        enrollment.save()
+        
+        # Initier le paiement
+        return self.initiate_payment(request, pk)
+
+
+@api_view(['POST'])
+@decorators_permission_classes([AllowAny])
+def enrollment_webhook(request):
+    """
+    Webhook pour recevoir les notifications de FedaPay.
+    
+    POST /api/v1/enrollments/webhook/
+    """
+    try:
+        # Récupérer la signature
+        signature = request.headers.get('X-FedaPay-Signature', '')
+        
+        # Vérifier la signature
+        if not FedaPayService.verify_webhook_signature(request.body, signature):
+            return Response({
+                'success': False,
+                'message': 'Signature invalide'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Parser le payload
+        payload = json.loads(request.body)
+        
+        # Traiter le webhook
+        result = FedaPayService.handle_webhook(payload)
+        
+        if result['success']:
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+            
+    except json.JSONDecodeError:
+        return Response({
+            'success': False,
+            'message': 'Payload JSON invalide'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

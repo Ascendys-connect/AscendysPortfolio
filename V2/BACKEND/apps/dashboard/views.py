@@ -4,6 +4,7 @@ Views for dashboard and activity logs.
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Count, Q
@@ -15,6 +16,13 @@ from .models import ActivityLog
 from .serializers import ActivityLogSerializer
 
 
+class ActivityLogPagination(PageNumberPagination):
+    """Custom pagination for activity logs: 30 items per page."""
+    page_size = 30
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for activity logs.
@@ -24,9 +32,10 @@ class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
     - retrieve: Get activity log detail
     - clear: Delete all activity logs (POST)
     """
-    queryset = ActivityLog.objects.all()
+    queryset = ActivityLog.objects.select_related('user', 'content_type').all()
     serializer_class = ActivityLogSerializer
     permission_classes = [IsAdminUser]
+    pagination_class = ActivityLogPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['action', 'user']
     search_fields = ['description', 'user__email', 'user__first_name', 'user__last_name']

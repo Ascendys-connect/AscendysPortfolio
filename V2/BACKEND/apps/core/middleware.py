@@ -81,18 +81,45 @@ class ActivityLogMiddleware(MiddlewareMixin):
         if request.user.is_authenticated and request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
             try:
                 from apps.dashboard.models import ActivityLog
-                
+
                 action_map = {
                     'POST': 'CREATE',
                     'PUT': 'UPDATE',
                     'PATCH': 'UPDATE',
                     'DELETE': 'DELETE',
                 }
-                
+
+                action = action_map.get(request.method, 'OTHER')
+
+                # Build a human-readable description from the URL path
+                # e.g. /api/v1/blog/posts/uuid/ -> "UPDATE blog/posts"
+                path_parts = [p for p in request.path.strip('/').split('/') if p]
+                # Strip leading "api/v1"
+                if len(path_parts) >= 2 and path_parts[0] == 'api' and path_parts[1] == 'v1':
+                    path_parts = path_parts[2:]
+                # Remove trailing UUIDs / numeric IDs and action slugs
+                import re
+                uuid_pattern = re.compile(
+                    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                    re.IGNORECASE,
+                )
+                clean_parts = [
+                    p for p in path_parts
+                    if not uuid_pattern.match(p) and not p.isdigit()
+                ]
+                resource = '/'.join(clean_parts[:2]) if clean_parts else request.path
+
+                action_labels = {
+                    'CREATE': 'Création',
+                    'UPDATE': 'Modification',
+                    'DELETE': 'Suppression',
+                }
+                description = f"{action_labels.get(action, action)} : {resource}"
+
                 ActivityLog.log_activity(
                     user=request.user,
-                    action=action_map.get(request.method, 'OTHER'),
-                    description=f"{request.method} {request.path}",
+                    action=action,
+                    description=description,
                     ip_address=RequestLoggingMiddleware.get_client_ip(request),
                     user_agent=request.META.get('HTTP_USER_AGENT', ''),
                     metadata={
@@ -102,7 +129,7 @@ class ActivityLogMiddleware(MiddlewareMixin):
                 )
             except Exception as e:
                 logger.error(f"Error logging activity: {e}")
-        
+
         return None
 
 

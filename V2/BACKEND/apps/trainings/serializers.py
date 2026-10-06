@@ -3,7 +3,7 @@ Serializers for Training and TrainingCategory models.
 """
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import TrainingCategory, Training
+from .models import TrainingCategory, Training, Enrollment
 
 User = get_user_model()
 
@@ -210,3 +210,138 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
             })
         
         return data
+
+
+
+class EnrollmentSerializer(serializers.ModelSerializer):
+    """
+    Serializer pour les inscriptions aux formations.
+    """
+    training_title = serializers.CharField(source='training.title', read_only=True)
+    training_price = serializers.DecimalField(
+        source='training.price',
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
+    training_slug = serializers.CharField(source='training.slug', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    education_level_display = serializers.CharField(source='get_education_level_display', read_only=True)
+    is_expired = serializers.BooleanField(read_only=True)
+    can_retry_payment = serializers.BooleanField(read_only=True)
+    
+    class Meta:
+        model = Enrollment
+        fields = [
+            'id',
+            'training',
+            'training_title',
+            'training_slug',
+            'training_price',
+            'full_name',
+            'email',
+            'phone',
+            'education_level',
+            'education_level_display',
+            'education_level_other',
+            'status',
+            'status_display',
+            'amount',
+            'currency',
+            'payment_id',
+            'payment_attempts',
+            'is_expired',
+            'can_retry_payment',
+            'expires_at',
+            'paid_at',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'id',
+            'payment_id',
+            'payment_attempts',
+            'expires_at',
+            'paid_at',
+            'created_at',
+            'updated_at',
+        ]
+
+
+class EnrollmentCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer pour créer une inscription.
+    """
+    class Meta:
+        model = Enrollment
+        fields = [
+            'training',
+            'full_name',
+            'email',
+            'phone',
+            'education_level',
+            'education_level_other',
+        ]
+    
+    def validate_email(self, value):
+        """Valide le format de l'email."""
+        if not value or '@' not in value:
+            raise serializers.ValidationError("Veuillez fournir un email valide.")
+        return value.lower().strip()
+    
+    def validate_phone(self, value):
+        """Valide le numéro de téléphone."""
+        if not value or len(value) < 8:
+            raise serializers.ValidationError("Veuillez fournir un numéro de téléphone valide.")
+        return value.strip()
+    
+    def validate_full_name(self, value):
+        """Valide le nom complet."""
+        if not value or len(value.strip()) < 3:
+            raise serializers.ValidationError("Le nom complet doit contenir au moins 3 caractères.")
+        return value.strip()
+    
+    def validate(self, data):
+        """Validation croisée."""
+        # Si "Autre" est sélectionné, education_level_other est requis
+        if data.get('education_level') == 'OTHER' and not data.get('education_level_other'):
+            raise serializers.ValidationError({
+                'education_level_other': 'Veuillez préciser votre niveau d\'études.'
+            })
+        
+        # Vérifier que la formation existe et est publiée
+        training = data.get('training')
+        if training.status != 'PUBLISHED':
+            raise serializers.ValidationError({
+                'training': 'Cette formation n\'est pas disponible pour inscription.'
+            })
+        
+        # Vérifier que la formation n'a pas déjà commencé
+        from django.utils import timezone
+        if training.start_date < timezone.now().date():
+            raise serializers.ValidationError({
+                'training': 'Cette formation a déjà commencé.'
+            })
+        
+        return data
+    
+    def create(self, validated_data):
+        """Crée une inscription avec status PENDING."""
+        training = validated_data['training']
+        enrollment = Enrollment.objects.create(
+            **validated_data,
+            amount=training.price,
+            currency=training.currency,
+            status='PENDING'
+        )
+        return enrollment
+
+
+class PaymentInitiationResponseSerializer(serializers.Serializer):
+    """
+    Serializer pour la réponse d'initiation de paiement.
+    """
+    checkout_url = serializers.URLField()
+    transaction_id = serializers.CharField()
+    enrollment_id = serializers.UUIDField()
+

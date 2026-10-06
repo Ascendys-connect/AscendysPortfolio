@@ -86,7 +86,8 @@ def company_update_view(request):
     serializer = CompanyUpdateSerializer(
         company,
         data=request.data,
-        partial=partial
+        partial=partial,
+        context={'request': request}
     )
     
     if serializer.is_valid():

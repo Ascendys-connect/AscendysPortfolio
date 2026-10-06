@@ -4,6 +4,11 @@ import AppLayout from "./layout/AppLayout";
 import Home from "./pages/Public/Home";
 import About from "./pages/Public/About";
 import Trainings from "./pages/Public/Trainings";
+import TrainingsPublic from "./pages/Public/TrainingsPublic";
+import EnrollmentPage from "./pages/Public/EnrollmentPage";
+import PaymentPage from "./pages/Public/PaymentPage";
+import PaymentSuccess from "./pages/Public/PaymentSuccess";
+import PaymentError from "./pages/Public/PaymentError";
 import Contact from "./pages/Public/Contact";
 import SignIn from "./pages/AuthPages/SignIn";
 import VerifyOTP from "./pages/AuthPages/VerifyOTP";
@@ -46,11 +51,12 @@ import CreateTestimonialPage from "./pages/Content/CreateTestimonialPage";
 import CreatePartnerPage from "./pages/Content/CreatePartnerPage";
 import ContactMessages from "./pages/Messages/ContactMessages";
 import Newsletter from "./pages/Messages/Newsletter";
-import MediaLibrary from "./pages/System/MediaLibrary";
 import CompanyInfo from "./pages/System/CompanyInfo";
 import ActivityLogs from "./pages/System/ActivityLogs";
 import GlobalAnalytics from "./pages/Analytics/GlobalAnalytics";
 import Settings from "./pages/System/Settings";
+import GalleriesList from "./pages/Galleries/GalleriesList";
+import CreateGalleryPage from "./pages/Galleries/CreateGalleryPage";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/OtherPage/Blank";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -77,6 +83,11 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/trainings" element={<Trainings />} />
+          <Route path="/formations" element={<TrainingsPublic />} />
+          <Route path="/enroll" element={<EnrollmentPage />} />
+          <Route path="/payment/:enrollmentId" element={<PaymentPage />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/error" element={<PaymentError />} />
           <Route path="/contact" element={<Contact />} />
 
           {/* Auth Routes (Guest Only) */}
@@ -373,6 +384,24 @@ export default function App() {
               }
             />
 
+            {/* Galleries (Médiathèques) */}
+            <Route
+              path="/admin/galleries"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <GalleriesList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/galleries/create"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <CreateGalleryPage />
+                </RoleGuard>
+              }
+            />
+
             {/* Legacy redirects */}
             <Route
               path="/testimonials"
@@ -410,14 +439,6 @@ export default function App() {
             />
 
             {/* System Pages (SUPER_ADMIN only) */}
-            <Route
-              path="/media"
-              element={
-                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN]}>
-                  <MediaLibrary />
-                </RoleGuard>
-              }
-            />
             <Route
               path="/company"
               element={

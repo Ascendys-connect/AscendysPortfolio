@@ -34,6 +34,29 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     """
     serializer_class = CustomTokenObtainPairSerializer
 
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            try:
+                from apps.dashboard.models import ActivityLog
+                from apps.core.middleware import RequestLoggingMiddleware
+                # Retrieve the user from the validated serializer
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=False)
+                user = serializer.user if hasattr(serializer, 'user') and serializer.user else None
+                if user:
+                    ActivityLog.log_activity(
+                        user=user,
+                        action='LOGIN',
+                        description=f'Connexion de {user.get_full_name() or user.email}',
+                        ip_address=RequestLoggingMiddleware.get_client_ip(request),
+                        user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                        metadata={'path': request.path},
+                    )
+            except Exception:
+                pass
+        return response
+
 
 @extend_schema(
     summary="Déconnexion",
@@ -55,7 +78,22 @@ def logout_view(request):
         if refresh_token:
             token = RefreshToken(refresh_token)
             token.blacklist()
-        
+
+        # Log the logout
+        try:
+            from apps.dashboard.models import ActivityLog
+            from apps.core.middleware import RequestLoggingMiddleware
+            ActivityLog.log_activity(
+                user=request.user,
+                action='LOGOUT',
+                description=f'Déconnexion de {request.user.get_full_name() or request.user.email}',
+                ip_address=RequestLoggingMiddleware.get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                metadata={'path': request.path},
+            )
+        except Exception:
+            pass
+
         return api_response(
             success=True,
             message='Déconnexion réussie.',

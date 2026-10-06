@@ -23,7 +23,13 @@ class Company(TimeStampedModel):
     
     # Contact Information
     email = models.EmailField(verbose_name="Email")
-    phone = models.CharField(max_length=20, blank=True, verbose_name="Téléphone")
+    phone = models.CharField(max_length=255, blank=True, verbose_name="Téléphone principal")
+    phones = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Numéros de téléphone",
+        help_text="Liste des numéros de téléphone avec indicatif"
+    )
     address = models.CharField(max_length=255, blank=True, verbose_name="Adresse")
     city = models.CharField(max_length=100, blank=True, verbose_name="Ville")
     country = models.CharField(max_length=100, default="Côte d'Ivoire", verbose_name="Pays")
@@ -70,6 +76,10 @@ class Company(TimeStampedModel):
         """
         if not self.pk and Company.objects.exists():
             raise ValidationError('Une seule instance de Company peut exister.')
+        if self.phones and len(self.phones) > 0:
+            self.phone = self.phones[0]
+        elif self.phone and not self.phones:
+            self.phones = [self.phone]
         return super().save(*args, **kwargs)
     
     @classmethod
