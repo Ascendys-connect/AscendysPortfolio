@@ -1,33 +1,19 @@
+import { useApi } from "@/hooks/useApi";
+import { Testimonial } from "@/types/content.types";
+
 export default function TestimonialsSection() {
-  const testimonials = [
-    {
-      name: "Kouassi Jean-Marc",
-      role: "Développeur Full Stack",
-      company: "Tech Solutions CI",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop",
-      content:
-        "Grâce à Ascendys Connect, j'ai pu acquérir les compétences nécessaires pour devenir développeur Full Stack. Les formateurs sont excellents et le suivi est personnalisé. Aujourd'hui, je travaille dans une entreprise tech innovante !",
-      rating: 5,
-    },
-    {
-      name: "Aïcha Traoré",
-      role: "Chef de Projet Digital",
-      company: "Digital Agency",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop",
-      content:
-        "Une expérience de formation exceptionnelle ! Les cours sont pratiques, orientés métier et dispensés par des professionnels du secteur. J'ai pu monter en compétences rapidement et évoluer dans ma carrière.",
-      rating: 5,
-    },
-    {
-      name: "Mamadou Diallo",
-      role: "Data Analyst",
-      company: "Banque Internationale",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop",
-      content:
-        "La formation en Data Science m'a ouvert de nouvelles perspectives professionnelles. Le contenu est riche, les projets sont concrets et la certification obtenue est reconnue par les employeurs.",
-      rating: 5,
-    },
-  ];
+  // Fetch testimonials from API
+  const { data: testimonials, isLoading, error, refetch } = useApi<Testimonial[]>(
+    "/testimonials/?is_published=true&page_size=3",
+    { defaultValue: [] }
+  );
+
+  // Helper for media URL
+  const getMediaUrl = (path: string | null | undefined, fallback: string) => {
+    if (!path) return fallback;
+    if (path.startsWith("http") || path.startsWith("/")) return path;
+    return `http://127.0.0.1:8000/${path}`;
+  };
 
   return (
     <section className="bg-white py-20 dark:bg-gray-950 lg:py-28">
@@ -47,9 +33,55 @@ export default function TestimonialsSection() {
           </p>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-gray-200 bg-gray-50 p-8 dark:border-gray-800 dark:bg-gray-900"
+              >
+                <div className="mb-4 flex gap-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <div key={s} className="size-5 animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />
+                  ))}
+                </div>
+                <div className="space-y-3 mb-6">
+                  <div className="h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                </div>
+                <div className="flex items-center gap-4 border-t border-gray-200 pt-6 dark:border-gray-800">
+                  <div className="size-12 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+                    <div className="h-3 animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Impossible de charger les témoignages
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-700"
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
+
         {/* Testimonials Grid */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((testimonial, index) => (
+        {!isLoading && !error && testimonials.length > 0 && (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((testimonial, index) => (
             <div
               key={index}
               className="group rounded-2xl border border-gray-200 bg-gray-50 p-8 transition-all hover:border-brand-300 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-700"
@@ -85,7 +117,7 @@ export default function TestimonialsSection() {
               {/* Author */}
               <div className="flex items-center gap-4 border-t border-gray-200 pt-6 dark:border-gray-800">
                 <img
-                  src={testimonial.image}
+                  src={getMediaUrl(testimonial.avatar, "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop")}
                   alt={testimonial.name}
                   className="size-12 rounded-full object-cover"
                 />
@@ -104,6 +136,7 @@ export default function TestimonialsSection() {
             </div>
           ))}
         </div>
+        )}
 
         {/* Stats Section */}
         <div className="mt-16 grid grid-cols-2 gap-8 rounded-2xl border border-gray-200 bg-gradient-to-br from-brand-50 to-gold-50 p-8 md:grid-cols-4 dark:border-gray-800 dark:from-brand-950/30 dark:to-gold-950/30 lg:p-12">

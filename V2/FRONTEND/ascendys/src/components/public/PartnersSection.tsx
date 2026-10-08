@@ -1,13 +1,24 @@
+import { useApi } from "@/hooks/useApi";
+import { Partner } from "@/types/content.types";
+
 export default function PartnersSection() {
-  // En production, ces logos viendront de l'API
-  const partners = [
-    { name: "Microsoft", logo: "https://via.placeholder.com/150x60/9800BF/FFFFFF?text=Microsoft" },
-    { name: "Google", logo: "https://via.placeholder.com/150x60/9800BF/FFFFFF?text=Google" },
-    { name: "Meta", logo: "https://via.placeholder.com/150x60/9800BF/FFFFFF?text=Meta" },
-    { name: "Amazon", logo: "https://via.placeholder.com/150x60/9800BF/FFFFFF?text=Amazon" },
-    { name: "IBM", logo: "https://via.placeholder.com/150x60/9800BF/FFFFFF?text=IBM" },
-    { name: "Oracle", logo: "https://via.placeholder.com/150x60/9800BF/FFFFFF?text=Oracle" },
-  ];
+  // Fetch partners from API
+  const { data: partners, isLoading, error } = useApi<Partner[]>(
+    "/partners/?is_active=true&page_size=8",
+    { defaultValue: [] }
+  );
+
+  // Helper for media URL
+  const getMediaUrl = (path: string | null | undefined) => {
+    if (!path) return null;
+    if (path.startsWith("http") || path.startsWith("/")) return path;
+    return `http://127.0.0.1:8000/${path}`;
+  };
+
+  // If no partners or still loading, check if should hide section
+  if (!isLoading && !error && partners.length === 0) {
+    return null; // Hide section completely if no partners
+  }
 
   return (
     <section className="bg-gray-50 py-20 dark:bg-gray-900">
@@ -27,94 +38,69 @@ export default function PartnersSection() {
           </p>
         </div>
 
-        {/* Partners Grid */}
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
-          {partners.map((partner, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-center rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 dark:hover:border-brand-700"
-            >
-              <img
-                src={partner.logo}
-                alt={partner.name}
-                className="max-h-12 w-auto object-contain opacity-60 grayscale transition-all hover:opacity-100 hover:grayscale-0"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Certifications */}
-        <div className="mt-16 rounded-2xl border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-gray-950 lg:p-12">
-          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-            <div>
-              <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                Certifications Reconnues
-              </h3>
-              <p className="mb-6 text-gray-600 dark:text-gray-400">
-                Toutes nos formations sont certifiées et reconnues par l'État
-                et nos partenaires internationaux. Obtenez des diplômes et
-                certifications qui boostent votre employabilité.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  "Certifications Microsoft",
-                  "Google Career Certificates",
-                  "Attestations de formation professionnelle",
-                  "Diplômes reconnus par l'État",
-                ].map((item, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-center gap-3 text-gray-700 dark:text-gray-300"
-                  >
-                    <svg
-                      className="size-5 shrink-0 text-gold-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                      />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex items-center justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-500 to-gold-500 blur-3xl opacity-20" />
-                <div className="relative rounded-2xl border-4 border-brand-600 bg-white p-8 shadow-2xl dark:border-brand-400 dark:bg-gray-900">
-                  <div className="text-center">
-                    <svg
-                      className="mx-auto mb-4 size-20 text-brand-600 dark:text-brand-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                      />
-                    </svg>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      Organisme Certifié
-                    </div>
-                    <div className="mt-2 text-brand-600 dark:text-brand-400">
-                      N° Agrément: 2024-CI-XXX
-                    </div>
-                  </div>
-                </div>
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="flex items-center justify-center rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-950"
+              >
+                <div className="h-12 w-full animate-pulse bg-gray-200 dark:bg-gray-700 rounded" />
               </div>
-            </div>
+            ))}
           </div>
-        </div>
+        )}
+
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">
+              Impossible de charger les partenaires
+            </p>
+          </div>
+        )}
+
+        {/* Partners Grid */}
+        {!isLoading && !error && (
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
+            {partners.map((partner, index) => {
+              const logoUrl = getMediaUrl(partner.logo);
+              const content = logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={partner.name}
+                  className="max-h-12 w-auto object-contain opacity-60 grayscale transition-all hover:opacity-100 hover:grayscale-0"
+                />
+              ) : (
+                <div className="text-center font-bold text-gray-700 dark:text-gray-300">
+                  {partner.name}
+                </div>
+              );
+
+              const card = (
+                <div className="flex items-center justify-center rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 dark:hover:border-brand-700">
+                  {content}
+                </div>
+              );
+
+              return partner.website ? (
+                <a
+                  key={index}
+                  href={partner.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {card}
+                </a>
+              ) : (
+                <div key={index}>
+                  {card}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
