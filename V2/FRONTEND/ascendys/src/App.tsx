@@ -3,7 +3,16 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import AppLayout from "./layout/AppLayout";
 import Home from "./pages/Public/Home";
 import About from "./pages/Public/About";
+import Services from "./pages/Public/Services";
+import Blog from "./pages/Public/Blog";
+import Gallery from "./pages/Public/Gallery";
 import Trainings from "./pages/Public/Trainings";
+import TrainingDetail from "./pages/Public/TrainingDetail";
+import EnrollTraining from "./pages/Public/EnrollTraining";
+import LegalNotice from "./pages/Public/LegalNotice";
+import PrivacyPolicy from "./pages/Public/PrivacyPolicy";
+import TermsOfUse from "./pages/Public/TermsOfUse";
+import CookiesPolicy from "./pages/Public/CookiesPolicy";
 import TrainingsPublic from "./pages/Public/TrainingsPublic";
 import EnrollmentPage from "./pages/Public/EnrollmentPage";
 import PaymentPage from "./pages/Public/PaymentPage";
@@ -82,8 +91,17 @@ export default function App() {
           {/* Public Pages - Main Entry Point */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/trainings" element={<Trainings />} />
+          <Route path="/trainings/:slug/enroll" element={<EnrollTraining />} />
+          <Route path="/trainings/:slug" element={<TrainingDetail />} />
           <Route path="/formations" element={<TrainingsPublic />} />
+          <Route path="/legal-notice" element={<LegalNotice />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
+          <Route path="/cookies" element={<CookiesPolicy />} />
           <Route path="/enroll" element={<EnrollmentPage />} />
           <Route path="/payment/:enrollmentId" element={<PaymentPage />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
