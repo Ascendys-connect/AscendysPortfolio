@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useApi } from "@/hooks/useApi";
 import type { Training } from "@/types/content.types";
+import { getMediaUrl, formatPrice } from "@/utils/media";
 
 export default function TrainingsSection() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -43,13 +44,6 @@ export default function TrainingsSection() {
       ADVANCED: "Avancé",
     };
     return levels[level] || level;
-  };
-
-  // Helper for media URL
-  const getMediaUrl = (path: string | null | undefined, fallback: string) => {
-    if (!path) return fallback;
-    if (path.startsWith("http") || path.startsWith("/")) return path;
-    return `http://127.0.0.1:8000/${path}`;
   };
 
   return (
@@ -135,7 +129,7 @@ export default function TrainingsSection() {
               {/* Image */}
               <div className="relative h-48 overflow-hidden bg-gray-200 dark:bg-gray-800">
                 <img
-                  src={getMediaUrl(training.image, "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop")}
+                  src={getMediaUrl(training.image, "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop") || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop"}
                   alt={training.title}
                   className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
@@ -190,9 +184,7 @@ export default function TrainingsSection() {
                       À partir de
                     </div>
                     <div className="text-xl font-bold text-brand-600 dark:text-brand-400">
-                      {training.price && training.price !== "0" && training.price !== "" 
-                        ? `${training.price} ${training.currency}` 
-                        : "Nous contacter"}
+                      {formatPrice(training.price, training.currency)}
                     </div>
                   </div>
                   <div className="flex gap-2">

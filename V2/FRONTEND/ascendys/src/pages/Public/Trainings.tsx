@@ -4,6 +4,7 @@ import PublicNavbar from "@/components/public/PublicNavbar";
 import PublicFooter from "@/components/public/PublicFooter";
 import { useApi } from "@/hooks/useApi";
 import type { Training } from "@/types/content.types";
+import { formatPrice } from "@/utils/media";
 
 export default function Trainings() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -237,9 +238,7 @@ export default function Trainings() {
                               À partir de
                             </div>
                             <div className="text-xl font-bold text-brand-600 dark:text-brand-400">
-                              {training.price && training.price !== "0" && training.price !== ""
-                                ? `${training.price} ${training.currency}`
-                                : "Nous contacter"}
+                              {formatPrice(training.price, training.currency)}
                             </div>
                           </div>
                           <a

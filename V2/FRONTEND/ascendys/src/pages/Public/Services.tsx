@@ -9,6 +9,7 @@ import PublicFooter from "@/components/public/PublicFooter";
 import WhatsAppButton from "@/components/public/WhatsAppButton";
 import { useApi } from "@/hooks/useApi";
 import type { Service } from "@/services/services.service";
+import { getMediaUrl } from "@/utils/media";
 
 export default function Services() {
   // Fetch services from API
@@ -16,13 +17,6 @@ export default function Services() {
     "/services/?is_active=true",
     { defaultValue: [] }
   );
-
-  // Helper for media URL
-  const getMediaUrl = (path: string | null | undefined) => {
-    if (!path) return null;
-    if (path.startsWith("http") || path.startsWith("/")) return path;
-    return `http://127.0.0.1:8000/${path}`;
-  };
 
   // Default icon SVG (book icon)
   const defaultIcon = (

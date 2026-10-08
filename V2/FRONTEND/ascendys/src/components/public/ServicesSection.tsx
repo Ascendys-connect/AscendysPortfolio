@@ -1,5 +1,6 @@
 import { useApi } from "@/hooks/useApi";
 import type { Service } from "@/services/services.service";
+import { getMediaUrl } from "@/utils/media";
 
 export default function ServicesSection() {
   // Fetch services from API
@@ -7,13 +8,6 @@ export default function ServicesSection() {
     "/services/?is_active=true&page_size=6",
     { defaultValue: [] }
   );
-
-  // Helper for media URL
-  const getMediaUrl = (path: string | null | undefined) => {
-    if (!path) return null;
-    if (path.startsWith("http") || path.startsWith("/")) return path;
-    return `http://127.0.0.1:8000/${path}`;
-  };
 
   // Default icon SVG (book icon from original)
   const defaultIcon = (
@@ -48,7 +42,7 @@ export default function ServicesSection() {
         {/* Loading State */}
         {isLoading && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
                 className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950"
