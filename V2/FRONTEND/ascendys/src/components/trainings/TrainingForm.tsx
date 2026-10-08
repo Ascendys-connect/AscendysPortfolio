@@ -72,6 +72,24 @@ export default function TrainingForm({
     // Status
     status: initialData?.status || "DRAFT",
     is_featured: initialData?.is_featured || false,
+    
+    // Marketing fields (new)
+    max_participants: initialData?.max_participants || "",
+    sessions_count: initialData?.sessions_count || "",
+    session_duration: initialData?.session_duration || "",
+    frequency: initialData?.frequency || "",
+    for_who: initialData?.for_who || [""],
+    access_prerequisites: initialData?.access_prerequisites || [""],
+    problems_solved: initialData?.problems_solved || [""],
+    deliverables: initialData?.deliverables || [""],
+    skills_acquired: initialData?.skills_acquired || [""],
+    transformation_before: initialData?.transformation_before || "",
+    transformation_after: initialData?.transformation_after || "",
+    included_items: initialData?.included_items || [""],
+    not_included_items: initialData?.not_included_items || [""],
+    strategic_positioning: initialData?.strategic_positioning || "",
+    payment_terms: initialData?.payment_terms || "",
+    premium_options: initialData?.premium_options || [""],
   });
 
   const [images, setImages] = useState<{
@@ -114,6 +132,22 @@ export default function TrainingForm({
         certification: initialData.certification || false,
         status: initialData.status || "DRAFT",
         is_featured: initialData.is_featured || false,
+        max_participants: initialData.max_participants || "",
+        sessions_count: initialData.sessions_count || "",
+        session_duration: initialData.session_duration || "",
+        frequency: initialData.frequency || "",
+        for_who: initialData.for_who || [""],
+        access_prerequisites: initialData.access_prerequisites || [""],
+        problems_solved: initialData.problems_solved || [""],
+        deliverables: initialData.deliverables || [""],
+        skills_acquired: initialData.skills_acquired || [""],
+        transformation_before: initialData.transformation_before || "",
+        transformation_after: initialData.transformation_after || "",
+        included_items: initialData.included_items || [""],
+        not_included_items: initialData.not_included_items || [""],
+        strategic_positioning: initialData.strategic_positioning || "",
+        payment_terms: initialData.payment_terms || "",
+        premium_options: initialData.premium_options || [""],
       });
       
       setImagePreviews({
@@ -306,6 +340,7 @@ export default function TrainingForm({
     { id: "details", label: "Détails" },
     { id: "schedule", label: "Planning & Lieu" },
     { id: "media", label: "Médias" },
+    { id: "marketing", label: "Marketing & Vente" },
   ];
 
   return (
@@ -761,6 +796,426 @@ export default function TrainingForm({
                 maxSizeMB={5}
               />
             </div>
+          </div>
+        )}
+
+        {/* Marketing & Vente Tab */}
+        {activeTab === "marketing" && (
+          <div className="space-y-8">
+
+            {/* Section: Sessions */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">📅 Détails des sessions</h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <Label>Places maximum</Label>
+                  <Input
+                    type="number"
+                    value={formData.max_participants}
+                    onChange={(e) => handleChange("max_participants", e.target.value)}
+                    placeholder="Ex: 10"
+                    min="1"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <Label>Nombre de sessions</Label>
+                  <Input
+                    type="number"
+                    value={formData.sessions_count}
+                    onChange={(e) => handleChange("sessions_count", e.target.value)}
+                    placeholder="Ex: 12"
+                    min="1"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <Label>Durée par session</Label>
+                  <Input
+                    type="text"
+                    value={formData.session_duration}
+                    onChange={(e) => handleChange("session_duration", e.target.value)}
+                    placeholder="Ex: 2h, 4h"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <Label>Fréquence</Label>
+                  <Input
+                    type="text"
+                    value={formData.frequency}
+                    onChange={(e) => handleChange("frequency", e.target.value)}
+                    placeholder="Ex: 2/semaine, week-end intensif"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section: Ciblage */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">🎯 Ciblage & Accès</h3>
+
+              <div className="mb-6">
+                <Label>Cette formation est pour vous si…</Label>
+                {formData.for_who.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("for_who", index, e.target.value)}
+                      placeholder={`Critère ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.for_who.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("for_who", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("for_who")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter un critère
+                </Button>
+              </div>
+
+              <div>
+                <Label>Prérequis d'accès</Label>
+                {formData.access_prerequisites.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("access_prerequisites", index, e.target.value)}
+                      placeholder={`Prérequis ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.access_prerequisites.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("access_prerequisites", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("access_prerequisites")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter un prérequis
+                </Button>
+              </div>
+            </div>
+
+            {/* Section: Problèmes & Transformation */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">💡 Problèmes & Transformation</h3>
+
+              <div className="mb-6">
+                <Label>Problèmes résolus par cette formation</Label>
+                {formData.problems_solved.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("problems_solved", index, e.target.value)}
+                      placeholder={`Problème ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.problems_solved.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("problems_solved", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("problems_solved")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter un problème
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <Label>Avant (transformation)</Label>
+                  <textarea
+                    value={formData.transformation_before}
+                    onChange={(e) => handleChange("transformation_before", e.target.value)}
+                    placeholder="Ex: Je fais des missions quand on m'appelle"
+                    rows={3}
+                    disabled={isLoading}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <Label>Après (transformation)</Label>
+                  <textarea
+                    value={formData.transformation_after}
+                    onChange={(e) => handleChange("transformation_after", e.target.value)}
+                    placeholder="Ex: Je pilote une activité de conseil structurée et rentable"
+                    rows={3}
+                    disabled={isLoading}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section: Ce que vous obtiendrez */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">🏆 Ce que vous obtiendrez</h3>
+
+              <div className="mb-6">
+                <Label>Livrables professionnels</Label>
+                {formData.deliverables.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("deliverables", index, e.target.value)}
+                      placeholder={`Livrable ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.deliverables.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("deliverables", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("deliverables")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter un livrable
+                </Button>
+              </div>
+
+              <div>
+                <Label>Compétences acquises</Label>
+                {formData.skills_acquired.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("skills_acquired", index, e.target.value)}
+                      placeholder={`Compétence ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.skills_acquired.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("skills_acquired", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("skills_acquired")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter une compétence
+                </Button>
+              </div>
+            </div>
+
+            {/* Section: Contenu inclus/exclu */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">📦 Contenu inclus / exclu</h3>
+
+              <div className="mb-6">
+                <Label>Ce qui est inclus</Label>
+                {formData.included_items.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("included_items", index, e.target.value)}
+                      placeholder={`Élément inclus ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.included_items.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("included_items", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("included_items")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter un élément inclus
+                </Button>
+              </div>
+
+              <div>
+                <Label>Ce qui n'est PAS inclus</Label>
+                {formData.not_included_items.map((item: string, index: number) => (
+                  <div key={index} className="mb-2 flex gap-2">
+                    <Input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleArrayChange("not_included_items", index, e.target.value)}
+                      placeholder={`Élément non inclus ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                    {formData.not_included_items.length > 1 && (
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveArrayItem("not_included_items", index)}
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  onClick={() => handleAddArrayItem("not_included_items")}
+                  variant="secondary"
+                  size="sm"
+                  disabled={isLoading}
+                  className="mt-2"
+                >
+                  + Ajouter un élément non inclus
+                </Button>
+              </div>
+            </div>
+
+            {/* Section: Positionnement & Paiement */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">💼 Positionnement & Paiement</h3>
+
+              <div className="mb-6">
+                <Label>Positionnement stratégique</Label>
+                <textarea
+                  value={formData.strategic_positioning}
+                  onChange={(e) => handleChange("strategic_positioning", e.target.value)}
+                  placeholder="Ex: Vous avez déjà les compétences. Transformez-les en activité de conseil structurée."
+                  rows={4}
+                  disabled={isLoading}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <Label>Modalités de paiement</Label>
+                <textarea
+                  value={formData.payment_terms}
+                  onChange={(e) => handleChange("payment_terms", e.target.value)}
+                  placeholder="Ex: Un seul versement / 70% à l'inscription et 30% avant la 3e semaine"
+                  rows={3}
+                  disabled={isLoading}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+            </div>
+
+            {/* Section: Options Premium */}
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">⭐ Options Premium</h3>
+              <Label>Options premium disponibles</Label>
+              {formData.premium_options.map((item: string, index: number) => (
+                <div key={index} className="mb-2 flex gap-2">
+                  <Input
+                    type="text"
+                    value={item}
+                    onChange={(e) => handleArrayChange("premium_options", index, e.target.value)}
+                    placeholder={`Option premium ${index + 1} (ex: Pack Mentorat Elite)`}
+                    disabled={isLoading}
+                  />
+                  {formData.premium_options.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => handleRemoveArrayItem("premium_options", index)}
+                      variant="secondary"
+                      size="sm"
+                      disabled={isLoading}
+                    >
+                      ✕
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button
+                type="button"
+                onClick={() => handleAddArrayItem("premium_options")}
+                variant="secondary"
+                size="sm"
+                disabled={isLoading}
+                className="mt-2"
+              >
+                + Ajouter une option premium
+              </Button>
+            </div>
+
           </div>
         )}
       </div>
