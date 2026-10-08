@@ -11,47 +11,51 @@ import type {
 import type { ApiResponse } from '@/types/api.types';
 
 class EnrollmentsService {
-  private baseURL = '/enrollments';
+  private baseURL = '/trainings/enrollments';
 
   /**
    * Créer une inscription (status = PENDING)
    */
   async create(data: EnrollmentFormData): Promise<Enrollment> {
-    const response = await apiService.post<ApiResponse<Enrollment>>(
+    const response: any = await apiService.post<Enrollment>(
       `${this.baseURL}/`,
       data
     );
-    return response.data!;
+    // Handle both wrapped and unwrapped responses
+    return response?.data || response;
   }
 
   /**
    * Récupérer une inscription par ID
    */
   async get(id: string): Promise<Enrollment> {
-    const response = await apiService.get<ApiResponse<Enrollment>>(
+    const response: any = await apiService.get<Enrollment>(
       `${this.baseURL}/${id}/`
     );
-    return response.data!;
+    // Handle both wrapped and unwrapped responses
+    return response?.data || response;
   }
 
   /**
    * Initier le paiement FedaPay
    */
   async initiatePayment(id: string): Promise<PaymentResponse> {
-    const response = await apiService.post<ApiResponse<PaymentResponse>>(
+    const response: any = await apiService.post<PaymentResponse>(
       `${this.baseURL}/${id}/initiate-payment/`
     );
-    return response.data!;
+    // Handle both wrapped and unwrapped responses
+    return response?.data || response;
   }
 
   /**
    * Réessayer le paiement
    */
   async retryPayment(id: string): Promise<PaymentResponse> {
-    const response = await apiService.post<ApiResponse<PaymentResponse>>(
+    const response: any = await apiService.post<PaymentResponse>(
       `${this.baseURL}/${id}/retry-payment/`
     );
-    return response.data!;
+    // Handle both wrapped and unwrapped responses
+    return response?.data || response;
   }
 }
 

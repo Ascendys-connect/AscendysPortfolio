@@ -19,6 +19,9 @@ import PaymentPage from "./pages/Public/PaymentPage";
 import PaymentSuccess from "./pages/Public/PaymentSuccess";
 import PaymentError from "./pages/Public/PaymentError";
 import Contact from "./pages/Public/Contact";
+import BlogDetail from "./pages/Public/BlogDetail";
+import EventDetail from "./pages/Public/EventDetail";
+import OfferDetail from "./pages/Public/OfferDetail";
 import SignIn from "./pages/AuthPages/SignIn";
 import VerifyOTP from "./pages/AuthPages/VerifyOTP";
 import ChangePassword from "./pages/AuthPages/ChangePassword";
@@ -107,6 +110,9 @@ export default function App() {
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/error" element={<PaymentError />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/events/:slug" element={<EventDetail />} />
+          <Route path="/offers/:slug" element={<OfferDetail />} />
 
           {/* Auth Routes (Guest Only) */}
           <Route
@@ -438,11 +444,11 @@ export default function App() {
               }
             />
 
-            {/* Messages (SUPER_ADMIN + ADMIN) */}
+            {/* Messages (SUPER_ADMIN + ADMIN + EDITOR) */}
             <Route
               path="/messages/contacts"
               element={
-                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
                   <ContactMessages />
                 </RoleGuard>
               }
@@ -450,7 +456,7 @@ export default function App() {
             <Route
               path="/messages/newsletter"
               element={
-                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
                   <Newsletter />
                 </RoleGuard>
               }
