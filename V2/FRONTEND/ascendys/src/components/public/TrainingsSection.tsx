@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
 import { useApi } from "@/hooks/useApi";
-import { Training } from "@/types/content.types";
+import type { Training } from "@/types/content.types";
 
 export default function TrainingsSection() {
   const [activeCategory, setActiveCategory] = useState("all");
 
   // Fetch trainings from API
   const { data: trainings, isLoading, error, refetch } = useApi<Training[]>(
-    "/trainings/?status=PUBLISHED&page_size=4",
+    "/trainings/?status=PUBLISHED&page_size=6",
     { defaultValue: [] }
   );
 

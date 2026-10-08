@@ -1,52 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PageMeta from "@/components/common/PageMeta";
 import PublicNavbar from "@/components/public/PublicNavbar";
 import PublicFooter from "@/components/public/PublicFooter";
 import { useApi } from "@/hooks/useApi";
-
-interface Training {
-  id: string;
-  title: string;
-  description: string;
-  slug: string;
-  category: {
-    id: string;
-    name: string;
-  };
-  duration_hours: number;
-  price: number;
-  level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
-  status: "DRAFT" | "PUBLISHED";
-  image?: string;
-  objectives: string[];
-  prerequisites: string[];
-}
+import type { Training } from "@/types/content.types";
 
 export default function Trainings() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: trainings, isLoading } = useApi<Training[]>("/trainings/trainings/", {
+  const { data: trainings, isLoading } = useApi<Training[]>("/trainings/?status=PUBLISHED", {
     defaultValue: [],
   });
 
-  // Filter published trainings only
-  const publishedTrainings = trainings.filter((t) => t.status === "PUBLISHED");
+  // Filter published trainings - already filtered by API
+  const publishedTrainings = trainings;
 
   // Get unique categories
   const categories = [
     { id: "all", name: "Toutes les formations" },
     ...Array.from(
-      new Map(
-        publishedTrainings.map((t) => [t.category.id, t.category])
-      ).values()
-    ),
+      new Set(
+        publishedTrainings
+          .map((t) => t.category_name)
+          .filter((name) => name && name.trim() !== "")
+      )
+    ).map((name) => ({
+      id: name.toLowerCase(),
+      name: name,
+    })),
   ];
 
   // Filter trainings
   const filteredTrainings = publishedTrainings.filter((training) => {
     const matchesCategory =
-      selectedCategory === "all" || training.category.id === selectedCategory;
+      selectedCategory === "all" || training.category_name?.toLowerCase() === selectedCategory;
     const matchesSearch = training.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -62,14 +50,6 @@ export default function Trainings() {
     return labels[level as keyof typeof labels] || level;
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "XOF",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
-
   return (
     <>
       <PageMeta
@@ -82,8 +62,17 @@ export default function Trainings() {
 
         <main className="pt-20">
           {/* Header */}
-          <section className="bg-gradient-to-br from-brand-600 to-brand-800 py-16 text-white lg:py-20">
-            <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <section className="relative py-16 text-white lg:py-20">
+            {/* Background Image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center opacity-30"
+              style={{ backgroundImage: 'url(/formation.avif)' }}
+            />
+            
+            {/* Dark Overlay */}
+            <div className="absolute inset-0 bg-black/50" />
+            
+            <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
               <h1 className="mb-4 text-4xl font-bold sm:text-5xl">
                 Nos Formations
               </h1>
@@ -224,7 +213,7 @@ export default function Trainings() {
                             {getLevelLabel(training.level)}
                           </span>
                           <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-900 backdrop-blur-sm">
-                            {training.duration_hours}h
+                            {training.duration}
                           </span>
                         </div>
                       </div>
@@ -232,13 +221,13 @@ export default function Trainings() {
                       {/* Content */}
                       <div className="p-6">
                         <div className="mb-2 text-xs font-semibold uppercase text-brand-600 dark:text-brand-400">
-                          {training.category.name}
+                          {training.category_name}
                         </div>
                         <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
                           {training.title}
                         </h3>
                         <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                          {training.description}
+                          {training.short_description || training.description}
                         </p>
 
                         {/* Price & CTA */}
@@ -248,14 +237,16 @@ export default function Trainings() {
                               À partir de
                             </div>
                             <div className="text-xl font-bold text-brand-600 dark:text-brand-400">
-                              {formatPrice(training.price)}
+                              {training.price && training.price !== "0" && training.price !== ""
+                                ? `${training.price} ${training.currency}`
+                                : "Nous contacter"}
                             </div>
                           </div>
                           <a
-                            href={`/home#contact`}
+                            href={`/trainings/${training.slug}`}
                             className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-lg"
                           >
-                            S'inscrire
+                            En savoir plus
                           </a>
                         </div>
                       </div>

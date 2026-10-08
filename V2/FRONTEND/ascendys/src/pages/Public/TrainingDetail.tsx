@@ -1,5 +1,4 @@
 import { useParams, Link, Navigate } from "react-router";
-import { useState, useEffect } from "react";
 import PageMeta from "@/components/common/PageMeta";
 import PublicNavbar from "@/components/public/PublicNavbar";
 import PublicFooter from "@/components/public/PublicFooter";
@@ -17,7 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useApi } from "@/hooks/useApi";
-import { Training } from "@/types/content.types";
+import type { Training } from "@/types/content.types";
 
 const levelLabels: Record<string, string> = {
   BEGINNER: "Débutant",
@@ -33,22 +32,13 @@ const categoryColors: Record<string, string> = {
 
 export default function TrainingDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const [training, setTraining] = useState<Training | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const { data: trainings } = useApi<Training[]>("/trainings/trainings/", {
-    defaultValue: [],
-  });
+  const { data: training, isLoading, error } = useApi<Training | null>(
+    `/trainings/${slug}/`,
+    { defaultValue: null }
+  );
 
-  useEffect(() => {
-    if (trainings.length > 0) {
-      const found = trainings.find((t) => t.slug === slug && t.status === "PUBLISHED");
-      setTraining(found || null);
-      setLoading(false);
-    }
-  }, [trainings, slug]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         <PublicNavbar />
@@ -62,7 +52,7 @@ export default function TrainingDetail() {
     );
   }
 
-  if (!training) {
+  if (!training || error) {
     return <Navigate to="/trainings" replace />;
   }
 

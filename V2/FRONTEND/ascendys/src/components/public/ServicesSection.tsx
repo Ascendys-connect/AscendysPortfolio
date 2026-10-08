@@ -1,10 +1,10 @@
 import { useApi } from "@/hooks/useApi";
-import { Service } from "@/services/services.service";
+import type { Service } from "@/services/services.service";
 
 export default function ServicesSection() {
   // Fetch services from API
   const { data: services, isLoading, error, refetch } = useApi<Service[]>(
-    "/services/?is_active=true&page_size=4",
+    "/services/?is_active=true&page_size=6",
     { defaultValue: [] }
   );
 
@@ -158,6 +158,31 @@ export default function ServicesSection() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* View All Button */}
+        {!isLoading && !error && services.length > 0 && (
+          <div className="mt-12 text-center">
+            <a
+              href="/services"
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-brand-600 px-8 py-3 font-semibold text-brand-600 transition-all hover:bg-brand-600 hover:text-white dark:border-brand-400 dark:text-brand-400 dark:hover:bg-brand-400 dark:hover:text-white"
+            >
+              Voir tous nos services
+              <svg
+                className="size-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </a>
           </div>
         )}
       </div>
