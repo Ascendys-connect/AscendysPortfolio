@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router";
 import PageMeta from "@/components/common/PageMeta";
 import PublicNavbar from "@/components/public/PublicNavbar";
 import PublicFooter from "@/components/public/PublicFooter";
 import WhatsAppButton from "@/components/public/WhatsAppButton";
+import EnrollmentForm from "@/components/trainings/EnrollmentForm";
 import {
   CheckCircle,
   XCircle,
@@ -32,6 +34,7 @@ const categoryColors: Record<string, string> = {
 
 export default function TrainingDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
 
   const { data: training, isLoading, error } = useApi<Training | null>(
     `/trainings/${slug}/`,
@@ -136,12 +139,12 @@ export default function TrainingDetail() {
                     {training.price}
                   </div>
                 </div>
-                <Link
-                  to="/contact"
+                <button
+                  onClick={() => setIsEnrollModalOpen(true)}
                   className="inline-flex items-center gap-2 rounded-lg bg-[#FFC000] px-8 py-4 font-semibold text-gray-900 transition-all hover:bg-[#ffcc33] hover:shadow-xl hover:-translate-y-0.5"
                 >
                   S'inscrire maintenant <ArrowRight size={16} />
-                </Link>
+                </button>
               </div>
             </div>
           </section>
@@ -156,12 +159,12 @@ export default function TrainingDetail() {
                 <span className="text-sm font-bold" style={{ color }}>
                   {training.price}
                 </span>
-                <Link
-                  to="/contact"
+                <button
+                  onClick={() => setIsEnrollModalOpen(true)}
                   className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-700"
                 >
                   S'inscrire <ArrowRight size={14} />
-                </Link>
+                </button>
               </div>
             </div>
           </div>
@@ -554,12 +557,12 @@ export default function TrainingDetail() {
                             </p>
                           </div>
                         )}
-                        <Link
-                          to="/contact"
-                          className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition-all hover:bg-brand-700"
+                        <button
+                          onClick={() => setIsEnrollModalOpen(true)}
+                          className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition-all hover:bg-brand-700"
                         >
                           S'inscrire <ArrowRight size={16} />
-                        </Link>
+                        </button>
                         <Link
                           to="/contact"
                           className="text-center text-xs text-gray-500 transition-colors hover:text-brand-600 dark:text-gray-500 dark:hover:text-brand-400"
@@ -591,12 +594,12 @@ export default function TrainingDetail() {
                   Inscrivez-vous maintenant pour réserver votre place.
                 </p>
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                  <Link
-                    to="/contact"
+                  <button
+                    onClick={() => setIsEnrollModalOpen(true)}
                     className="inline-flex items-center gap-2 rounded-lg bg-[#FFC000] px-8 py-4 font-semibold text-gray-900 transition-all hover:bg-[#ffcc33] hover:shadow-xl"
                   >
                     S'inscrire maintenant <ArrowRight size={16} />
-                  </Link>
+                  </button>
                   <Link
                     to="/trainings"
                     className="inline-flex items-center gap-2 rounded-lg border-2 border-white bg-white/10 px-8 py-4 font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
@@ -611,6 +614,35 @@ export default function TrainingDetail() {
 
         <PublicFooter />
         <WhatsAppButton />
+
+        {/* Enrollment Modal */}
+        {isEnrollModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="relative w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-900">
+              {/* Close button */}
+              <button
+                onClick={() => setIsEnrollModalOpen(false)}
+                className="absolute right-4 top-4 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                aria-label="Fermer"
+              >
+                <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Modal Title */}
+              <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
+                Inscription à la formation
+              </h2>
+
+              {/* Enrollment Form */}
+              <EnrollmentForm
+                trainingId={training.id}
+                trainingTitle={training.title}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
