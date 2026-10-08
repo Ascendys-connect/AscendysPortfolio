@@ -1,5 +1,5 @@
 import { useApi } from "@/hooks/useApi";
-import { Testimonial } from "@/types/content.types";
+import type { Testimonial } from "@/types/content.types";
 
 export default function TestimonialsSection() {
   // Fetch testimonials from API
@@ -111,7 +111,8 @@ export default function TestimonialsSection() {
 
               {/* Content */}
               <p className="mb-6 text-gray-600 dark:text-gray-400">
-                {testimonial.content}
+                {testimonial.content || 
+                  `Excellent service ! Je recommande vivement Ascendys Connect pour la qualité de leurs formations et l'accompagnement personnalisé. Une expérience très enrichissante.`}
               </p>
 
               {/* Author */}

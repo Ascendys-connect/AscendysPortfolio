@@ -8,7 +8,7 @@ import type { Gallery } from '@/types/content.types';
 
 export default function Gallery() {
   const { data: galleries, isLoading } = useApi<Gallery[]>(
-    '/galleries/?is_published=true',
+    '/media/galleries/?is_published=true',
     { defaultValue: [] }
   );
 
