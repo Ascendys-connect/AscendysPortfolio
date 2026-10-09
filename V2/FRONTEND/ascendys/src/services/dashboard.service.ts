@@ -7,7 +7,6 @@ import { apiService } from './api.service';
 
 export interface EditorStats {
   draft_count: number;
-  pending_count: number;
   published_count: number;
   total_count: number;
 }

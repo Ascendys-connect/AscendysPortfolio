@@ -1,34 +1,89 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import PageMeta from "@/components/common/PageMeta";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { dashboardService, type EditorStats } from "@/services/dashboard.service";
 
 export default function EditorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { showError } = useToast();
   const [stats, setStats] = useState<EditorStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    // Set mounted flag
+    isMountedRef.current = true;
+
     const fetchStats = async () => {
       try {
         setLoadingStats(true);
         setError(null);
         const data = await dashboardService.getEditorStats();
-        setStats(data);
+        
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setStats(data);
+        }
       } catch (err: any) {
         console.error('Failed to load editor stats:', err);
-        setError('Impossible de charger les statistiques');
-        setStats(null);
+        const errorMessage = 'Impossible de charger les statistiques';
+        
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setError(errorMessage);
+          setStats(null);
+          // Show user-visible error notification
+          showError('Erreur', errorMessage);
+        }
       } finally {
-        setLoadingStats(false);
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setLoadingStats(false);
+        }
       }
     };
 
     fetchStats();
-  }, []);
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [showError]);
+
+  const handleRetry = () => {
+    // Re-trigger the fetch by remounting effect logic manually
+    setLoadingStats(true);
+    setError(null);
+    
+    const fetchStats = async () => {
+      try {
+        const data = await dashboardService.getEditorStats();
+        if (isMountedRef.current) {
+          setStats(data);
+          setError(null);
+        }
+      } catch (err: any) {
+        console.error('Failed to load editor stats:', err);
+        const errorMessage = 'Impossible de charger les statistiques';
+        if (isMountedRef.current) {
+          setError(errorMessage);
+          setStats(null);
+          showError('Erreur', errorMessage);
+        }
+      } finally {
+        if (isMountedRef.current) {
+          setLoadingStats(false);
+        }
+      }
+    };
+
+    fetchStats();
+  };
 
   const renderStatValue = (value: number | undefined) => {
     if (loadingStats) {
@@ -59,7 +114,44 @@ export default function EditorDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {error && (
+          <div className="rounded-lg border border-danger-200 bg-danger-50 p-4 dark:border-danger-900/50 dark:bg-danger-900/20">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-3">
+                <svg
+                  className="size-5 text-danger-600 dark:text-danger-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <h3 className="font-medium text-danger-900 dark:text-danger-200">
+                    Erreur de chargement
+                  </h3>
+                  <p className="mt-1 text-sm text-danger-700 dark:text-danger-300">
+                    {error}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleRetry}
+                disabled={loadingStats}
+                className="rounded-lg bg-danger-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-danger-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Réessayer
+              </button>
+            </div>
+          </div>
+        )}
+        
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
@@ -88,37 +180,6 @@ export default function EditorDashboard() {
             </div>
             <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
               En cours de rédaction
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  En attente
-                </p>
-                <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
-                  {renderStatValue(stats?.pending_count)}
-                </p>
-              </div>
-              <div className="flex size-12 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-900/30">
-                <svg
-                  className="size-6 text-warning-600 dark:text-warning-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-              En attente de validation
             </p>
           </div>
 

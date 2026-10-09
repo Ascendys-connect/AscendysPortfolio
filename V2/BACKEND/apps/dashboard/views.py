@@ -380,8 +380,8 @@ def editor_stats(request):
     trainings_published = trainings_qs.filter(status='PUBLISHED').count()
     trainings_total = trainings_qs.count()
     
-    # Get blog posts created by this user (uses 'author' field)
-    blog_qs = BlogPost.objects.filter(author=user)
+    # Get blog posts created by this user (uses 'author' field, includes soft-delete filter)
+    blog_qs = BlogPost.objects.filter(author=user, is_deleted=False)
     blog_draft = blog_qs.filter(status='DRAFT').count()
     blog_published = blog_qs.filter(status='PUBLISHED').count()
     blog_total = blog_qs.count()
@@ -398,21 +398,16 @@ def editor_stats(request):
     services_published = services_qs.filter(status='PUBLISHED').count()
     services_total = services_qs.count()
     
-    # Aggregate counts
+    # Aggregate counts across all content types
     draft_count = trainings_draft + blog_draft + events_draft + services_draft
     published_count = trainings_published + blog_published + events_published + services_published
     total_count = trainings_total + blog_total + events_total + services_total
-    
-    # "Pending" count: editors create as DRAFT, waiting for admin approval
-    # So pending = draft in this context
-    pending_count = draft_count
     
     return Response({
         'success': True,
         'message': 'Statistiques de l\'éditeur récupérées avec succès',
         'data': {
             'draft_count': draft_count,
-            'pending_count': pending_count,
             'published_count': published_count,
             'total_count': total_count,
         }
