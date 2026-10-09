@@ -9,6 +9,8 @@ class ContactMessageCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating contact messages.
     """
+    subject = serializers.CharField(required=False, default='GENERAL')
+
     class Meta:
         model = ContactMessage
         fields = [
@@ -29,6 +31,30 @@ class ContactMessageCreateSerializer(serializers.ModelSerializer):
                 "Vous devez accepter la politique de confidentialité."
             )
         return value
+    
+    def validate_subject(self, value):
+        """Map common form subjects to model choice keys."""
+        if not value:
+            return 'GENERAL'
+        mapping = {
+            'information': 'GENERAL',
+            'general': 'GENERAL',
+            'formation': 'TRAINING',
+            'training': 'TRAINING',
+            'service': 'SERVICE',
+            'devis': 'SERVICE',
+            'partenariat': 'PARTNERSHIP',
+            'partnership': 'PARTNERSHIP',
+            'support': 'SUPPORT',
+            'autre': 'OTHER',
+            'other': 'OTHER',
+        }
+        val_upper = str(value).upper().strip()
+        valid_keys = [c[0] for c in ContactMessage.SUBJECT_CHOICES]
+        if val_upper in valid_keys:
+            return val_upper
+        val_lower = str(value).lower().strip()
+        return mapping.get(val_lower, 'OTHER')
     
     def validate_message(self, value):
         """Validate message length."""

@@ -1,7 +1,7 @@
-import { UsFlagIcon } from "@/icons";
+import { UsFlagIcon, FrFlagIcon } from "@/icons";
 import type React from "react";
 
-export const locales = ["en"] as const;
+export const locales = ["en", "fr"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "en";
 
@@ -18,32 +18,17 @@ export const languages: Language[] = [
   {
     id: "en",
     name: "English",
-    shortName: "English",
+    shortName: "EN",
     dir: "ltr",
     FlagIcon: UsFlagIcon,
   },
-  // {
-  //   id: "ar",
-  //   name: "Arabic (Saudi)",
-  //   shortName: "Arabic",
-  //   dir: "rtl",
-  //   FlagIcon: SaFlagIcon,
-  //   badge: "RTL",
-  // },
-  // {
-  //   id: "es",
-  //   name: "Español",
-  //   shortName: "Español",
-  //   dir: "ltr",
-  //   FlagIcon: EsFlagIcon,
-  // },
-  // {
-  //   id: "de",
-  //   name: "Deutsch",
-  //   shortName: "Deutsch",
-  //   dir: "ltr",
-  //   FlagIcon: DeFlagIcon,
-  // },
+  {
+    id: "fr",
+    name: "Français",
+    shortName: "FR",
+    dir: "ltr",
+    FlagIcon: FrFlagIcon,
+  },
 ];
 
 export function getLanguage(locale: Locale): Language {

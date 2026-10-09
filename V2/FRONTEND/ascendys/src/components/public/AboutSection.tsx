@@ -1,22 +1,24 @@
+import { Award, Users, Lightbulb, MapPin } from "lucide-react";
+
 export default function AboutSection() {
   const values = [
     {
-      icon: "🎯",
+      icon: <Award size={28} />,
       title: "Excellence",
       description: "Nous visons l'excellence dans chaque formation dispensée",
     },
     {
-      icon: "🤝",
+      icon: <Users size={28} />,
       title: "Accompagnement",
       description: "Un suivi personnalisé pour garantir votre réussite",
     },
     {
-      icon: "💡",
+      icon: <Lightbulb size={28} />,
       title: "Innovation",
       description: "Des méthodes pédagogiques modernes et efficaces",
     },
     {
-      icon: "🌍",
+      icon: <MapPin size={28} />,
       title: "Accessibilité",
       description: "Des formations accessibles à tous, partout au Togo",
     },
@@ -30,7 +32,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="a-propos" className="bg-white py-20 dark:bg-gray-950 lg:py-28">
+    <section id="a-propos" className="bg-white py-12 dark:bg-gray-950 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
@@ -96,16 +98,16 @@ export default function AboutSection() {
               {values.map((value, index) => (
                 <div
                   key={index}
-                  className="flex gap-4 rounded-xl border border-gray-200 bg-gray-50 p-6 transition-all hover:border-brand-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-700"
+                  className="flex gap-4 rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-brand-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950 dark:hover:border-brand-700"
                 >
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-white text-2xl shadow-sm dark:bg-gray-950">
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-purple-600 text-white shadow-md transition-transform hover:scale-110">
                     {value.icon}
                   </div>
                   <div>
-                    <h4 className="mb-2 font-bold text-gray-900 dark:text-white">
+                    <h4 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
                       {value.title}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
                       {value.description}
                     </p>
                   </div>

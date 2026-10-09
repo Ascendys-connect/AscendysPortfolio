@@ -17,6 +17,7 @@ class TestimonialListSerializer(serializers.ModelSerializer):
             'role',
             'company',
             'avatar',
+            'content',
             'rating',
             'is_featured',
             'is_published',

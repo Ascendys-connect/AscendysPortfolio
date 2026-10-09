@@ -9,6 +9,8 @@ import type { ApiResponse, ApiError, QueryParams } from '@/types/api.types';
 class ApiService {
   private baseURL: string;
   private defaultHeaders: HeadersInit;
+  private isRefreshing: boolean = false;
+  private refreshSubscribers: Array<(token: string) => void> = [];
 
   constructor() {
     this.baseURL = API_BASE_URL;
@@ -20,6 +22,70 @@ class ApiService {
    */
   private getAuthToken(): string | null {
     return localStorage.getItem('access_token');
+  }
+
+  /**
+   * Get refresh token from localStorage
+   */
+  private getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
+  }
+
+  /**
+   * Add subscriber to wait for token refresh
+   */
+  private subscribeTokenRefresh(callback: (token: string) => void): void {
+    this.refreshSubscribers.push(callback);
+  }
+
+  /**
+   * Notify all subscribers when token is refreshed
+   */
+  private onTokenRefreshed(token: string): void {
+    this.refreshSubscribers.forEach((callback) => callback(token));
+    this.refreshSubscribers = [];
+  }
+
+  /**
+   * Refresh the access token using refresh token
+   */
+  private async refreshAccessToken(): Promise<string | null> {
+    const refreshToken = this.getRefreshToken();
+    
+    if (!refreshToken) {
+      return null;
+    }
+
+    try {
+      const response = await fetch(`${this.baseURL}/auth/refresh/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Refresh token expired');
+      }
+
+      const data = await response.json();
+      const newAccessToken = data.access || data.data?.access;
+      const newRefreshToken = data.refresh || data.data?.refresh;
+
+      if (newAccessToken) {
+        localStorage.setItem('access_token', newAccessToken);
+        if (newRefreshToken) {
+          localStorage.setItem('refresh_token', newRefreshToken);
+        }
+        return newAccessToken;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Failed to refresh token:', error);
+      return null;
+    }
   }
 
   /**
@@ -60,7 +126,7 @@ class ApiService {
   /**
    * Handle API response
    */
-  private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
+  private async handleResponse<T>(response: Response, originalRequest?: () => Promise<Response>): Promise<ApiResponse<T>> {
     const contentType = response.headers.get('content-type');
     const isJson = contentType?.includes('application/json');
 
@@ -73,9 +139,45 @@ class ApiService {
     }
 
     if (!response.ok) {
-      // Handle authentication errors
-      if (response.status === HTTP_STATUS.UNAUTHORIZED) {
-        // Clear auth data
+      // Handle authentication errors - try to refresh token
+      if (response.status === HTTP_STATUS.UNAUTHORIZED && originalRequest) {
+        // Don't try to refresh if this is already a refresh request
+        if (!response.url.includes('/auth/refresh/')) {
+          // If already refreshing, wait for it
+          if (this.isRefreshing) {
+            return new Promise((resolve) => {
+              this.subscribeTokenRefresh(async (token: string) => {
+                try {
+                  const retryResponse = await originalRequest();
+                  const retryData = await this.handleResponse<T>(retryResponse);
+                  resolve(retryData);
+                } catch (error) {
+                  throw error;
+                }
+              });
+            });
+          }
+
+          // Try to refresh the token
+          this.isRefreshing = true;
+          const newToken = await this.refreshAccessToken();
+          this.isRefreshing = false;
+
+          if (newToken) {
+            // Notify all waiting requests
+            this.onTokenRefreshed(newToken);
+            
+            // Retry the original request with new token
+            try {
+              const retryResponse = await originalRequest();
+              return this.handleResponse<T>(retryResponse, originalRequest);
+            } catch (error) {
+              throw error;
+            }
+          }
+        }
+
+        // If refresh failed or this is a refresh request, logout
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
@@ -108,12 +210,15 @@ class ApiService {
     try {
       const url = this.buildURL(endpoint, params);
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: this.getHeaders(),
-      });
+      const makeRequest = async () => {
+        return fetch(url, {
+          method: 'GET',
+          headers: this.getHeaders(),
+        });
+      };
 
-      return this.handleResponse<T>(response);
+      const response = await makeRequest();
+      return this.handleResponse<T>(response, makeRequest);
     } catch (error: any) {
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -136,13 +241,16 @@ class ApiService {
       const url = `${this.baseURL}${endpoint}`;
       const isFormData = data instanceof FormData;
       
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: this.getHeaders(customHeaders, isFormData),
-        body: isFormData ? data : JSON.stringify(data),
-      });
+      const makeRequest = async () => {
+        return fetch(url, {
+          method: 'POST',
+          headers: this.getHeaders(customHeaders, isFormData),
+          body: isFormData ? data : JSON.stringify(data),
+        });
+      };
 
-      return this.handleResponse<T>(response);
+      const response = await makeRequest();
+      return this.handleResponse<T>(response, makeRequest);
     } catch (error: any) {
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -165,13 +273,16 @@ class ApiService {
       const url = `${this.baseURL}${endpoint}`;
       const isFormData = data instanceof FormData;
       
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: this.getHeaders(customHeaders, isFormData),
-        body: isFormData ? data : JSON.stringify(data),
-      });
+      const makeRequest = async () => {
+        return fetch(url, {
+          method: 'PUT',
+          headers: this.getHeaders(customHeaders, isFormData),
+          body: isFormData ? data : JSON.stringify(data),
+        });
+      };
 
-      return this.handleResponse<T>(response);
+      const response = await makeRequest();
+      return this.handleResponse<T>(response, makeRequest);
     } catch (error: any) {
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -194,13 +305,16 @@ class ApiService {
       const url = `${this.baseURL}${endpoint}`;
       const isFormData = data instanceof FormData;
       
-      const response = await fetch(url, {
-        method: 'PATCH',
-        headers: this.getHeaders(customHeaders, isFormData),
-        body: isFormData ? data : JSON.stringify(data),
-      });
+      const makeRequest = async () => {
+        return fetch(url, {
+          method: 'PATCH',
+          headers: this.getHeaders(customHeaders, isFormData),
+          body: isFormData ? data : JSON.stringify(data),
+        });
+      };
 
-      return this.handleResponse<T>(response);
+      const response = await makeRequest();
+      return this.handleResponse<T>(response, makeRequest);
     } catch (error: any) {
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -222,12 +336,15 @@ class ApiService {
     try {
       const url = `${this.baseURL}${endpoint}`;
       
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: this.getHeaders(),
-      });
+      const makeRequest = async () => {
+        return fetch(url, {
+          method: 'DELETE',
+          headers: this.getHeaders(),
+        });
+      };
 
-      return this.handleResponse<T>(response);
+      const response = await makeRequest();
+      return this.handleResponse<T>(response, makeRequest);
     } catch (error: any) {
       // Handle network errors
       if (error instanceof TypeError && error.message.includes('fetch')) {

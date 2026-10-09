@@ -122,7 +122,7 @@ export default function Services() {
                   {services.map((service, i) => {
                     const iconUrl = getMediaUrl(service.icon);
                     const iconElement = iconUrl ? (
-                      <img src={iconUrl} className="size-7" alt="" />
+                      <img src={iconUrl} className="size-14 rounded-lg" alt="" />
                     ) : defaultIcon;
 
                     return (
@@ -135,12 +135,7 @@ export default function Services() {
                         {/* Content */}
                         <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                           <div
-                            className="mb-6 flex size-16 items-center justify-center rounded-2xl"
-                            style={{
-                              background:
-                                "linear-gradient(135deg, #4208A1, #9800BF)",
-                              color: "white",
-                            }}
+                            className="mb-2 flex size-32 items-center justify-center rounded-2xl bg-transparent"
                           >
                             {iconElement}
                           </div>
@@ -150,8 +145,8 @@ export default function Services() {
                           >
                             {service.title}
                           </h2>
-                          <p className="mb-7 mt-6 leading-relaxed text-[#6B6B6B]">
-                            {service.description}
+                          <p className="mb-7 leading-relaxed text-[#6B6B6B]">
+                            {service.short_description}
                           </p>
                           <ul className="flex flex-col gap-3">
                             {(service.features || []).map((feature, j) => (
@@ -172,7 +167,7 @@ export default function Services() {
                         {/* Visual card */}
                         <div className={i % 2 === 1 ? "lg:order-1" : ""}>
                           <div
-                            className="flex min-h-[280px] flex-col justify-between rounded-2xl"
+                            className="flex min-h-[280px] flex-col items-center justify-center text-center rounded-2xl"
                             style={{
                               background:
                                 i % 2 === 0
@@ -208,7 +203,7 @@ export default function Services() {
                                 i % 2 === 0 ? "text-white/65" : "text-[#6B6B6B]"
                               }`}
                             >
-                              {service.short_description || service.description}
+                              {service.description || service.short_description || "Aucune description disponible"}
                             </p>
                           </div>
                         </div>

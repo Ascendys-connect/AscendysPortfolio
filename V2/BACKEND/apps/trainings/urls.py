@@ -12,12 +12,19 @@ from .views import (
 
 app_name = 'trainings'
 
-router = DefaultRouter()
-router.register(r'categories', TrainingCategoryViewSet, basename='training-category')
-router.register(r'enrollments', EnrollmentViewSet, basename='enrollment')
-router.register(r'', TrainingViewSet, basename='training')
+# Router for trainings and categories (slug-based lookup)
+training_router = DefaultRouter()
+training_router.register(r'categories', TrainingCategoryViewSet, basename='training-category')
+training_router.register(r'', TrainingViewSet, basename='training')
+
+# Separate router for enrollments to avoid route conflicts with the slug-based training router
+enrollment_router = DefaultRouter()
+enrollment_router.register(r'', EnrollmentViewSet, basename='enrollment')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    # Enrollments MUST be defined before the catch-all training router
+    path('enrollments/', include(enrollment_router.urls)),
     path('enrollments/webhook/', enrollment_webhook, name='enrollment-webhook'),
+    path('', include(training_router.urls)),
 ]
+

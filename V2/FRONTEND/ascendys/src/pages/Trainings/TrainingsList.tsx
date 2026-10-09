@@ -75,11 +75,22 @@ export default function TrainingsList() {
     }
   };
 
+  const handleDuplicate = async (training: Training) => {
+    try {
+      const response = await trainingsService.duplicate(training.slug);
+      showSuccess("Formation dupliquée", `La formation a été dupliquée avec succès`);
+      // Rediriger vers l'édition de la copie
+      navigate(`/admin/trainings/edit/${response.data.slug}`);
+    } catch (error) {
+      showError("Erreur", "Impossible de dupliquer la formation");
+    }
+  };
+
   const handleDeleteTraining = async () => {
     if (!trainingToDelete) return;
     setIsDeleting(true);
     try {
-      await trainingsService.delete(trainingToDelete.id);
+      await trainingsService.delete(trainingToDelete.slug);
       showSuccess("Formation supprimée", "La formation a été supprimée avec succès");
       setTrainingToDelete(null);
       refetch();
@@ -183,20 +194,39 @@ export default function TrainingsList() {
             onDraft={() => handleDraft(training)}
           />
           {canEdit && (
-            <button
-              onClick={() => navigate(`/admin/trainings/edit/${training.slug}`)}
-              className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-              title="Modifier"
-            >
-              <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-            </button>
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDuplicate(training);
+                }}
+                className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/40"
+                title="Dupliquer cette formation"
+              >
+                <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={() => navigate(`/admin/trainings/edit/${training.slug}`)}
+                className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                title="Modifier"
+              >
+                <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+            </>
           )}
           {canDelete && (
             <button

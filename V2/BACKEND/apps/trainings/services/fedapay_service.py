@@ -41,55 +41,97 @@ class FedaPayService:
             dict: {'checkout_url': str, 'transaction_id': str}
         """
         try:
-            import fedapay
-            
+            import requests
+
             config = FedaPayService.get_config()
-            
-            # Configuration FedaPay
-            fedapay.api_key = config['secret_key']
-            fedapay.environment = config['mode']
-            
+            base_url = 'https://api.fedapay.com' if config['mode'] == 'live' else 'https://sandbox-api.fedapay.com'
+            headers = {
+                'Authorization': f"Bearer {config['secret_key']}",
+                'Content-Type': 'application/json',
+            }
+
+            customer = {
+                'firstname': enrollment.full_name.split()[0] if enrollment.full_name else 'Client',
+                'lastname': ' '.join(enrollment.full_name.split()[1:]) if len(enrollment.full_name.split()) > 1 else 'Client',
+                'email': enrollment.email,
+            }
+            def detect_country(phone_str):
+                if not phone_str:
+                    return 'tg'
+                clean = phone_str.strip().replace(' ', '').replace('-', '')
+                if clean.startswith('+228') or clean.startswith('00228') or clean.startswith('228'):
+                    return 'tg'
+                if clean.startswith('+229') or clean.startswith('00229') or clean.startswith('229'):
+                    return 'bj'
+                if clean.startswith('+225') or clean.startswith('00225') or clean.startswith('225'):
+                    return 'ci'
+                if clean.startswith('+221') or clean.startswith('00221') or clean.startswith('221'):
+                    return 'sn'
+                if clean.startswith('+226') or clean.startswith('00226') or clean.startswith('226'):
+                    return 'bf'
+                if clean.startswith('+227') or clean.startswith('00227') or clean.startswith('227'):
+                    return 'ne'
+                return 'tg'
+
+            if enrollment.phone:
+                customer['phone_number'] = {
+                    'number': enrollment.phone,
+                    'country': detect_country(enrollment.phone),
+                }
+
             # Données de la transaction
             transaction_data = {
                 'description': f'Inscription - {enrollment.training.title}',
-                'amount': int(enrollment.amount),  # FedaPay attend un montant en centimes
+                'amount': int(enrollment.amount),
                 'currency': {
-                    'iso': enrollment.currency
+                    'iso': enrollment.currency or 'XOF',
                 },
                 'callback_url': f"{config['callback_url']}/payment/callback?enrollment_id={enrollment.id}",
-                'customer': {
-                    'firstname': enrollment.full_name.split()[0] if enrollment.full_name else '',
-                    'lastname': ' '.join(enrollment.full_name.split()[1:]) if len(enrollment.full_name.split()) > 1 else '',
-                    'email': enrollment.email,
-                    'phone_number': {
-                        'number': enrollment.phone,
-                        'country': 'BJ'  # À adapter selon le pays
-                    }
-                },
+                'customer': customer,
                 'custom_metadata': {
                     'enrollment_id': str(enrollment.id),
                     'training_slug': enrollment.training.slug,
                 }
             }
-            
-            # Créer la transaction
-            transaction = fedapay.Transaction.create(transaction_data)
-            
-            # Générer le token de paiement
-            token = transaction.generateToken()
-            
+
+            response = requests.post(
+                f"{base_url}/v1/transactions",
+                json=transaction_data,
+                headers=headers,
+                timeout=15
+            )
+
+            if not response.ok:
+                logger.error(f"Erreur API FedaPay ({response.status_code}): {response.text}")
+                raise Exception(f"Erreur FedaPay: {response.text}")
+
+            res_data = response.json()
+            trx = res_data.get('v1/transaction') or res_data.get('transaction') or res_data
+            transaction_id = str(trx.get('id', ''))
+            checkout_url = trx.get('payment_url')
+
+            if not checkout_url:
+                token_res = requests.post(
+                    f"{base_url}/v1/transactions/{transaction_id}/token",
+                    headers=headers,
+                    timeout=15
+                )
+                if token_res.ok:
+                    token_data = token_res.json()
+                    checkout_url = token_data.get('url')
+
             # Mise à jour de l'enrollment
             enrollment.status = 'PROCESSING'
             enrollment.payment_attempts += 1
             enrollment.save()
-            
-            logger.info(f"Transaction FedaPay créée pour enrollment {enrollment.id}: {transaction.id}")
-            
+
+            logger.info(f"Transaction FedaPay créée pour enrollment {enrollment.id}: {transaction_id}")
+
             return {
-                'checkout_url': token.url,
-                'transaction_id': transaction.id
+                'checkout_url': checkout_url,
+                'transaction_id': transaction_id,
             }
-            
+
         except Exception as e:
             logger.error(f"Erreur lors de la création de la transaction FedaPay: {str(e)}")
             raise Exception(f"Impossible de créer la transaction de paiement: {str(e)}")

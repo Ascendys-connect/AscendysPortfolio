@@ -39,6 +39,10 @@ export interface Enrollment {
   payment_attempts: number;
   is_expired: boolean;
   can_retry_payment: boolean;
+  reminder_1h_sent_at?: string;
+  reminder_24h_sent_at?: string;
+  reminder_7d_sent_at?: string;
+  reminders_count?: number;
   expires_at?: string;
   paid_at?: string;
   created_at: string;

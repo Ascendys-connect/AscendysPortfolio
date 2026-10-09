@@ -55,7 +55,8 @@ class TestimonialViewSet(viewsets.ModelViewSet):
         Filter queryset based on user permissions.
         Only show published testimonials to non-admin users.
         """
-        queryset = Testimonial.objects.all()
+        # Always exclude soft-deleted testimonials
+        queryset = Testimonial.objects.filter(is_deleted=False)
         
         # Non-admin users only see published testimonials
         if not self.request.user.is_authenticated or not self.request.user.is_admin:

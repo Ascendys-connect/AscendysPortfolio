@@ -3,8 +3,10 @@ Views for Service management.
 """
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils import timezone
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from apps.core.exceptions import api_response
@@ -33,13 +35,24 @@ class ServiceViewSet(viewsets.ModelViewSet):
     - destroy: DELETE /api/v1/services/{id}/
     """
     queryset = Service.objects.filter(is_deleted=False)
-    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['is_active']
     search_fields = ['title', 'short_description', 'description']
     ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
     lookup_field = 'slug'
+
+    def get_permissions(self):
+        """
+        Return appropriate permissions based on action.
+        """
+        if self.action in ['list', 'retrieve', 'featured']:
+            return [AllowAny()]
+        elif self.action in ['create', 'update', 'partial_update']:
+            return [IsAuthenticated()]
+        elif self.action in ['publish', 'archive', 'destroy']:
+            return [IsAdminOrReadOnly()]
+        return [IsAdminOrReadOnly()]
 
     def get_serializer_class(self):
         """
@@ -61,6 +74,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # Admin users see all services
         if self.request.user.is_authenticated and hasattr(self.request.user, 'is_admin') and self.request.user.is_admin:
             return queryset
+        
+        # Editors see their own services + active services
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'role') and self.request.user.role == 'EDITOR':
+            return queryset.filter(Q(created_by=self.request.user) | Q(is_active=True))
         
         # Public users only see active services
         return queryset.filter(is_active=True)
@@ -120,7 +137,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save()
+            # Editors must create services in DRAFT status
+            status_value = serializer.validated_data.get('status', 'DRAFT')
+            if hasattr(request.user, 'role') and request.user.role == 'EDITOR':
+                status_value = 'DRAFT'
+            
+            serializer.save(created_by=request.user, status=status_value)
             return api_response(
                 success=True,
                 message="Service créé avec succès.",
@@ -144,6 +166,16 @@ class ServiceViewSet(viewsets.ModelViewSet):
         Update a service (admin only).
         """
         instance = self.get_object()
+        
+        # Editors can only update their own services
+        if hasattr(request.user, 'role') and request.user.role == 'EDITOR':
+            if instance.created_by != request.user:
+                return api_response(
+                    success=False,
+                    message="Vous ne pouvez modifier que vos propres services.",
+                    status_code=status.HTTP_403_FORBIDDEN
+                )
+        
         serializer = self.get_serializer(instance, data=request.data)
         
         if serializer.is_valid():
@@ -171,6 +203,16 @@ class ServiceViewSet(viewsets.ModelViewSet):
         Partially update a service (admin only).
         """
         instance = self.get_object()
+        
+        # Editors can only update their own services
+        if hasattr(request.user, 'role') and request.user.role == 'EDITOR':
+            if instance.created_by != request.user:
+                return api_response(
+                    success=False,
+                    message="Vous ne pouvez modifier que vos propres services.",
+                    status_code=status.HTTP_403_FORBIDDEN
+                )
+        
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         
         if serializer.is_valid():

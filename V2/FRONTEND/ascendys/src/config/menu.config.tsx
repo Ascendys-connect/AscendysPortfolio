@@ -10,6 +10,8 @@ import {
   TaskIcon,
   GroupIcon,
   ChatIcon,
+  BellAltIcon,
+  PaperPlaneIcon,
 } from "@/icons";
 
 export type MenuItem = {
@@ -44,6 +46,20 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
   },
   {
+    icon: <BellAltIcon fontSize={24} />,
+    name: "Notifications",
+    key: "notifications",
+    path: "/notifications",
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
+  },
+  {
+    icon: <PaperPlaneIcon fontSize={24} />,
+    name: "Diffusion de messages",
+    key: "broadcastMessages",
+    path: "/notifications/broadcast",
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+  },
+  {
     icon: <UserCircleIcon fontSize={24} />,
     name: "Utilisateurs",
     key: "users",
@@ -74,6 +90,12 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
         key: "trainingsList",
         path: "/admin/trainings",
         roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
+      },
+      {
+        name: "Inscriptions & Abonnements",
+        key: "enrollmentsList",
+        path: "/admin/trainings/enrollments",
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN], // Removed EDITOR
       },
       {
         name: "Créer une formation",
@@ -237,19 +259,19 @@ export const CONTENT_MENU_ITEMS: MenuItem[] = [
     icon: <PageIcon fontSize={24} />,
     name: "Messages",
     key: "messages",
-    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+    roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
     subItems: [
       {
         name: "Contacts",
         key: "contactMessages",
         path: "/messages/contacts",
-        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
       {
         name: "Newsletter",
         key: "newsletter",
         path: "/messages/newsletter",
-        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
+        roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR],
       },
     ],
   },

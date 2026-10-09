@@ -1,15 +1,18 @@
 import PageMeta from "@/components/common/PageMeta";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/button/Button";
+import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { useNavigate } from "react-router";
 import { useApi } from "@/hooks/useApi";
 import eventsService from "@/services/events.service";
 import type { Event } from "@/types/content.types";
 import { EventTypeLabels, ContentStatus } from "@/types/content.types";
 import StatusActionsModal from "@/components/common/StatusActionsModal";
+import { useState } from "react";
 
 export default function EventsList() {
   const navigate = useNavigate();
+  const [deleteTarget, setDeleteTarget] = useState<Event | null>(null);
 
   const {
     data: events,
@@ -31,14 +34,24 @@ export default function EventsList() {
           await eventsService.archive(event.slug);
           break;
         case "delete":
-          if (window.confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) {
-            await eventsService.delete(event.slug);
-          }
-          break;
+          setDeleteTarget(event);
+          return;
       }
       fetchEvents();
     } catch (error) {
       console.error("Erreur lors de l'action:", error);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await eventsService.delete(deleteTarget.slug);
+      fetchEvents();
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -245,6 +258,13 @@ export default function EventsList() {
           </div>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        itemName={deleteTarget?.title}
+      />
     </>
   );
 }

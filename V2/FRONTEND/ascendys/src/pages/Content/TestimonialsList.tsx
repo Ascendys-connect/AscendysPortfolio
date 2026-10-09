@@ -32,6 +32,7 @@ export default function TestimonialsList() {
     testimonial: Testimonial | null;
   }>({ isOpen: false, testimonial: null });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoadingTestimonial, setIsLoadingTestimonial] = useState(false);
 
   const testimonials: Testimonial[] = Array.isArray(rawTestimonials)
     ? rawTestimonials
@@ -80,6 +81,21 @@ export default function TestimonialsList() {
         "Erreur lors de la modification.";
       showError("Erreur", msg);
       throw error;
+    }
+  };
+
+  const handleOpenEditModal = async (testimonial: Testimonial) => {
+    setIsLoadingTestimonial(true);
+    try {
+      // Récupérer les détails complets du témoignage
+      const response = await testimonialsService.getById(testimonial.id);
+      // Extraire les données du wrapper {success, message, data}
+      const fullTestimonial = response.data || response;
+      setEditModal({ isOpen: true, testimonial: fullTestimonial });
+    } catch (error: any) {
+      showError("Erreur", "Impossible de charger les détails du témoignage");
+    } finally {
+      setIsLoadingTestimonial(false);
     }
   };
 
@@ -228,10 +244,9 @@ export default function TestimonialsList() {
                     <td className="px-6 py-4 text-end">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() =>
-                            setEditModal({ isOpen: true, testimonial: t })
-                          }
-                          className="rounded-lg p-2 text-gray-400 transition hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
+                          onClick={() => handleOpenEditModal(t)}
+                          disabled={isLoadingTestimonial}
+                          className="rounded-lg p-2 text-gray-400 transition hover:bg-brand-50 hover:text-brand-600 disabled:opacity-50 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
                           title="Modifier"
                         >
                           <PencilIcon className="size-5" />

@@ -32,6 +32,7 @@ export default function PartnersList() {
     partner: Partner | null;
   }>({ isOpen: false, partner: null });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoadingPartner, setIsLoadingPartner] = useState(false);
 
   const partners: Partner[] = Array.isArray(rawPartners)
     ? rawPartners
@@ -79,6 +80,21 @@ export default function PartnersList() {
         "Erreur lors de la modification.";
       showError("Erreur", msg);
       throw error;
+    }
+  };
+
+  const handleOpenEditModal = async (partner: Partner) => {
+    setIsLoadingPartner(true);
+    try {
+      // Récupérer les détails complets du partenaire avec la description
+      const response = await partnersService.getById(partner.id);
+      // Extraire les données du wrapper {success, message, data}
+      const fullPartner = response.data || response;
+      setEditModal({ isOpen: true, partner: fullPartner });
+    } catch (error: any) {
+      showError("Erreur", "Impossible de charger les détails du partenaire");
+    } finally {
+      setIsLoadingPartner(false);
     }
   };
 
@@ -228,8 +244,9 @@ export default function PartnersList() {
                     <td className="px-6 py-4 text-end">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => setEditModal({ isOpen: true, partner: p })}
-                          className="rounded-lg p-2 text-gray-400 transition hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
+                          onClick={() => handleOpenEditModal(p)}
+                          disabled={isLoadingPartner}
+                          className="rounded-lg p-2 text-gray-400 transition hover:bg-brand-50 hover:text-brand-600 disabled:opacity-50 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
                           title="Modifier"
                         >
                           <PencilIcon className="size-5" />

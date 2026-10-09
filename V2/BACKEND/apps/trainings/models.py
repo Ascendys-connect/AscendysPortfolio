@@ -36,8 +36,18 @@ class TrainingCategory(TimeStampedModel, SoftDeleteModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = self._generate_unique_slug(slugify(self.name))
         super().save(*args, **kwargs)
+
+    def _generate_unique_slug(self, base_slug):
+        """Génère un slug unique en ajoutant un suffixe numérique si nécessaire."""
+        slug = base_slug
+        counter = 1
+        qs = TrainingCategory.objects.exclude(pk=self.pk)
+        while qs.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        return slug
 
 
 class Training(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
@@ -164,6 +174,102 @@ class Training(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
         help_text="Nombre maximum de participants",
         verbose_name="Capacité"
     )
+    max_participants = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="Nombre maximum de places (ex: 10 places maximum)",
+        verbose_name="Places maximum"
+    )
+    
+    # Session details
+    sessions_count = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="Nombre de sessions (ex: 12)",
+        verbose_name="Nombre de sessions"
+    )
+    session_duration = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Durée d'une session (ex: '2h', '4h')",
+        verbose_name="Durée par session"
+    )
+    frequency = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Fréquence des sessions (ex: '2/semaine', 'week-end intensif')",
+        verbose_name="Fréquence"
+    )
+    
+    # Marketing content
+    for_who = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Liste des critères 'Cette formation est pour vous si...'",
+        verbose_name="Pour qui (critères d'identification)"
+    )
+    access_prerequisites = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Prérequis d'accès à la formation",
+        verbose_name="Prérequis d'accès"
+    )
+    problems_solved = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Liste des problèmes que la formation résout",
+        verbose_name="Problèmes résolus"
+    )
+    deliverables = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Livrables professionnels obtenus",
+        verbose_name="Livrables"
+    )
+    skills_acquired = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Nouvelles compétences acquises",
+        verbose_name="Compétences acquises"
+    )
+    transformation_before = models.TextField(
+        blank=True,
+        help_text="État 'Avant' la formation",
+        verbose_name="Transformation - Avant"
+    )
+    transformation_after = models.TextField(
+        blank=True,
+        help_text="État 'Après' la formation",
+        verbose_name="Transformation - Après"
+    )
+    included_items = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Ce qui est inclus dans la formation",
+        verbose_name="Inclus"
+    )
+    not_included_items = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Ce qui n'est PAS inclus",
+        verbose_name="Non inclus"
+    )
+    strategic_positioning = models.TextField(
+        blank=True,
+        help_text="Positionnement stratégique de la formation",
+        verbose_name="Positionnement stratégique"
+    )
+    payment_terms = models.TextField(
+        blank=True,
+        help_text="Modalités de paiement (ex: '70% à l'inscription et 30% avant la 3ᵉ semaine')",
+        verbose_name="Modalités de paiement"
+    )
+    premium_options = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Options premium disponibles",
+        verbose_name="Options premium"
+    )
     
     # Certification
     certification = models.BooleanField(
@@ -196,8 +302,18 @@ class Training(UUIDModel, TimeStampedModel, PublishableModel, SoftDeleteModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = self._generate_unique_slug(slugify(self.title))
         super().save(*args, **kwargs)
+
+    def _generate_unique_slug(self, base_slug):
+        """Génère un slug unique en ajoutant un suffixe numérique si nécessaire."""
+        slug = base_slug
+        counter = 1
+        qs = Training.objects.exclude(pk=self.pk)
+        while qs.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        return slug
 
 
 class Enrollment(UUIDModel, TimeStampedModel):
@@ -307,6 +423,27 @@ class Enrollment(UUIDModel, TimeStampedModel):
     notes = models.TextField(
         blank=True,
         verbose_name="Notes internes"
+    )
+    
+    # Relances automatiques de paiement
+    reminder_1h_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Relance 1h envoyée le"
+    )
+    reminder_24h_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Relance 24h envoyée le"
+    )
+    reminder_7d_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Relance 7j envoyée le"
+    )
+    reminders_count = models.IntegerField(
+        default=0,
+        verbose_name="Nombre de relances envoyées"
     )
     
     class Meta:

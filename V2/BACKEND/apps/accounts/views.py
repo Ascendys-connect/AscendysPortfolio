@@ -145,16 +145,35 @@ def update_profile_view(request):
     """
     Update current user profile.
     """
-    serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
+    serializer = UserUpdateSerializer(
+        request.user, 
+        data=request.data, 
+        partial=True,
+        context={'request': request}
+    )
     
     if serializer.is_valid():
-        serializer.save()
-        return api_response(
-            success=True,
-            message='Profil mis à jour avec succès.',
-            data=UserSerializer(request.user).data,
-            status_code=status.HTTP_200_OK
-        )
+        try:
+            serializer.save()
+            return api_response(
+                success=True,
+                message='Profil mis à jour avec succès.',
+                data=UserSerializer(request.user).data,
+                status_code=status.HTTP_200_OK
+            )
+        except Exception as e:
+            # Handle database IntegrityError for duplicate phone
+            error_message = str(e)
+            if 'phone' in error_message.lower() or 'accounts_user_phone' in error_message:
+                return api_response(
+                    success=False,
+                    message='Ce numéro de téléphone est déjà utilisé.',
+                    errors={'phone': ['Ce numéro de téléphone est déjà utilisé par un autre utilisateur. Veuillez en choisir un autre.']},
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+            else:
+                # Re-raise other exceptions
+                raise
     
     return api_response(
         success=False,

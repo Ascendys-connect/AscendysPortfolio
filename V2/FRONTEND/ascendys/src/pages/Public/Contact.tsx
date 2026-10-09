@@ -8,13 +8,17 @@ import SocialIcon from "@/components/common/SocialIcon";
 import api from "@/services/api.service";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Send, CheckCircle2, AlertCircle } from "lucide-react";
 
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import type { E164Number } from 'libphonenumber-js/core';
+
 export default function Contact() {
   const { company, email, phones, fullAddress, socialLinks, whatsappUrl } = useCompany();
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone: "" as E164Number | "",
     subject: "",
     message: "",
   });
@@ -37,7 +41,7 @@ export default function Contact() {
         first_name,
         last_name,
         email: formData.email.trim(),
-        phone: formData.phone.trim(),
+        phone: formData.phone ? String(formData.phone).trim() : "",
         subject: formData.subject || "information",
         message: formData.message.trim(),
         consent_privacy: true,
@@ -293,13 +297,12 @@ export default function Contact() {
                         <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                           Téléphone
                         </label>
-                        <input
-                          type="tel"
-                          name="phone"
+                        <PhoneInput
+                          international
+                          defaultCountry="TG"
                           value={formData.phone}
-                          onChange={handleChange}
+                          onChange={(value) => setFormData({ ...formData, phone: value || "" })}
                           className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-                          placeholder="+228 XX XX XX XX"
                         />
                       </div>
 

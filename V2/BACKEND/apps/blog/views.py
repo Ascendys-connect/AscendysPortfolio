@@ -3,9 +3,10 @@ Views for Blog management.
 """
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from apps.core.exceptions import api_response
@@ -82,13 +83,24 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     ViewSet for BlogPost CRUD operations with publish/archive actions.
     """
     queryset = BlogPost.objects.select_related('author', 'category').prefetch_related('tags').filter(is_deleted=False)
-    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'status', 'is_featured', 'author']
     search_fields = ['title', 'excerpt', 'content']
     ordering_fields = ['created_at', 'published_at', 'views_count', 'title']
     ordering = ['-created_at']
     lookup_field = 'slug'
+
+    def get_permissions(self):
+        """
+        Return appropriate permissions based on action.
+        """
+        if self.action in ['list', 'retrieve', 'featured']:
+            return [AllowAny()]
+        elif self.action in ['create', 'update', 'partial_update']:
+            return [IsAuthenticated()]
+        elif self.action in ['publish', 'archive', 'set_to_draft', 'destroy']:
+            return [IsAdminOrReadOnly()]
+        return [IsAdminOrReadOnly()]
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -109,6 +121,10 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         # Admin sees all posts
         if self.request.user.is_authenticated and hasattr(self.request.user, 'is_admin') and self.request.user.is_admin:
             return queryset
+        
+        # Editors see their own posts + published posts
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'role') and self.request.user.role == 'EDITOR':
+            return queryset.filter(Q(author=self.request.user) | Q(status='PUBLISHED'))
         
         # Public sees only published posts
         return queryset.filter(status='PUBLISHED')
@@ -155,7 +171,12 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(author=request.user)
+            # Editors must create posts in DRAFT status
+            status_value = serializer.validated_data.get('status', 'DRAFT')
+            if hasattr(request.user, 'role') and request.user.role == 'EDITOR':
+                status_value = 'DRAFT'
+            
+            serializer.save(author=request.user, status=status_value)
             return api_response(
                 success=True,
                 message="Article créé avec succès.",
@@ -171,6 +192,23 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+        
+        # Editors can only update their own posts
+        if hasattr(request.user, 'role') and request.user.role == 'EDITOR':
+            if instance.author != request.user:
+                return api_response(
+                    success=False,
+                    message="Vous ne pouvez modifier que vos propres articles.",
+                    status_code=status.HTTP_403_FORBIDDEN
+                )
+            # Editors cannot change status
+            if 'status' in request.data and request.data['status'] != instance.status:
+                return api_response(
+                    success=False,
+                    message="Vous n'avez pas la permission de changer le statut de l'article.",
+                    status_code=status.HTTP_403_FORBIDDEN
+                )
+        
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
             serializer.save()

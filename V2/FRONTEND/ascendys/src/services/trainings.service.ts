@@ -10,7 +10,12 @@ class TrainingsService {
   private readonly basePath = '/trainings';
 
   async getAll(): Promise<Training[]> {
-    return apiService.get<Training[]>(`${this.basePath}/`);
+    const response: any = await apiService.get<Training[]>(`${this.basePath}/`);
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response?.results)) return response.results;
+    if (Array.isArray(response?.data)) return response.data;
+    if (Array.isArray(response?.data?.results)) return response.data.results;
+    return [];
   }
 
   async getById(id: string): Promise<Training> {
@@ -26,11 +31,11 @@ class TrainingsService {
   }
 
   async update(slug: string, data: FormData | any): Promise<Training> {
-    return apiService.put<Training>(`${this.basePath}/${slug}/`, data);
+    return apiService.patch<Training>(`${this.basePath}/${slug}/`, data);
   }
 
-  async delete(id: string): Promise<void> {
-    return apiService.delete(`${this.basePath}/${id}/`);
+  async delete(slug: string): Promise<void> {
+    return apiService.delete(`${this.basePath}/${slug}/`);
   }
 
   /**
@@ -52,6 +57,13 @@ class TrainingsService {
    */
   async draft(slug: string): Promise<Training> {
     return apiService.post<Training>(`${this.basePath}/${slug}/draft/`);
+  }
+
+  /**
+   * Duplicate an existing training
+   */
+  async duplicate(slug: string): Promise<Training> {
+    return apiService.post<Training>(`${this.basePath}/${slug}/duplicate/`);
   }
 }
 

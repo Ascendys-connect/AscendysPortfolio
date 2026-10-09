@@ -35,6 +35,7 @@ import Dashboard from "./pages/Dashboard";
 import UsersList from "./pages/Users/UsersList";
 import CreateUser from "./pages/Users/CreateUser";
 import TrainingsList from "./pages/Trainings/TrainingsList";
+import EnrollmentsList from "./pages/Trainings/EnrollmentsList";
 import CreateTraining from "./pages/Trainings/CreateTraining";
 import EditTraining from "./pages/Trainings/EditTraining";
 import TrainingCategories from "./pages/Trainings/TrainingCategories";
@@ -67,6 +68,8 @@ import CompanyInfo from "./pages/System/CompanyInfo";
 import ActivityLogs from "./pages/System/ActivityLogs";
 import GlobalAnalytics from "./pages/Analytics/GlobalAnalytics";
 import Settings from "./pages/System/Settings";
+import NotificationsPage from "./pages/Notifications/NotificationsPage";
+import BroadcastMessagePage from "./pages/Notifications/BroadcastMessagePage";
 import GalleriesList from "./pages/Galleries/GalleriesList";
 import CreateGalleryPage from "./pages/Galleries/CreateGalleryPage";
 import FormElements from "./pages/Forms/FormElements";
@@ -80,6 +83,7 @@ import Buttons from "./pages/UiElements/Buttons";
 import Images from "./pages/UiElements/Images";
 import Videos from "./pages/UiElements/Videos";
 import UserProfiles from "./pages/UserProfiles";
+import EditProfilePage from "./pages/AuthPages/EditProfilePage";
 import { AuthGuard } from "./guards/AuthGuard";
 import { GuestGuard } from "./guards/GuestGuard";
 import { RoleGuard } from "./guards/RoleGuard";
@@ -140,6 +144,27 @@ export default function App() {
             {/* Dashboard - Role-based rendering */}
             <Route path="/dashboard" element={<Dashboard />} />
 
+            {/* Profile - Available for all authenticated users */}
+            <Route path="/profile" element={<EditProfilePage />} />
+
+            {/* Notifications (SUPER_ADMIN + ADMIN + EDITOR) */}
+            <Route
+              path="/notifications"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <NotificationsPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/notifications/broadcast"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN]}>
+                  <BroadcastMessagePage />
+                </RoleGuard>
+              }
+            />
+
             {/* Users Management (SUPER_ADMIN only) */}
             <Route
               path="/users"
@@ -164,6 +189,14 @@ export default function App() {
               element={
                 <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
                   <TrainingsList />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/admin/trainings/enrollments"
+              element={
+                <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR]}>
+                  <EnrollmentsList />
                 </RoleGuard>
               }
             />

@@ -152,19 +152,19 @@ export default function EditorDashboard() {
         )}
         
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                   Brouillons
                 </p>
-                <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
+                <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
                   {renderStatValue(stats?.draft_count)}
                 </p>
               </div>
-              <div className="flex size-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
                 <svg
-                  className="size-6 text-gray-600 dark:text-gray-400"
+                  className="size-5 text-gray-600 dark:text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -178,24 +178,21 @@ export default function EditorDashboard() {
                 </svg>
               </div>
             </div>
-            <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-              En cours de rédaction
-            </p>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                   Publiés
                 </p>
-                <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
+                <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
                   {renderStatValue(stats?.published_count)}
                 </p>
               </div>
-              <div className="flex size-12 items-center justify-center rounded-lg bg-success-100 dark:bg-success-900/30">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-success-100 dark:bg-success-900/30">
                 <svg
-                  className="size-6 text-success-600 dark:text-success-500"
+                  className="size-5 text-success-600 dark:text-success-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -209,24 +206,21 @@ export default function EditorDashboard() {
                 </svg>
               </div>
             </div>
-            <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-              Contenus validés et publiés
-            </p>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                   Total
                 </p>
-                <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
+                <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
                   {renderStatValue(stats?.total_count)}
                 </p>
               </div>
-              <div className="flex size-12 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/30">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/30">
                 <svg
-                  className="size-6 text-brand-600 dark:text-brand-500"
+                  className="size-5 text-brand-600 dark:text-brand-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -240,9 +234,6 @@ export default function EditorDashboard() {
                 </svg>
               </div>
             </div>
-            <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-              Tous vos contenus
-            </p>
           </div>
         </div>
 

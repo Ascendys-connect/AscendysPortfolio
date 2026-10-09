@@ -121,8 +121,10 @@ class ServiceListSerializer(serializers.ModelSerializer):
             'title',
             'slug',
             'short_description',
+            'description',
             'icon',
             'image',
+            'features',
             'is_featured',
             'is_active',
         ]

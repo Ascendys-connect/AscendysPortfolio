@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apps.media',         # Étape 11
     'apps.dashboard',     # Étape 12
     'apps.search',        # Étape 13
+    'apps.notifications', # Notifications système
     'apps.core',
 ]
 

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Briefcase } from "lucide-react";
 import { useApi } from "@/hooks/useApi";
 import type { Offer } from "@/services/offers.service";
 
@@ -31,9 +32,12 @@ export default function JobOffersSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            💼 Offres d'Emploi & Stages
-          </h2>
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <Briefcase className="size-8 text-accent-600 dark:text-accent-400" />
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              Offres d'Emploi & Stages
+            </h2>
+          </div>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">
             Découvrez nos opportunités professionnelles actuelles
           </p>

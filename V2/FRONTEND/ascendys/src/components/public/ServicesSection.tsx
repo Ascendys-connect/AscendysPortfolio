@@ -76,10 +76,10 @@ export default function ServicesSection() {
         {/* Services Grid */}
         {!isLoading && !error && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, index) => {
+            {services.slice(0, 6).map((service, index) => {
               const iconUrl = getMediaUrl(service.icon);
               const iconElement = iconUrl ? (
-                <img src={iconUrl} className="size-8" alt="" />
+                <img src={iconUrl} className="size-8 rounded-lg" alt="" />
               ) : defaultIcon;
 
               return (
@@ -88,7 +88,7 @@ export default function ServicesSection() {
                   className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-brand-300 hover:shadow-xl dark:border-gray-800 dark:bg-gray-950 dark:hover:border-brand-700"
                 >
                   {/* Icon */}
-                  <div className="mb-4 inline-flex rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 p-2.5 text-white shadow-lg transition-transform group-hover:scale-110">
+                  <div className="mb-4 inline-flex rounded-xl bg-transparent p-2.5 text-gray-900 dark:text-white">
                     {iconElement}
                   </div>
 

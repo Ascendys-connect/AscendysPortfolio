@@ -109,6 +109,13 @@ class AuthService {
   }
 
   /**
+   * Update current user profile (first_name, last_name, phone, avatar)
+   */
+  async updateProfile(data: Partial<Pick<User, 'first_name' | 'last_name' | 'phone'>>): Promise<ApiResponse<User>> {
+    return apiService.patch<User>(API_ENDPOINTS.AUTH.UPDATE_PROFILE, data);
+  }
+
+  /**
    * Change password
    */
   async changePassword(data: ChangePasswordData): Promise<ApiResponse> {

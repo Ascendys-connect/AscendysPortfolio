@@ -4,6 +4,9 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import type { E164Number } from 'libphonenumber-js/core';
 import { enrollmentsService } from '@/services/enrollments.service';
 import type { EnrollmentFormData, EducationLevel } from '@/types/enrollment.types';
 import { EDUCATION_LEVELS } from '@/types/enrollment.types';
@@ -27,7 +30,7 @@ export default function EnrollmentForm({
     training: trainingId || '',
     full_name: '',
     email: '',
-    phone: '',
+    phone: '' as E164Number | '',
     education_level: 'BACHELOR',
     education_level_other: '',
   });
@@ -61,7 +64,7 @@ export default function EnrollmentForm({
         throw new Error('Veuillez entrer un email valide');
       }
       
-      if (!formData.phone || formData.phone.length < 8) {
+      if (!formData.phone || String(formData.phone).length < 8) {
         throw new Error('Veuillez entrer un numéro de téléphone valide');
       }
       
@@ -149,15 +152,13 @@ export default function EnrollmentForm({
         <label htmlFor="phone" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           Numéro de téléphone <span className="text-red-500">*</span>
         </label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
+        <PhoneInput
+          international
+          defaultCountry="TG"
           value={formData.phone}
-          onChange={handleChange}
-          required
+          onChange={(value) => setFormData(prev => ({ ...prev, phone: value || '' }))}
           className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          placeholder="+229 XX XX XX XX"
+          required
         />
       </div>
 

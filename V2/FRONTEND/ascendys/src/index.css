@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap");
 
 @import "tailwindcss";
 
@@ -12,6 +12,10 @@
   --ascendys-gold: #ffc000;
   --ascendys-black: #1a1a1a;
   --ascendys-gray: #ababab;
+  
+  /* Fonts */
+  --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-inter: 'Inter', sans-serif;
   
   /* Gradients */
   --gradient-brand: linear-gradient(135deg, #4208a1 0%, #9800bf 100%);
@@ -28,6 +32,8 @@
 @theme {
   --font-*: initial;
   --font-outfit: Outfit, sans-serif;
+  --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-inter: 'Inter', sans-serif;
 
   --breakpoint-*: initial;
   --breakpoint-2xsm: 375px;
@@ -230,7 +236,8 @@
   }
 
   body {
-    @apply relative z-1 bg-gray-50 font-outfit font-normal;
+    @apply relative z-1 bg-gray-50 font-normal;
+    font-family: var(--font-plus-jakarta);
   }
 }
 

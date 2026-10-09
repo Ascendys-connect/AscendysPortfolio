@@ -7,10 +7,12 @@ import ImageUploader from "@/components/form/ImageUploader";
 import PhoneInput from "@/components/form/input/PhoneInput";
 import { companyService } from "@/services/company.service";
 import { useToast } from "@/context/ToastContext";
+import { useCompany } from "@/context/CompanyContext";
 import type { CompanyInfo } from "@/types/content.types";
 
 export default function CompanyInfoPage() {
   const { showSuccess, showError } = useToast();
+  const { refreshCompany } = useCompany();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [company, setCompany] = useState<CompanyInfo | null>(null);
@@ -221,6 +223,7 @@ export default function CompanyInfoPage() {
       const updated = await companyService.update(submitData);
       setCompany(updated);
       showSuccess("Enregistré avec succès", "Les informations de l'entreprise ont été mises à jour.");
+      await refreshCompany();
       await loadCompanyData();
     } catch (error: any) {
       console.error("Error updating company info:", error);

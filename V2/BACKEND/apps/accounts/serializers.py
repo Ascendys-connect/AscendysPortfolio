@@ -100,6 +100,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     """
     Serializer for updating user profile.
     """
+    # Override phone field to remove unique validation at serializer level
+    phone = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True)
+    
     class Meta:
         model = User
         fields = [
@@ -109,6 +112,49 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'avatar',
             'role',  # Allow admin to update role
         ]
+        extra_kwargs = {
+            'phone': {'validators': []},  # Remove default validators including unique
+        }
+
+    def validate_phone(self, value):
+        """
+        Validate that phone number is unique (excluding current user).
+        """
+        if not value:
+            return value  # Allow empty phone
+        
+        # Normalize phone number (remove spaces, special chars except +)
+        normalized_value = ''.join(c for c in value if c.isdigit() or c == '+').strip()
+        
+        # Get the current user being updated
+        instance = self.instance
+        
+        # Get current user's phone (normalized)
+        current_phone = instance.phone if instance else None
+        if current_phone:
+            current_phone_normalized = ''.join(c for c in current_phone if c.isdigit() or c == '+').strip()
+        else:
+            current_phone_normalized = None
+        
+        # If the phone hasn't changed, allow it
+        if current_phone_normalized and normalized_value == current_phone_normalized:
+            return value
+        
+        # Check if phone already exists for another user (excluding soft-deleted users)
+        # Compare normalized versions
+        all_users = User.objects.filter(is_deleted=False).exclude(
+            pk=instance.pk if instance else None
+        )
+        
+        for user in all_users:
+            if user.phone:
+                user_phone_normalized = ''.join(c for c in user.phone if c.isdigit() or c == '+').strip()
+                if user_phone_normalized == normalized_value:
+                    raise serializers.ValidationError(
+                        'Ce numéro de téléphone est déjà utilisé par un autre utilisateur. Veuillez en choisir un autre.'
+                    )
+        
+        return value
 
     def validate_role(self, value):
         """

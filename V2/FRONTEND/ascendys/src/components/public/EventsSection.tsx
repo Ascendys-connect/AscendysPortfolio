@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { Calendar } from "lucide-react";
 import { apiService } from "@/services/api.service";
 import type { Event } from "@/types/content.types";
 
@@ -59,9 +60,12 @@ export default function EventsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-            📅 Événements à Venir
-          </h2>
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <Calendar className="size-8 text-brand-600 dark:text-brand-400" />
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              Événements à Venir
+            </h2>
+          </div>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">
             Participez à nos prochains événements et webinaires
           </p>

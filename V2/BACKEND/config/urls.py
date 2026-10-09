@@ -61,6 +61,9 @@ urlpatterns = [
         
         # Search & SEO
         path('search/', include('apps.search.urls')),
+        
+        # Notifications
+        path('notifications/', include('apps.notifications.urls')),
     ])),
     
     # API Documentation

@@ -145,7 +145,14 @@
     "accountSettings": "Account settings",
     "support": "Support",
     "language": "Language",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "logoutModal": {
+      "title": "Sign out",
+      "description": "Are you sure you want to sign out of your account?",
+      "cancel": "Cancel",
+      "confirm": "Sign out",
+      "signingOut": "Signing out..."
+    }
   },
   "ecommerce": {
     "title": "E-commerce Dashboard",

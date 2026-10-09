@@ -6,6 +6,7 @@ import Button from "@/components/ui/button/Button";
 import { useToast } from "@/context/ToastContext";
 import { useApi } from "@/hooks/useApi";
 import { usePermissions } from "@/hooks/usePermissions";
+import { X, Target, Lightbulb, Award, Briefcase, Users } from "lucide-react";
 
 interface TrainingCategory {
   id: number;
@@ -393,7 +394,7 @@ export default function TrainingForm({
                 onChange={(e) => handleChange("short_description", e.target.value)}
                 placeholder="Résumé de la formation (300 caractères max)"
                 maxLength={300}
-                rows={3}
+                rows={5}
                 required
                 disabled={isLoading}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -411,7 +412,7 @@ export default function TrainingForm({
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
                 placeholder="Description détaillée de la formation..."
-                rows={6}
+                rows={8}
                 required
                 disabled={isLoading}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -548,13 +549,14 @@ export default function TrainingForm({
               </Label>
               {formData.objectives.map((obj, index) => (
                 <div key={index} className="mb-2 flex gap-2">
-                  <Input
-                    type="text"
+                  <textarea
                     value={obj}
                     onChange={(e) => handleArrayChange("objectives", index, e.target.value)}
                     placeholder={`Objectif ${index + 1}`}
                     required
                     disabled={isLoading}
+                    rows={3}
+                    className="flex-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                   {formData.objectives.length > 1 && (
                     <Button
@@ -564,7 +566,7 @@ export default function TrainingForm({
                       size="sm"
                       disabled={isLoading}
                     >
-                      ✕
+                      <X size={14} />
                     </Button>
                   )}
                 </div>
@@ -587,13 +589,14 @@ export default function TrainingForm({
               </Label>
               {formData.prerequisites.map((prereq, index) => (
                 <div key={index} className="mb-2 flex gap-2">
-                  <Input
-                    type="text"
+                  <textarea
                     value={prereq}
                     onChange={(e) => handleArrayChange("prerequisites", index, e.target.value)}
                     placeholder={`Prérequis ${index + 1}`}
                     required
                     disabled={isLoading}
+                    rows={3}
+                    className="flex-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
                   {formData.prerequisites.length > 1 && (
                     <Button
@@ -628,7 +631,7 @@ export default function TrainingForm({
                 value={formData.target_audience}
                 onChange={(e) => handleChange("target_audience", e.target.value)}
                 placeholder="À qui s'adresse cette formation ?"
-                rows={3}
+                rows={5}
                 required
                 disabled={isLoading}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -805,7 +808,7 @@ export default function TrainingForm({
 
             {/* Section: Sessions */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">📅 Détails des sessions</h3>
+              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">Détails des sessions</h3>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <Label>Places maximum</Label>
@@ -854,7 +857,10 @@ export default function TrainingForm({
 
             {/* Section: Ciblage */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">🎯 Ciblage & Accès</h3>
+              <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-gray-200">
+                <Target size={18} className="text-brand-600" />
+                Ciblage & Accès
+              </h3>
 
               <div className="mb-6">
                 <Label>Cette formation est pour vous si…</Label>
@@ -896,12 +902,13 @@ export default function TrainingForm({
                 <Label>Prérequis d'accès</Label>
                 {formData.access_prerequisites.map((item: string, index: number) => (
                   <div key={index} className="mb-2 flex gap-2">
-                    <Input
-                      type="text"
+                    <textarea
                       value={item}
                       onChange={(e) => handleArrayChange("access_prerequisites", index, e.target.value)}
                       placeholder={`Prérequis ${index + 1}`}
                       disabled={isLoading}
+                      rows={3}
+                      className="flex-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                     {formData.access_prerequisites.length > 1 && (
                       <Button
@@ -931,7 +938,10 @@ export default function TrainingForm({
 
             {/* Section: Problèmes & Transformation */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">💡 Problèmes & Transformation</h3>
+              <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-gray-200">
+                <Lightbulb size={18} className="text-brand-600" />
+                Problèmes & Transformation
+              </h3>
 
               <div className="mb-6">
                 <Label>Problèmes résolus par cette formation</Label>
@@ -976,7 +986,7 @@ export default function TrainingForm({
                     value={formData.transformation_before}
                     onChange={(e) => handleChange("transformation_before", e.target.value)}
                     placeholder="Ex: Je fais des missions quand on m'appelle"
-                    rows={3}
+                    rows={5}
                     disabled={isLoading}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
@@ -987,7 +997,7 @@ export default function TrainingForm({
                     value={formData.transformation_after}
                     onChange={(e) => handleChange("transformation_after", e.target.value)}
                     placeholder="Ex: Je pilote une activité de conseil structurée et rentable"
-                    rows={3}
+                    rows={5}
                     disabled={isLoading}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   />
@@ -997,7 +1007,10 @@ export default function TrainingForm({
 
             {/* Section: Ce que vous obtiendrez */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">🏆 Ce que vous obtiendrez</h3>
+              <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-gray-200">
+                <Award size={18} className="text-brand-600" />
+                Ce que vous obtiendrez
+              </h3>
 
               <div className="mb-6">
                 <Label>Livrables professionnels</Label>
@@ -1074,7 +1087,10 @@ export default function TrainingForm({
 
             {/* Section: Contenu inclus/exclu */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">📦 Contenu inclus / exclu</h3>
+              <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-gray-200">
+                <Users size={18} className="text-brand-600" />
+                Contenu inclus / exclu
+              </h3>
 
               <div className="mb-6">
                 <Label>Ce qui est inclus</Label>
@@ -1151,7 +1167,10 @@ export default function TrainingForm({
 
             {/* Section: Positionnement & Paiement */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">💼 Positionnement & Paiement</h3>
+              <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-gray-200">
+                <Briefcase size={18} className="text-brand-600" />
+                Positionnement & Paiement
+              </h3>
 
               <div className="mb-6">
                 <Label>Positionnement stratégique</Label>
@@ -1159,7 +1178,7 @@ export default function TrainingForm({
                   value={formData.strategic_positioning}
                   onChange={(e) => handleChange("strategic_positioning", e.target.value)}
                   placeholder="Ex: Vous avez déjà les compétences. Transformez-les en activité de conseil structurée."
-                  rows={4}
+                  rows={6}
                   disabled={isLoading}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
@@ -1171,7 +1190,7 @@ export default function TrainingForm({
                   value={formData.payment_terms}
                   onChange={(e) => handleChange("payment_terms", e.target.value)}
                   placeholder="Ex: Un seul versement / 70% à l'inscription et 30% avant la 3e semaine"
-                  rows={3}
+                  rows={5}
                   disabled={isLoading}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
@@ -1180,7 +1199,10 @@ export default function TrainingForm({
 
             {/* Section: Options Premium */}
             <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-800 dark:text-gray-200">⭐ Options Premium</h3>
+              <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-800 dark:text-gray-200">
+                <Award size={18} className="text-gold-500" />
+                Options Premium
+              </h3>
               <Label>Options premium disponibles</Label>
               {formData.premium_options.map((item: string, index: number) => (
                 <div key={index} className="mb-2 flex gap-2">

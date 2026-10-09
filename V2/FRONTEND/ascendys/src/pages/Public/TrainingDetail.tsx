@@ -70,12 +70,33 @@ export default function TrainingDetail() {
 
         <main className="pt-20">
           {/* Hero */}
-          <section
-            className="relative overflow-hidden py-16 lg:py-20"
-            style={{
-              background: `linear-gradient(135deg, #0d0025 0%, #1a0050 40%, ${color} 100%)`,
-            }}
-          >
+          <section className="relative overflow-hidden py-16 lg:py-20">
+            {/* Background image with overlay */}
+            {training.image && (
+              <div className="absolute inset-0">
+                <img
+                  src={training.image}
+                  alt={training.title}
+                  className="size-full object-cover opacity-40"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(13,0,37,0.9) 0%, rgba(26,0,80,0.85) 40%, ${color}CC 100%)`,
+                  }}
+                />
+              </div>
+            )}
+            {/* Fallback gradient if no image */}
+            {!training.image && (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(135deg, #0d0025 0%, #1a0050 40%, ${color} 100%)`,
+                }}
+              />
+            )}
+
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <Link
                 to="/trainings"
@@ -133,7 +154,7 @@ export default function TrainingDetail() {
                     Investissement
                   </div>
                   <div className="text-3xl font-extrabold" style={{ color: "#FFC000" }}>
-                    {training.price}
+                    {training.price} <span className="text-lg font-semibold">{training.currency}</span>
                   </div>
                 </div>
                 <Link
@@ -154,7 +175,7 @@ export default function TrainingDetail() {
               </span>
               <div className="flex items-center gap-4">
                 <span className="text-sm font-bold" style={{ color }}>
-                  {training.price}
+                  {training.price} {training.currency}
                 </span>
                 <Link
                   to={`/trainings/${training.slug}/enroll`}
@@ -506,7 +527,7 @@ export default function TrainingDetail() {
                           Investissement
                         </div>
                         <div className="mb-1 text-3xl font-extrabold text-white">
-                          {training.price}
+                          {training.price} <span className="text-lg font-semibold opacity-80">{training.currency}</span>
                         </div>
                         <div className="text-xs text-white/50">
                           {training.duration}

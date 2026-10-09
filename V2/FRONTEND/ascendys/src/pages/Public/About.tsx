@@ -1,43 +1,51 @@
 import PageMeta from "@/components/common/PageMeta";
 import PublicNavbar from "@/components/public/PublicNavbar";
 import PublicFooter from "@/components/public/PublicFooter";
+import { Target, Users, Lightbulb, CheckCircle2, ArrowRight } from "lucide-react";
+import { Link } from "react-router";
 
 export default function About() {
-  const team = [
+  const pillars = [
     {
-      name: "Dr. Kouadio Michel",
-      role: "Directeur Général",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop",
-      bio: "Expert en formation professionnelle avec plus de 15 ans d'expérience",
+      icon: <Target size={22} />,
+      title: "Analyse réelle des besoins métiers",
+      desc: "Nous partons toujours de vos enjeux concrets, pas d'une liste de technologies.",
     },
     {
-      name: "Aminata Touré",
-      role: "Directrice Pédagogique",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop",
-      bio: "Spécialiste en ingénierie pédagogique et transformation digitale",
+      icon: <CheckCircle2 size={22} />,
+      title: "Solutions pragmatiques et mesurables",
+      desc: "Chaque livrable est défini, documenté et évaluable.",
     },
     {
-      name: "Jean-Baptiste Yao",
-      role: "Responsable Technique",
-      image: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=400&auto=format&fit=crop",
-      bio: "Ingénieur en développement web et formateur certifié",
+      icon: <Lightbulb size={22} />,
+      title: "Offres packagées et lisibles",
+      desc: "Des offres claires, sans jargon.",
+    },
+    {
+      icon: <CheckCircle2 size={22} />,
+      title: "Accompagnement structuré et documenté",
+      desc: "Chaque mission suit un processus précis avec livrables, jalons et comptes-rendus.",
+    },
+    {
+      icon: <Users size={22} />,
+      title: "Un interlocuteur unique",
+      desc: "Un seul point de contact pour toute votre relation avec ASCENDYS CONNECT.",
     },
   ];
 
-  const milestones = [
-    { year: "2014", event: "Création d'Ascendys Connect" },
-    { year: "2016", event: "Certification organisme de formation" },
-    { year: "2018", event: "Partenariat avec Microsoft et Google" },
-    { year: "2020", event: "Lancement plateforme e-learning" },
-    { year: "2022", event: "500+ étudiants formés" },
-    { year: "2024", event: "Expansion à l'international" },
+  const clients = [
+    "Institutions et programmes",
+    "Organisations structurées",
+    "PME et structures en croissance",
+    "Projets digitaux",
+    "Entrepreneurs et porteurs de projets",
   ];
 
   return (
     <>
       <PageMeta
-        title="À propos - Ascendys Connect"
-        description="Découvrez l'histoire d'Ascendys Connect, organisme de formation professionnelle au Togo"
+        title="À propos — Qui sommes-nous"
+        description="ASCENDYS CONNECT est une entreprise de solutions IT & Digitales. Découvrez notre mission, notre approche et les organisations que nous accompagnons."
       />
 
       <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -45,238 +53,181 @@ export default function About() {
 
         <main className="pt-20">
           {/* Hero Section */}
-          <section className="relative bg-gradient-to-br from-brand-600 to-brand-800 py-20 text-white lg:py-28">
-            <div className="absolute inset-0 opacity-10" style={{
-              backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-            }} />
+          <section className="relative py-20 text-white lg:py-28">
+            {/* Background Image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: 'url(/a_propos.jpg)' }}
+            />
+            
+            {/* Dark Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70" />
             
             <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-              <h1 className="mb-6 text-4xl font-bold sm:text-5xl lg:text-6xl">
-                Notre Histoire
+              <div className="mb-6 inline-block rounded-full bg-brand-600/20 px-5 py-2 backdrop-blur-sm">
+                <span className="text-sm font-semibold uppercase tracking-wider text-brand-300">
+                  À propos
+                </span>
+              </div>
+              <h1 className="mb-6 text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
+                Qui sommes‑nous
               </h1>
-              <p className="mx-auto max-w-3xl text-xl text-brand-100">
-                Depuis 2014, nous transformons des vies à travers la formation
-                professionnelle de qualité
+              <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-200 lg:text-xl">
+                Une entreprise de solutions IT & Digitales à Lomé, engagée pour plus
+                de valeur dans chaque mission.
               </p>
             </div>
           </section>
 
-          {/* Mission & Vision */}
-          <section className="py-20 lg:py-28">
+          {/* Présentation */}
+          <section className="py-16 lg:py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+              <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
                 <div>
-                  <div className="mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-brand-100 text-3xl dark:bg-brand-950/30">
-                    🎯
-                  </div>
-                  <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
-                    Notre Mission
+                  <span className="mb-4 inline-block rounded-full bg-brand-100 px-4 py-1.5 text-sm font-semibold text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
+                    Notre identité
+                  </span>
+                  <h2 className="mb-3 text-3xl font-bold text-gray-900 dark:text-white">
+                    ASCENDYS CONNECT
                   </h2>
-                  <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-                    Rendre la formation professionnelle accessible à tous au Togo
-                    et en Afrique de l'Ouest. Nous croyons que chacun
-                    mérite une chance de développer ses compétences et
-                    d'atteindre ses objectifs professionnels.
+                  <div className="mb-6 h-1 w-12 rounded bg-[#FFC000]"></div>
+                  <div className="mt-8 space-y-5">
+                    <p className="leading-relaxed text-gray-600 dark:text-gray-400">
+                      ASCENDYS Connect est une entreprise de solutions IT &amp;
+                      Digitales spécialisée dans l&apos;audit, le conseil, l&apos;ingénierie
+                      technique, la sécurité informatique, les télécommunications,
+                      le support et la formation professionnelle.
+                    </p>
+                    <p className="leading-relaxed text-gray-600 dark:text-gray-400">
+                      Nous accompagnons les organisations dans la conception, la
+                      sécurisation et l&apos;optimisation de leurs systèmes
+                      d&apos;information, avec une approche orientée performance et
+                      résultats concrets.
+                    </p>
+                    <p className="leading-relaxed text-gray-600 dark:text-gray-400">
+                      Nous fournissons aussi le matériel nécessaire à vos projets
+                      IT, installé, configuré et maintenu par nos équipes, afin de
+                      garantir performance, compatibilité et sécurité.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Mission card */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#4208A1] to-[#9800BF] p-8 shadow-2xl lg:p-10">
+                  {/* Decorative elements */}
+                  <div className="absolute -right-10 -top-10 size-40 rounded-full bg-white/5"></div>
+                  <div className="absolute -bottom-10 -left-10 size-40 rounded-full bg-white/5"></div>
+
+                  <div className="relative">
+                    <div className="mb-4">
+                      <div className="mb-3 text-xs font-bold uppercase tracking-widest text-[#FFC000]">
+                        Notre mission
+                      </div>
+                      <h3 className="text-2xl font-bold leading-snug text-white">
+                        Transformer l&apos;IT et le Digital en leviers de performance,
+                        de sécurité et de croissance.
+                      </h3>
+                    </div>
+                    <hr className="my-6 border-white/20" />
+                    <p className="text-sm leading-relaxed text-white/80">
+                      Chaque engagement que nous prenons est orienté vers un résultat
+                      mesurable et exploitable pour votre organisation.
+                    </p>
+                    <p className="mt-6 font-semibold italic text-[#FFC000]">
+                      « Pour plus de Valeur. »
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Notre approche */}
+          <section className="bg-gray-50 py-16 dark:bg-gray-900 lg:py-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="mb-14 flex flex-col items-center text-center">
+                <span className="mb-4 inline-block rounded-full bg-brand-100 px-4 py-1.5 text-sm font-semibold text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
+                  Notre approche
+                </span>
+                <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
+                  5 piliers fondamentaux
+                </h2>
+                <div className="h-1 w-12 rounded bg-[#FFC000]"></div>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {pillars.map((p, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:scale-105 hover:border-brand-400 hover:shadow-xl dark:border-gray-800 dark:bg-gray-950 dark:hover:border-brand-600"
+                  >
+                    <div className="flex size-12 items-center justify-center rounded-lg bg-gradient-to-br from-[#4208A1] to-[#9800BF] text-white">
+                      {p.icon}
+                    </div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{p.title}</h3>
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{p.desc}</p>
+                  </div>
+                ))}
+                <div className="flex items-center justify-center rounded-xl bg-gradient-to-br from-[#4208A1] to-[#9800BF] p-8 text-center">
+                  <p className="text-lg font-semibold italic leading-snug text-white">
+                    « Nous ne vendons pas de technologies. Nous livrons des
+                    solutions exploitables. »
                   </p>
-                  <ul className="space-y-3">
-                    {[
-                      "Formations de qualité certifiées",
-                      "Accompagnement personnalisé",
-                      "Insertion professionnelle garantie",
-                      "Innovation pédagogique continue",
-                    ].map((item, idx) => (
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Nos clients */}
+          <section className="py-16 lg:py-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+                <div>
+                  <span className="mb-4 inline-block rounded-full bg-brand-100 px-4 py-1.5 text-sm font-semibold text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
+                    Nos clients
+                  </span>
+                  <h2 className="mb-3 text-3xl font-bold text-gray-900 dark:text-white">
+                    Nous accompagnons
+                  </h2>
+                  <div className="mb-6 h-1 w-12 rounded bg-[#FFC000]"></div>
+                  <p className="mb-8 mt-6 leading-relaxed text-gray-600 dark:text-gray-400">
+                    Des organisations de toutes tailles, à chaque étape de leur
+                    transformation IT et digitale.
+                  </p>
+                  <ul className="flex flex-col gap-3">
+                    {clients.map((c, i) => (
                       <li
-                        key={idx}
-                        className="flex items-center gap-3 text-gray-700 dark:text-gray-300"
+                        key={i}
+                        className="flex items-center gap-3 font-medium text-gray-900 dark:text-white"
                       >
-                        <svg
-                          className="size-6 shrink-0 text-gold-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        {item}
+                        <span className="size-2 shrink-0 rounded-full bg-[#FFC000]" />
+                        {c}
                       </li>
                     ))}
                   </ul>
                 </div>
+                <div className="flex flex-col gap-5">
+                  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a0050] to-[#4208A1] p-8 shadow-2xl">
+                    {/* Decorative elements */}
+                    <div className="absolute -right-10 -top-10 size-32 rounded-full bg-white/5"></div>
+                    <div className="absolute -bottom-10 -left-10 size-32 rounded-full bg-white/5"></div>
 
-                <div>
-                  <div className="mb-6 inline-flex size-16 items-center justify-center rounded-2xl bg-gold-100 text-3xl dark:bg-gold-950/30">
-                    🌟
-                  </div>
-                  <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
-                    Notre Vision
-                  </h2>
-                  <p className="mb-6 text-lg text-gray-600 dark:text-gray-400">
-                    Devenir le leader de la formation professionnelle en Afrique
-                    de l'Ouest d'ici 2030. Nous aspirons à créer un écosystème
-                    où chaque individu peut se former, évoluer et contribuer au
-                    développement économique.
-                  </p>
-                  <div className="space-y-4">
-                    {[
-                      {
-                        label: "Excellence",
-                        description: "Standards internationaux de formation",
-                      },
-                      {
-                        label: "Innovation",
-                        description: "Technologies éducatives de pointe",
-                      },
-                      {
-                        label: "Impact",
-                        description: "Transformer 10 000 vies d'ici 2030",
-                      },
-                    ].map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
-                      >
-                        <div className="font-semibold text-brand-600 dark:text-brand-400">
-                          {item.label}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {item.description}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Timeline */}
-          <section className="bg-gray-50 py-20 dark:bg-gray-900 lg:py-28">
-            <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-16 text-center">
-                <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-                  Notre Parcours
-                </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  10 ans d'innovation et d'excellence
-                </p>
-              </div>
-
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute inset-y-0 start-8 w-0.5 bg-brand-200 dark:bg-brand-900 lg:start-1/2" />
-
-                <div className="space-y-12">
-                  {milestones.map((milestone, index) => (
-                    <div
-                      key={index}
-                      className={`relative flex items-center gap-8 ${
-                        index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
-                      }`}
-                    >
-                      {/* Year badge */}
-                      <div className="relative z-10 flex size-16 shrink-0 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white shadow-lg lg:absolute lg:start-1/2 lg:-translate-x-1/2">
-                        {milestone.year}
-                      </div>
-
-                      {/* Content */}
-                      <div
-                        className={`flex-1 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950 lg:w-5/12 ${
-                          index % 2 === 0 ? "lg:text-end" : "lg:text-start"
-                        }`}
-                      >
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {milestone.event}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Team Section */}
-          <section className="py-20 lg:py-28">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-16 text-center">
-                <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-                  Notre Équipe
-                </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  Des experts passionnés à votre service
-                </p>
-              </div>
-
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {team.map((member, index) => (
-                  <div
-                    key={index}
-                    className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-xl dark:border-gray-800 dark:bg-gray-950"
-                  >
-                    <div className="relative h-64 overflow-hidden bg-gray-200 dark:bg-gray-800">
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
-                        {member.name}
+                    <div className="relative">
+                      <h3 className="mb-3 text-xl font-bold text-white">
+                        Prêt à travailler avec nous ?
                       </h3>
-                      <p className="mb-3 text-sm font-semibold text-brand-600 dark:text-brand-400">
-                        {member.role}
+                      <p className="mb-6 text-sm text-white/75">
+                        Premier échange offert pour analyser votre situation et
+                        définir vos priorités
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {member.bio}
-                      </p>
+                      <Link 
+                        to="/contact" 
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#FFC000] px-6 py-3 text-sm font-semibold text-gray-900 transition-all hover:bg-[#FFD633] hover:shadow-lg"
+                      >
+                        Nous contacter <ArrowRight size={15} />
+                      </Link>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* CTA Section */}
-          <section className="bg-gradient-to-br from-brand-600 to-brand-800 py-20 text-white">
-            <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-              <h2 className="mb-6 text-3xl font-bold sm:text-4xl">
-                Rejoignez l'aventure Ascendys Connect
-              </h2>
-              <p className="mb-8 text-xl text-brand-100">
-                Ensemble, construisons votre avenir professionnel
-              </p>
-              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <a
-                  href="/home#formations"
-                  className="inline-flex items-center gap-2 rounded-lg bg-gold-500 px-8 py-4 font-semibold text-gray-900 transition-all hover:bg-gold-400 hover:shadow-xl"
-                >
-                  Découvrir nos formations
-                  <svg
-                    className="size-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </a>
-                <a
-                  href="/home#contact"
-                  className="inline-flex items-center gap-2 rounded-lg border-2 border-white bg-white/10 px-8 py-4 font-semibold backdrop-blur-sm transition-all hover:bg-white/20"
-                >
-                  Nous contacter
-                </a>
+                </div>
               </div>
             </div>
           </section>

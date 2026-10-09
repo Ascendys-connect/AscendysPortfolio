@@ -121,7 +121,7 @@ export default function TrainingsSection() {
         {/* Trainings Grid */}
         {!isLoading && !error && (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredTrainings.map((training, index) => (
+            {filteredTrainings.slice(0, 6).map((training, index) => (
             <div
               key={index}
               className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-2xl dark:border-gray-800 dark:bg-gray-950"
@@ -195,7 +195,7 @@ export default function TrainingsSection() {
                       Voir plus
                     </a>
                     <a
-                      href="/contact"
+                      href={`/trainings/${training.slug}/enroll`}
                       className="flex-1 rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition-all hover:bg-brand-700 hover:shadow-lg"
                     >
                       S'inscrire

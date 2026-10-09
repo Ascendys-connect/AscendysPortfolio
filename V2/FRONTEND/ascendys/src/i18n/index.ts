@@ -2,10 +2,14 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import enCommon from "../locales/en/common.json";
+import frCommon from "../locales/fr/common.json";
 
 export const resources = {
   en: {
     common: enCommon,
+  },
+  fr: {
+    common: frCommon,
   },
 } as const;
 

@@ -1,5 +1,5 @@
 import { useApi } from "@/hooks/useApi";
-import { Partner } from "@/types/content.types";
+import type { Partner } from "@/types/content.types";
 
 export default function PartnersSection() {
   // Fetch partners from API

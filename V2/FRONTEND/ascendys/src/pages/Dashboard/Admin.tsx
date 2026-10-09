@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Bienvenue, {user?.first_name || "Administrateur"} 👋
+            Bienvenue, {user?.first_name || "Administrateur"}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Gérez vos contenus, publications et suivez l'engagement

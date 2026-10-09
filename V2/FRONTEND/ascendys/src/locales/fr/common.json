@@ -1,0 +1,887 @@
+{
+  "common": {
+    "home": "Accueil",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "saveChanges": "Enregistrer",
+    "viewMore": "Voir plus",
+    "delete": "Supprimer",
+    "filter": "Filtrer",
+    "seeAll": "Tout voir"
+  },
+  "sidebar": {
+    "groups": {
+      "menu": "Menu",
+      "support": "Support",
+      "others": "Autres"
+    },
+    "badges": {
+      "new": "nouveau",
+      "pro": "pro"
+    },
+    "items": {
+      "dashboard": "Tableau de bord",
+      "ecommerceHome": "E-commerce",
+      "analytics": "Analytique",
+      "marketing": "Marketing",
+      "crm": "CRM",
+      "stocks": "Actions",
+      "saas": "SaaS",
+      "logistics": "Logistique",
+      "ai": "IA",
+      "sales": "Ventes",
+      "finance": "Finance",
+      "aiAssistant": "Assistant IA",
+      "textGenerator": "Générateur de texte",
+      "imageGenerator": "Générateur d'image",
+      "codeGenerator": "Générateur de code",
+      "videoGenerator": "Générateur de vidéo",
+      "aiSettings": "Paramètres IA",
+      "ecommerce": "E-commerce",
+      "products": "Produits",
+      "addProduct": "Ajouter un produit",
+      "billing": "Facturation",
+      "invoices": "Factures",
+      "singleInvoice": "Facture unique",
+      "createInvoice": "Créer une facture",
+      "transactions": "Transactions",
+      "singleTransaction": "Transaction unique",
+      "calendar": "Calendrier",
+      "userProfile": "Profil utilisateur",
+      "task": "Tâche",
+      "taskList": "Liste",
+      "kanban": "Kanban",
+      "forms": "Formulaires",
+      "formElements": "Éléments de formulaire",
+      "formLayout": "Mise en page formulaire",
+      "tables": "Tableaux",
+      "basicTables": "Tableaux de base",
+      "dataTables": "Tableaux de données",
+      "pages": "Pages",
+      "fileManager": "Gestionnaire de fichiers",
+      "pricingTables": "Tarifs",
+      "faq": "FAQ",
+      "apiKeys": "Clés API",
+      "integrations": "Intégrations",
+      "blankPage": "Page vierge",
+      "error404": "Erreur 404",
+      "error500": "Erreur 500",
+      "error503": "Erreur 503",
+      "comingSoon": "Bientôt disponible",
+      "maintenance": "Maintenance",
+      "successPage": "Succès",
+      "layouts": "Mises en page",
+      "layoutOne": "Mise en page 1",
+      "layoutTwo": "Mise en page 2",
+      "layoutThree": "Mise en page 3",
+      "layoutFour": "Mise en page 4",
+      "layoutFive": "Mise en page 5",
+      "layoutSix": "Mise en page 6",
+      "charts": "Graphiques",
+      "lineChart": "Graphique linéaire",
+      "barChart": "Graphique à barres",
+      "pieChart": "Graphique en secteurs",
+      "radarChart": "Graphique radar",
+      "radialChart": "Graphique radial",
+      "maps": "Cartes",
+      "mapsGoogle": "Cartes",
+      "vectorMap": "Carte vectorielle",
+      "uiElements": "Éléments UI",
+      "alerts": "Alertes",
+      "avatar": "Avatar",
+      "badge": "Badge",
+      "breadcrumb": "Fil d'Ariane",
+      "buttons": "Boutons",
+      "buttonsGroup": "Groupe de boutons",
+      "cards": "Cartes",
+      "carousel": "Carrousel",
+      "dropdowns": "Menus déroulants",
+      "images": "Images",
+      "links": "Liens",
+      "listView": "Liste",
+      "modals": "Modaux",
+      "notificationUi": "Notification",
+      "pagination": "Pagination",
+      "popovers": "Popups",
+      "progressbar": "Barre de progression",
+      "ribbons": "Rubans",
+      "spinners": "Chargements",
+      "tabs": "Onglets",
+      "tooltips": "Infobulles",
+      "videos": "Vidéos",
+      "authentication": "Authentification",
+      "signIn": "Connexion",
+      "signUp": "Inscription",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "twoStepVerification": "Vérification en deux étapes",
+      "chat": "Chat",
+      "supportMenu": "Ticket de support",
+      "supportList": "Liste des tickets",
+      "supportReply": "Répondre au ticket",
+      "email": "E-mail",
+      "inbox": "Boîte de réception",
+      "inboxDetails": "Détails"
+    },
+    "widget": {
+      "title": "#1 Tableau de bord Tailwind CSS",
+      "description": "Modèle d'administration Tailwind CSS avec plus de 500 composants UI et pages.",
+      "purchasePlan": "Acheter un plan"
+    }
+  },
+  "header": {
+    "searchPlaceholder": "Rechercher ou saisir une commande...",
+    "toggleSidebar": "Basculer le menu",
+    "notifications": {
+      "title": "Notifications",
+      "requestsPermission": "demande la permission de modifier",
+      "project": "Projet",
+      "minAgo": "Il y a {count} min",
+      "hrAgo": "Il y a {count} h",
+      "viewAll": "Voir toutes les notifications"
+    }
+  },
+  "userDropdown": {
+    "editProfile": "Modifier le profil",
+    "accountSettings": "Paramètres du compte",
+    "support": "Support",
+    "language": "Langue",
+    "signOut": "Se déconnecter",
+    "logoutModal": {
+      "title": "Se déconnecter",
+      "description": "Êtes-vous sûr de vouloir vous déconnecter de votre compte ?",
+      "cancel": "Annuler",
+      "confirm": "Se déconnecter",
+      "signingOut": "Déconnexion..."
+    }
+  },
+  "ecommerce": {
+    "title": "Tableau de bord e-commerce",
+    "metrics": {
+      "customers": "Clients",
+      "orders": "Commandes"
+    },
+    "months": {
+      "jan": "Jan",
+      "feb": "Fév",
+      "mar": "Mar",
+      "apr": "Avr",
+      "may": "Mai",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aoû",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Déc"
+    },
+    "monthlySales": {
+      "title": "Ventes mensuelles",
+      "series": "Ventes"
+    },
+    "monthlyTarget": {
+      "title": "Objectif mensuel",
+      "subtitle": "Objectif que vous avez fixé pour chaque mois",
+      "earned": "Vous gagnez {amount} aujourd'hui, c'est plus qu'au mois dernier. Continuez ainsi !",
+      "target": "Objectif",
+      "revenue": "Revenus",
+      "today": "Aujourd'hui"
+    },
+    "statistics": {
+      "title": "Statistiques",
+      "subtitle": "Objectif que vous avez fixé pour chaque mois",
+      "sales": "Ventes",
+      "revenue": "Revenus",
+      "monthly": "Mensuel",
+      "quarterly": "Trimestriel",
+      "annually": "Annuel",
+      "selectDateRange": "Sélectionner une plage de dates"
+    },
+    "recentOrders": {
+      "title": "Commandes récentes",
+      "products": "Produits",
+      "category": "Catégorie",
+      "price": "Prix",
+      "status": "Statut",
+      "variants": "{count, plural, one {# Variante} other {# Variantes}}",
+      "categories": {
+        "laptop": "Ordinateur portable",
+        "watch": "Montre",
+        "smartphone": "Smartphone",
+        "electronics": "Électronique",
+        "accessories": "Accessoires"
+      },
+      "statuses": {
+        "delivered": "Livré",
+        "pending": "En attente",
+        "canceled": "Annulé"
+      }
+    },
+    "demographic": {
+      "title": "Démographie des clients",
+      "subtitle": "Nombre de clients par pays",
+      "customers": "{count} clients",
+      "usa": "États-Unis",
+      "france": "France"
+    }
+  },
+  "analytics": {
+    "metrics": {
+      "uniqueVisitors": "Visiteurs uniques",
+      "totalPageviews": "Pages vues totales",
+      "bounceRate": "Taux de rebond",
+      "visitDuration": "Durée de visite",
+      "vsLastMonth": "Vs le mois dernier"
+    },
+    "barChart": {
+      "title": "Analytique",
+      "subtitle": "Analyse des visiteurs des 30 derniers jours"
+    },
+    "topChannels": {
+      "title": "Meilleurs canaux",
+      "source": "Source",
+      "visitors": "Visiteurs",
+      "channelsReport": "Rapport des canaux"
+    },
+    "topPages": {
+      "title": "Meilleures pages",
+      "source": "Source",
+      "pageview": "Pages vues",
+      "channelsReport": "Rapport des canaux"
+    },
+    "activeUsers": {
+      "title": "Utilisateurs actifs",
+      "liveVisitors": "Visiteurs en direct",
+      "avgDaily": "Moy. quotidienne",
+      "avgWeekly": "Moy. hebdomadaire",
+      "avgMonthly": "Moy. mensuelle"
+    },
+    "acquisitionChannels": {
+      "title": "Canaux d'acquisition",
+      "direct": "Direct",
+      "referral": "Référence",
+      "organicSearch": "Recherche organique",
+      "social": "Réseaux sociaux"
+    },
+    "session": {
+      "title": "Sessions par appareil",
+      "desktop": "Ordinateur",
+      "mobile": "Mobile",
+      "tablet": "Tablette"
+    },
+    "recentOrders": {
+      "title": "Commandes récentes",
+      "products": "Produits",
+      "category": "Catégorie",
+      "country": "Pays",
+      "cr": "TC",
+      "value": "Valeur",
+      "categories": {
+        "uiKits": "Kits UI",
+        "templates": "Modèles",
+        "saas": "SaaS"
+      },
+      "crDashboard": "Tableau de bord"
+    }
+  },
+  "notFound": {
+    "error": "ERREUR",
+    "message": "Nous ne trouvons pas la page que vous recherchez !",
+    "backHome": "Retour à l'accueil"
+  },
+  "marketing": {
+    "metrics": {
+      "avgClientRating": "Note client moy.",
+      "instagramFollowers": "Abonnés Instagram",
+      "totalRevenue": "Revenu total",
+      "vsLastMonth": "Vs le mois dernier"
+    },
+    "impressionChart": {
+      "title": "Impressions & Trafic de données",
+      "totalRevenue": "Revenu total",
+      "sales": "Ventes",
+      "revenue": "Revenus"
+    },
+    "featuredCampaign": {
+      "title": "Campagnes vedettes",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer",
+      "products": "Produits",
+      "campaign": "Campagne",
+      "status": "Statut",
+      "adsCampaign": "Campagne publicitaire",
+      "campaigns": {
+        "growBrand": "Développez votre marque...",
+        "betterIdeas": "De meilleures idées...",
+        "increaseTraffic": "Augmentez votre trafic..."
+      },
+      "statuses": {
+        "success": "Succès",
+        "pending": "En attente",
+        "failed": "Échoué"
+      }
+    },
+    "trafficStats": {
+      "title": "Statistiques de trafic",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer",
+      "newSubscribers": "Nouveaux abonnés",
+      "conversionRate": "Taux de conversion",
+      "pageBounceRate": "Taux de rebond",
+      "thenLastWeek": "par rapport à la semaine dernière",
+      "newSales": "Nouvelles ventes"
+    },
+    "trafficSource": {
+      "title": "Meilleures sources de trafic",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer",
+      "viewAll": "Tout voir"
+    }
+  },
+  "crm": {
+    "metrics": {
+      "activeDeal": "Affaire active",
+      "revenueTotal": "Revenu total",
+      "closedDeals": "Affaires conclues",
+      "lastMonth": "le mois dernier"
+    },
+    "statistics": {
+      "title": "Statistiques",
+      "subtitle": "Objectif fixé pour chaque mois",
+      "avgYearlyProfit": "Bénéfice annuel moy.",
+      "sales": "Ventes",
+      "revenue": "Revenus"
+    },
+    "estimatedRevenue": {
+      "title": "Revenu estimé",
+      "subtitle": "Objectif fixé pour chaque mois",
+      "goals": "Objectifs de juin",
+      "marketing": "Marketing",
+      "sales": "Ventes"
+    },
+    "salesCategory": {
+      "title": "Catégorie de ventes",
+      "affiliate": "Affiliation",
+      "direct": "Direct",
+      "adsense": "Adsense",
+      "affiliateProgram": "Programme d'affiliation",
+      "directBuy": "Achat direct",
+      "products": "Produits",
+      "total": "Total",
+      "usedOf": "Utilisé sur"
+    },
+    "upcomingSchedule": {
+      "title": "Planning à venir",
+      "schedules": {
+        "item1": {
+          "title": "Presse analytique commerciale",
+          "description": "Explorer l'avenir des données +6 autres"
+        },
+        "item2": {
+          "title": "Sprint commercial",
+          "description": "Techniques de Sprint commercial +2 autres"
+        },
+        "item3": {
+          "title": "Réunion de revue client",
+          "description": "Insights de la réunion +8 autres"
+        }
+      }
+    },
+    "recentOrders": {
+      "title": "Commandes récentes",
+      "dealId": "ID affaire",
+      "customer": "Client",
+      "productService": "Produit/Service",
+      "dealValue": "Valeur affaire",
+      "closeDate": "Date de clôture",
+      "status": "Statut",
+      "action": "Action",
+      "products": {
+        "softwareLicense": "Licence logicielle",
+        "cloudHosting": "Hébergement cloud",
+        "webDomain": "Domaine web",
+        "sslCertificate": "Certificat SSL",
+        "premiumSupport": "Support premium"
+      },
+      "statuses": {
+        "complete": "Terminé",
+        "pending": "En attente",
+        "cancel": "Annuler"
+      }
+    }
+  },
+  "stocks": {
+    "title": "Actions",
+    "dividend": {
+      "title": "Dividende",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer"
+    },
+    "portfolioPerformance": {
+      "title": "Performance du portefeuille",
+      "subtitle": "Vos statistiques de performance de chaque mois",
+      "series": "Performance du portefeuille"
+    },
+    "trendingStocks": {
+      "title": "Actions tendances",
+      "shortStock": "Vendre à découvert",
+      "buyStock": "Acheter"
+    },
+    "watchlist": {
+      "title": "Ma liste de surveillance",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer"
+    },
+    "latestTransactions": {
+      "title": "Dernières transactions",
+      "searchPlaceholder": "Rechercher...",
+      "table": {
+        "name": "Nom",
+        "date": "Date",
+        "price": "Prix",
+        "category": "Catégorie",
+        "status": "Statut"
+      },
+      "actions": {
+        "bought": "Acheté {symbol}",
+        "sell": "Vendre {symbol}"
+      },
+      "categories": {
+        "finance": "Finance"
+      },
+      "statuses": {
+        "success": "Succès",
+        "pending": "En attente",
+        "failed": "Échoué"
+      }
+    }
+  },
+  "saas": {
+    "title": "SaaS",
+    "metrics": {
+      "overview": "Aperçu",
+      "totalRevenue": "Revenu total",
+      "activeUsers": "Utilisateurs actifs",
+      "clv": "Valeur vie client",
+      "cac": "Coût d'acquisition client"
+    },
+    "churnRate": {
+      "title": "Taux de désabonnement",
+      "subtitle": "Rétrogradation vers le plan gratuit",
+      "thanLastWeek": "par rapport à la semaine dernière",
+      "series": "Taux de désabonnement",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer"
+    },
+    "userGrowth": {
+      "title": "Croissance des utilisateurs",
+      "subtitle": "Nouvelles inscriptions site + mobile",
+      "thanLastWeek": "par rapport à la semaine dernière",
+      "series": "Revenus",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer"
+    },
+    "conversionFunnel": {
+      "title": "Entonnoir de conversion",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer",
+      "series": {
+        "adImpressions": "Impressions publicitaires",
+        "websiteSession": "Session web",
+        "appDownload": "Téléchargement app",
+        "newUsers": "Nouveaux utilisateurs"
+      }
+    },
+    "recentInvoices": {
+      "title": "Factures récentes",
+      "table": {
+        "serialNo": "N° de série :",
+        "closeDate": "Date de clôture",
+        "user": "Utilisateur",
+        "amount": "Montant",
+        "status": "Statut"
+      },
+      "statuses": {
+        "complete": "Terminé",
+        "pending": "En attente",
+        "cancelled": "Annulé"
+      }
+    },
+    "productPerformance": {
+      "title": "Performance des produits",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer",
+      "tabs": {
+        "dailySales": "Ventes quotidiennes",
+        "onlineSales": "Ventes en ligne",
+        "newUsers": "Nouveaux utilisateurs"
+      },
+      "digitalProduct": "Produit numérique",
+      "physicalProduct": "Produit physique",
+      "avgDailySales": "Ventes quotidiennes moyennes",
+      "totalOnlineSales": "Total ventes en ligne",
+      "addedLastMonth": "Ajouté le mois dernier",
+      "totalNewUsers": "Total nouveaux utilisateurs",
+      "series": {
+        "sales": "Ventes",
+        "revenue": "Revenus"
+      }
+    },
+    "activities": {
+      "title": "Activités",
+      "viewMore": "Voir plus",
+      "delete": "Supprimer",
+      "newInvoice": "Nouvelle facture",
+      "createdInvoice": "facture créée",
+      "justNow": "À l'instant",
+      "fifteenMinAgo": "Il y a 15 minutes",
+      "fiveMonthsAgo": "Il y a 5 mois",
+      "twoWeeksAgo": "Il y a 2 semaines"
+    }
+  },
+  "logistics": {
+    "title": "Logistique",
+    "metrics": {
+      "totalOrders": "Total commandes",
+      "ordersInTransit": "Commandes en transit"
+    },
+    "deliveryStatistics": {
+      "title": "Statistiques de livraison",
+      "subtitle": "Nombre total de livraisons 70,5K",
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "shipment": "Expédition",
+      "delivery": "Livraison"
+    },
+    "revenueEarned": {
+      "totalRevenue": "Revenu total généré",
+      "shippedQuantities": "Quantités expédiées",
+      "newSales": "Nouvelles ventes"
+    },
+    "deliveryVehicle": {
+      "title": "Véhicules de livraison",
+      "subtitle": "Véhicules en circulation",
+      "thanLastWeek": "par rapport à la semaine dernière",
+      "onRoute": "En route"
+    },
+    "trackingDelivery": {
+      "title": "Suivi des livraisons",
+      "subtitle": "Historique de livraison récent"
+    },
+    "trackingProgress": {
+      "trackingId": "ID de suivi",
+      "inTransit": "En transit",
+      "pickedUp": "Récupéré",
+      "delivered": "Livré"
+    },
+    "deliveryMan": {
+      "courier": "Livreur"
+    },
+    "deliveriesActivity": {
+      "title": "Activités de livraison",
+      "subtitle": "Suivez vos activités d'expédition récentes",
+      "tabs": {
+        "all": "Tout",
+        "delivered": "Livré",
+        "inTransit": "En transit",
+        "pending": "En attente",
+        "processing": "En cours"
+      },
+      "filter": {
+        "button": "Filtrer",
+        "category": "Catégorie",
+        "searchCategory": "Rechercher une catégorie...",
+        "company": "Société",
+        "searchCompany": "Rechercher une société...",
+        "apply": "Appliquer"
+      },
+      "table": {
+        "orderId": "ID commande",
+        "category": "Catégorie",
+        "company": "Société",
+        "arrivalTime": "Heure d'arrivée",
+        "route": "Itinéraire",
+        "price": "Prix",
+        "status": "Statut"
+      },
+      "categories": {
+        "furniture": "Mobilier",
+        "clothing": "Vêtements",
+        "books": "Livres",
+        "automotive": "Automobile",
+        "electronics": "Électronique",
+        "health": "Santé",
+        "toys": "Jouets",
+        "kitchen": "Cuisine",
+        "beauty": "Beauté",
+        "sports": "Sports"
+      },
+      "statuses": {
+        "delivered": "Livré",
+        "inTransit": "En transit",
+        "canceled": "Annulé"
+      },
+      "pagination": {
+        "showing": "Affichage",
+        "to": "à",
+        "of": "sur",
+        "page": "Page"
+      }
+    }
+  },
+  "aiDashboard": {
+    "stats": {
+      "users": "Utilisateurs",
+      "projects": "Projets",
+      "revenue": "Revenus",
+      "paidUsers": "Utilisateurs payants",
+      "last30Days": "30 derniers jours"
+    },
+    "userRevenue": {
+      "title": "Statistiques utilisateurs & revenus",
+      "subtitle": "Visualisez la progression mensuelle et l'engagement.",
+      "users": "Utilisateurs",
+      "revenue": "Revenus",
+      "monthly": "Mensuel",
+      "quarterly": "Trimestriel",
+      "annually": "Annuel"
+    },
+    "apiToken": {
+      "title": "Utilisation des tokens API",
+      "totalApiTokenUsed": "Total des tokens API utilisés",
+      "tokenUsed": "Tokens utilisés",
+      "configuredKey": "{count, plural, one {# clé API configurée} other {# clés API configurées}}",
+      "viewAllUsageDetails": "Voir tous les détails d'utilisation"
+    },
+    "userAnalytics": {
+      "title": "Analytique utilisateurs",
+      "subtitle": "Insights des utilisateurs de la plateforme",
+      "totalUsers": "Total utilisateurs",
+      "freeUsers": "Utilisateurs gratuits",
+      "paidUsers": "Utilisateurs payants",
+      "ofTotalUser": "du total",
+      "thisMonth": "Ce mois-ci",
+      "fromLastMonth": "depuis le mois dernier",
+      "thisYear": "Cette année",
+      "fromLastYear": "depuis l'année dernière"
+    },
+    "projectAnalytics": {
+      "title": "Analytique des projets",
+      "subtitle": "Voir les insights détaillés des projets",
+      "totalProjects": "Total projets",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "projectCreated": "Projet créé",
+      "thisMonth": "Ce mois-ci",
+      "fromLastMonth": "depuis le mois dernier",
+      "thisYear": "Cette année",
+      "fromLastYear": "depuis l'année dernière"
+    },
+    "recentTransactions": {
+      "title": "Transactions récentes",
+      "searchPlaceholder": "Rechercher...",
+      "filter": "Filtrer",
+      "table": {
+        "paidBy": "Payé par",
+        "packageName": "Nom du forfait",
+        "price": "Prix",
+        "paidDate": "Date de paiement",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "packages": {
+        "starterMonthly": "Starter - Mensuel",
+        "growthYearly": "Croissance - Annuel",
+        "premiumMonthly": "Premium - Mensuel"
+      },
+      "statuses": {
+        "active": "Actif",
+        "expired": "Expiré"
+      },
+      "pagination": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "pageOf": "Page {current} sur {total}"
+      },
+      "noResults": "Aucun résultat trouvé"
+    }
+  },
+  "sales": {
+    "salesStats": {
+      "title": "Tableau de bord des ventes",
+      "subtitle": "Suivez vos revenus, performances et croissance des ventes en temps réel",
+      "selectDateRange": "Sélectionner une plage de dates",
+      "export": "Exporter",
+      "totalRevenue": "Revenu total",
+      "totalSales": "Total ventes",
+      "conversionRate": "Taux de conversion",
+      "refundRate": "Taux de remboursement",
+      "vsLastMonth": "vs le mois dernier",
+      "newSales": "Nouvelles ventes"
+    },
+    "userRevenueStats": {
+      "title": "Statistiques utilisateurs & revenus",
+      "subtitle": "Visualisez la progression mensuelle et l'engagement.",
+      "daily": "Quotidien",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuel",
+      "onlineSales": "Ventes en ligne",
+      "offlineSales": "Ventes hors ligne"
+    },
+    "userRetention": {
+      "title": "Rétention des utilisateurs",
+      "subtitle": "Engagement des utilisateurs dans le temps",
+      "increasedVsLastWeek": "Augmentation vs semaine dernière"
+    },
+    "salesByChannel": {
+      "title": "Ventes par canal",
+      "subtitle": "Aperçu des performances par canal",
+      "increasedVsLastWeek": "Augmentation vs semaine dernière",
+      "channels": {
+        "website": "Site web",
+        "email": "E-mail",
+        "socialMedia": "Réseaux sociaux"
+      },
+      "table": {
+        "channels": "Canaux",
+        "metric": "Métrique",
+        "total": "Total"
+      }
+    },
+    "salesByCountry": {
+      "title": "Ventes par pays",
+      "subtitle": "Aperçu des ventes par pays",
+      "countries": {
+        "usa": "États-Unis",
+        "france": "France",
+        "japan": "Japon",
+        "germany": "Allemagne"
+      }
+    },
+    "topProducts": {
+      "title": "Meilleurs produits",
+      "table": {
+        "productName": "Nom du produit",
+        "category": "Catégorie",
+        "sales": "Ventes",
+        "earnings": "Gains",
+        "stocks": "Stock",
+        "status": "Statut"
+      },
+      "products": {
+        "classicDenimJacket": "Veste en jean classique",
+        "slimFitChinos": "Chinos slim",
+        "organicCottonTShirt": "T-shirt en coton bio",
+        "leatherAnkleBoots": "Bottines en cuir"
+      },
+      "variants": {
+        "threeSizes": "3 tailles",
+        "fourColors": "4 couleurs",
+        "fiveColors": "5 couleurs",
+        "sixSizes": "6 tailles"
+      },
+      "categories": {
+        "jacket": "Veste",
+        "pants": "Pantalon",
+        "tShirt": "T-shirt",
+        "footwear": "Chaussures"
+      },
+      "statuses": {
+        "inStock": "En stock",
+        "lowStock": "Stock faible",
+        "outOfStock": "Rupture de stock"
+      }
+    }
+  },
+  "finance": {
+    "totalBalanceOverview": {
+      "title": "Solde total",
+      "overview": "Aperçu de vos fonds actuels",
+      "thanLastMonth": "par rapport au mois dernier",
+      "primaryAccount": "Compte principal :",
+      "seeDetails": "Voir les détails",
+      "transfer": "Transférer",
+      "received": "Reçu",
+      "balance": "Solde"
+    },
+    "stats": {
+      "totalBalance": "Solde total",
+      "monthlyIncome": "Revenus mensuels",
+      "totalSpent": "Total dépensé",
+      "savingRate": "Taux d'épargne",
+      "thanLastMonth": "par rapport au mois dernier",
+      "goalProgress": "Objectif : 30% - 3,9% restants"
+    },
+    "cashflow": {
+      "title": "Aperçu des flux de trésorerie",
+      "totalRevenue": "Revenu total",
+      "income": "Revenus",
+      "expense": "Dépenses"
+    },
+    "spending": {
+      "title": "Dépenses",
+      "yearly": "Annuel",
+      "monthly": "Mensuel",
+      "total": "Total",
+      "categories": {
+        "activity": "Activité",
+        "onlinePurchases": "Achats en ligne",
+        "groceries": "Alimentation",
+        "digitalGoods": "Produits numériques",
+        "stationery": "Papeterie",
+        "others": "Autres"
+      }
+    },
+    "quickSend": {
+      "title": "Envoi rapide",
+      "sendFrom": "Envoyer depuis",
+      "currency": "Devise",
+      "amount": "Montant",
+      "sendMoney": "Envoyer de l'argent"
+    },
+    "myCards": {
+      "title": "Mes cartes",
+      "addCard": "Ajouter une carte",
+      "virtualCard": "Carte virtuelle",
+      "recentTransactions": "Transactions récentes",
+      "seeAllTransactions": "Voir toutes les transactions",
+      "cardNumber": "Numéro de carte",
+      "exp": "EXP",
+      "cvc": "CVC",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "transactions": {
+        "paymentReceived": "Paiement reçu",
+        "cashbackDesc": "Cashback de Stellar Rewards",
+        "netflixSubscription": "Abonnement Netflix",
+        "netflixDesc": "Charge d'abonnement de septembre",
+        "moneyReceived": "Argent reçu",
+        "paypalDesc": "Paiement reçu via PayPal",
+        "googleAds": "Google Ads",
+        "googleAdsDesc": "Paiement reçu de Google Ads"
+      }
+    },
+    "transactionsTable": {
+      "title": "Transactions récentes",
+      "searchPlaceholder": "Rechercher...",
+      "filter": "Filtrer",
+      "table": {
+        "orderId": "ID commande",
+        "activity": "Activité",
+        "price": "Prix",
+        "date": "Date",
+        "status": "Statut"
+      },
+      "activities": {
+        "hotelBooking": "Réservation hôtel",
+        "onlineShopping": "Achats en ligne",
+        "gamePurchase": "Achat de jeu",
+        "utilityBillPayment": "Paiement de factures",
+        "onlineCourseEnrollment": "Inscription cours en ligne"
+      },
+      "statuses": {
+        "completed": "Terminé",
+        "inProgress": "En cours"
+      }
+    }
+  }
+}

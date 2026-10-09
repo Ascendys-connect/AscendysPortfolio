@@ -54,7 +54,8 @@ class PartnerViewSet(viewsets.ModelViewSet):
         Filter queryset based on user permissions.
         Only show active partners to non-admin users.
         """
-        queryset = Partner.objects.all()
+        # Always exclude soft-deleted partners
+        queryset = Partner.objects.filter(is_deleted=False)
         
         # Non-admin users only see active partners
         if not self.request.user.is_authenticated or not self.request.user.is_admin:

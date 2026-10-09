@@ -390,7 +390,7 @@ export default function SuperAdminDashboard() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-800 dark:text-white">Médiathèque</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white">Fichiers Média</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {stats?.media_files?.images ?? 0} images · {stats?.media_files?.documents ?? 0} docs
                   </p>
@@ -401,6 +401,29 @@ export default function SuperAdminDashboard() {
                   {stats?.media_files?.total ?? stats?.media_files_count ?? 0}
                 </span>
                 <div className="mt-0.5">{renderGrowthBadge(stats?.media_files)}</div>
+              </div>
+            </div>
+
+            {/* Galeries */}
+            <div className="flex items-center justify-between py-3.5">
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800 dark:text-white">Galeries</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {stats?.galleries?.photos ?? 0} photos · {stats?.galleries?.videos ?? 0} vidéos
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {stats?.galleries?.total ?? stats?.galleries_count ?? 0}
+                </span>
+                <div className="mt-0.5">{renderGrowthBadge(stats?.galleries)}</div>
               </div>
             </div>
 
@@ -485,7 +508,7 @@ export default function SuperAdminDashboard() {
           </Link>
 
           <Link
-            to="/admin/media"
+            to="/admin/galleries"
             className="group flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-5 text-center transition hover:border-purple-500 hover:shadow-theme-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-purple-500"
           >
             <div className="flex size-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 transition group-hover:scale-110 dark:bg-purple-950/40 dark:text-purple-400">
@@ -497,7 +520,7 @@ export default function SuperAdminDashboard() {
               Médiathèque
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {stats?.media_files?.total ?? stats?.media_files_count ?? 0} fichiers
+              {stats?.galleries?.total ?? stats?.galleries_count ?? 0} galeries
             </span>
           </Link>
         </div>

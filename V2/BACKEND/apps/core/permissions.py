@@ -7,15 +7,19 @@ from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
 class IsAdminUser(permissions.BasePermission):
     """
-    Permission to check if user is Admin or Super Admin.
+    Permission to check if user is Admin, Super Admin or Editor.
     """
     message = "Vous devez être administrateur pour effectuer cette action."
     
     def has_permission(self, request, view):
-        return (
+        return bool(
             request.user and 
             request.user.is_authenticated and 
-            request.user.role in ['ADMIN', 'SUPER_ADMIN']
+            (
+                getattr(request.user, 'role', '') in ['ADMIN', 'SUPER_ADMIN', 'EDITOR'] or
+                getattr(request.user, 'is_superuser', False) or
+                getattr(request.user, 'is_staff', False)
+            )
         )
 
 

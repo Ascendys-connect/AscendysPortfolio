@@ -139,6 +139,22 @@ class TrainingSerializer(serializers.ModelSerializer):
             'instructor',
             'instructor_name',
             'capacity',
+            'max_participants',
+            'sessions_count',
+            'session_duration',
+            'frequency',
+            'for_who',
+            'access_prerequisites',
+            'problems_solved',
+            'deliverables',
+            'skills_acquired',
+            'transformation_before',
+            'transformation_after',
+            'included_items',
+            'not_included_items',
+            'strategic_positioning',
+            'payment_terms',
+            'premium_options',
             'certification',
             'status',
             'status_display',
@@ -178,6 +194,22 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
             'training_mode',
             'instructor',
             'capacity',
+            'max_participants',
+            'sessions_count',
+            'session_duration',
+            'frequency',
+            'for_who',
+            'access_prerequisites',
+            'problems_solved',
+            'deliverables',
+            'skills_acquired',
+            'transformation_before',
+            'transformation_after',
+            'included_items',
+            'not_included_items',
+            'strategic_positioning',
+            'payment_terms',
+            'premium_options',
             'certification',
             'status',
             'is_featured',
@@ -190,9 +222,13 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
         return value.strip()
 
     def validate_start_date(self, value):
-        """Validate that start_date is not in the past."""
+        """Validate that start_date is not in the past (only on creation)."""
         from django.utils import timezone
-        from datetime import date
+        
+        # En mode édition, on accepte la date existante même si elle est passée
+        instance = getattr(self, 'instance', None)
+        if instance and instance.start_date == value:
+            return value
         
         today = timezone.now().date()
         if value < today:
@@ -252,6 +288,10 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             'payment_attempts',
             'is_expired',
             'can_retry_payment',
+            'reminder_1h_sent_at',
+            'reminder_24h_sent_at',
+            'reminder_7d_sent_at',
+            'reminders_count',
             'expires_at',
             'paid_at',
             'created_at',
@@ -261,6 +301,10 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             'id',
             'payment_id',
             'payment_attempts',
+            'reminder_1h_sent_at',
+            'reminder_24h_sent_at',
+            'reminder_7d_sent_at',
+            'reminders_count',
             'expires_at',
             'paid_at',
             'created_at',

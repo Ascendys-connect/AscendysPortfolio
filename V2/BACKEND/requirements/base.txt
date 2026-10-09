@@ -26,3 +26,6 @@ django-ratelimit==4.1.0
 
 # Timezone
 pytz==2024.1
+
+# HTTP client
+requests>=2.31.0

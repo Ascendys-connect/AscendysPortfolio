@@ -1,5 +1,6 @@
 import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
+import { useNotifications } from "@/context/NotificationContext";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Link, useLocation } from "react-router";
 import {
@@ -20,6 +21,7 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, setIsMobileOpen } =
     useSidebar();
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const location = useLocation();
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "content" | "system";
@@ -178,17 +180,31 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 <span
-                  className={`menu-item-icon-size ${
+                  className={`menu-item-icon-size relative ${
                     isActive(nav.path)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
                   }`}
                 >
                   {nav.icon}
+                  {nav.key === "notifications" && unreadCount > 0 && (
+                    <span className="absolute -top-1 -end-1 flex size-2.5">
+                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex size-2.5 rounded-full bg-red-500"></span>
+                    </span>
+                  )}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <span className="menu-item-text">
                     {nav.name}
+                  </span>
+                )}
+                {nav.key === "notifications" && unreadCount > 0 && (isExpanded || isHovered || isMobileOpen) && (
+                  <span className="ms-auto flex items-center">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:bg-red-500/20 dark:text-red-400 border border-red-500/20">
+                      <span className="size-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
                   </span>
                 )}
               </Link>

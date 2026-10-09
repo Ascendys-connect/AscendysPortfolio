@@ -166,7 +166,7 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         """
         Allow anyone to subscribe/unsubscribe, admins only for list/retrieve.
         """
-        if self.action in ['subscribe', 'unsubscribe']:
+        if self.action in ['create', 'subscribe', 'unsubscribe']:
             return [AllowAny()]
         return [IsAdminUser()]
     
@@ -174,9 +174,15 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         """
         Return appropriate serializer based on action.
         """
-        if self.action == 'subscribe':
+        if self.action in ['create', 'subscribe']:
             return NewsletterSubscribeSerializer
         return NewsletterSubscriberDetailSerializer
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Public create endpoint mapping to subscribe.
+        """
+        return self.subscribe(request)
     
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def subscribe(self, request):

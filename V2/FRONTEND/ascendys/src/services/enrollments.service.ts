@@ -57,6 +57,42 @@ class EnrollmentsService {
     // Handle both wrapped and unwrapped responses
     return response?.data || response;
   }
+
+  /**
+   * Lister les inscriptions avec filtres (training, status, search, etc.)
+   */
+  async list(params?: Record<string, any>): Promise<Enrollment[]> {
+    const response: any = await apiService.get<Enrollment[]>(
+      `${this.baseURL}/`,
+      params
+    );
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response?.data)) return response.data;
+    if (Array.isArray(response?.results)) return response.results;
+    if (Array.isArray(response?.data?.results)) return response.data.results;
+    return [];
+  }
+
+  /**
+   * Envoyer manuellement un email de relance
+   */
+  async sendReminder(id: string, stage: string = 'manual'): Promise<any> {
+    const response: any = await apiService.post(
+      `${this.baseURL}/${id}/send-reminder/`,
+      { stage }
+    );
+    return response?.data || response;
+  }
+
+  /**
+   * Exécuter le scan automatique des relances (1h, 24h, 7j)
+   */
+  async processReminders(): Promise<any> {
+    const response: any = await apiService.post(
+      `${this.baseURL}/process-reminders/`
+    );
+    return response?.data || response;
+  }
 }
 
 export const enrollmentsService = new EnrollmentsService();

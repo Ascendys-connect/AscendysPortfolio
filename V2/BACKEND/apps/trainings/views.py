@@ -140,13 +140,24 @@ class TrainingViewSet(viewsets.ModelViewSet):
     ViewSet for Training CRUD operations with publish/archive actions.
     """
     queryset = Training.objects.select_related('category', 'instructor', 'created_by').all()
-    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'level', 'training_mode', 'status', 'is_featured', 'certification']
     search_fields = ['title', 'short_description', 'description', 'target_audience']
     ordering_fields = ['created_at', 'start_date', 'price', 'views_count', 'title']
     ordering = ['-created_at']
     lookup_field = 'slug'
+
+    def get_permissions(self):
+        """
+        Return appropriate permissions based on action.
+        """
+        if self.action in ['list', 'retrieve', 'featured']:
+            return [AllowAny()]
+        elif self.action in ['create', 'update', 'partial_update', 'archive', 'duplicate']:
+            return [IsAuthenticated()]
+        elif self.action in ['publish', 'draft', 'destroy']:
+            return [IsAdminOrReadOnly()]
+        return [IsAdminOrReadOnly()]
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -235,8 +246,9 @@ class TrainingViewSet(viewsets.ModelViewSet):
         )
 
     def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
         if serializer.is_valid():
             serializer.save()
             return api_response(
@@ -251,6 +263,10 @@ class TrainingViewSet(viewsets.ModelViewSet):
             errors=serializer.errors,
             status_code=status.HTTP_400_BAD_REQUEST
         )
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
     @extend_schema(
         summary="Formations mises en avant",
@@ -348,6 +364,90 @@ class TrainingViewSet(viewsets.ModelViewSet):
             status_code=status.HTTP_200_OK
         )
 
+    @extend_schema(
+        summary="Dupliquer une formation",
+        description="Crée une copie d'une formation existante avec toutes ses données - Accessible aux Admin, Super Admin et Editor"
+    )
+    @action(detail=True, methods=['post'])
+    def duplicate(self, request, slug=None):
+        """Dupliquer une formation existante"""
+        from django.utils.text import slugify
+        
+        original = self.get_object()
+        
+        # Préparer les données pour la copie
+        duplicate_data = {
+            'title': f"{original.title} (Copie)",
+            'short_description': original.short_description,
+            'description': original.description,
+            'category': original.category,
+            'objectives': original.objectives,
+            'prerequisites': original.prerequisites,
+            'target_audience': original.target_audience,
+            'syllabus': original.syllabus,
+            'duration': original.duration,
+            'level': original.level,
+            'price': original.price,
+            'currency': original.currency,
+            'start_date': original.start_date,
+            'end_date': original.end_date,
+            'location': original.location,
+            'training_mode': original.training_mode,
+            'capacity': original.capacity,
+            'max_participants': original.max_participants,
+            'sessions_count': original.sessions_count,
+            'session_duration': original.session_duration,
+            'frequency': original.frequency,
+            'certification': original.certification,
+            'is_featured': False,
+            'status': 'DRAFT',  # Force draft
+            # Champs marketing
+            'for_who': original.for_who,
+            'access_prerequisites': original.access_prerequisites,
+            'problems_solved': original.problems_solved,
+            'deliverables': original.deliverables,
+            'skills_acquired': original.skills_acquired,
+            'transformation_before': original.transformation_before,
+            'transformation_after': original.transformation_after,
+            'included_items': original.included_items,
+            'not_included_items': original.not_included_items,
+            'strategic_positioning': original.strategic_positioning,
+            'payment_terms': original.payment_terms,
+            'premium_options': original.premium_options,
+            'created_by': request.user,
+        }
+        
+        # Copier les images si elles existent
+        if original.image:
+            duplicate_data['image'] = original.image
+        if original.banner:
+            duplicate_data['banner'] = original.banner
+        
+        # Copier l'instructeur
+        if original.instructor:
+            duplicate_data['instructor'] = original.instructor
+        
+        # Créer la copie
+        duplicated = Training.objects.create(**duplicate_data)
+        
+        # Générer un slug unique
+        base_slug = slugify(duplicated.title)
+        unique_slug = base_slug
+        counter = 1
+        while Training.objects.filter(slug=unique_slug).exists():
+            unique_slug = f"{base_slug}-{counter}"
+            counter += 1
+        duplicated.slug = unique_slug
+        duplicated.save()
+        
+        serializer = self.get_serializer(duplicated)
+        return api_response(
+            success=True,
+            message="Formation dupliquée avec succès.",
+            data=serializer.data,
+            status_code=status.HTTP_201_CREATED
+        )
+
     def destroy(self, request, *args, **kwargs):
         """
         Soft delete a training - Only Admin and Super Admin can delete
@@ -415,14 +515,18 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
         """
         queryset = super().get_queryset()
         
-        # Admin voit tout
+        # Admin / Staff voit tout
         if self.request.user.is_authenticated and (
-            hasattr(self.request.user, 'is_admin') and self.request.user.is_admin
+            getattr(self.request.user, 'is_admin', False)
+            or getattr(self.request.user, 'role', '') in ['ADMIN', 'SUPER_ADMIN']
+            or self.request.user.is_staff
+            or self.request.user.is_superuser
         ):
             return queryset
         
-        # Public : accès par ID uniquement (via retrieve)
-        if self.action == 'retrieve':
+        # Public : accès par ID uniquement (retrieve + custom payment actions)
+        PUBLIC_ACTIONS = {'retrieve', 'initiate_payment', 'retry_payment'}
+        if self.action in PUBLIC_ACTIONS:
             return queryset
         
         # Par défaut, rien
@@ -445,12 +549,12 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
             'data': response_serializer.data
         }, status=status.HTTP_201_CREATED)
     
-    @action(detail=True, methods=['post'], url_path='initiate-payment')
+    @action(detail=True, methods=['post'], url_path='initiate-payment', permission_classes=[AllowAny])
     def initiate_payment(self, request, pk=None):
         """
         Initie le paiement FedaPay pour une inscription.
         
-        POST /api/v1/enrollments/{id}/initiate-payment/
+        POST /api/v1/trainings/enrollments/{id}/initiate-payment/
         """
         enrollment = self.get_object()
         
@@ -483,12 +587,12 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
                 'message': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    @action(detail=True, methods=['post'], url_path='retry-payment')
+    @action(detail=True, methods=['post'], url_path='retry-payment', permission_classes=[AllowAny])
     def retry_payment(self, request, pk=None):
         """
         Réessayer le paiement pour une inscription échouée.
         
-        POST /api/v1/enrollments/{id}/retry-payment/
+        POST /api/v1/trainings/enrollments/{id}/retry-payment/
         """
         enrollment = self.get_object()
         
@@ -505,6 +609,42 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
         
         # Initier le paiement
         return self.initiate_payment(request, pk)
+
+    @action(detail=True, methods=['post'], url_path='send-reminder')
+    def send_reminder(self, request, pk=None):
+        """
+        Envoie un email de relance de paiement pour cette inscription.
+        POST /api/v1/trainings/enrollments/{id}/send-reminder/
+        """
+        from .services.reminder_service import PaymentReminderService
+        enrollment = self.get_object()
+        stage = request.data.get('stage', 'manual')
+        success = PaymentReminderService.send_reminder(enrollment, stage=stage)
+        if success:
+            enrollment.refresh_from_db()
+            return Response({
+                'success': True,
+                'message': f"Email de relance envoyé avec succès à {enrollment.email}.",
+                'data': EnrollmentSerializer(enrollment).data
+            })
+        return Response({
+            'success': False,
+            'message': "Impossible d'envoyer l'email de relance (inscription déjà payée ou erreur d'envoi)."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], url_path='process-reminders')
+    def process_reminders(self, request):
+        """
+        Scanne et traite toutes les relances automatiques en attente (1h, 24h, 7j).
+        POST /api/v1/trainings/enrollments/process-reminders/
+        """
+        from .services.reminder_service import PaymentReminderService
+        report = PaymentReminderService.process_all_pending_reminders()
+        return Response({
+            'success': True,
+            'message': "Traitement des relances automatiques terminé.",
+            'data': report
+        })
 
 
 @api_view(['POST'])

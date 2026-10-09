@@ -119,12 +119,14 @@ import { ReactComponent as DeFlagIcon } from "./flag-de.svg?react";
 import { ReactComponent as EsFlagIcon } from "./flag-es.svg?react";
 import { ReactComponent as SaFlagIcon } from "./flag-sa.svg?react";
 import { ReactComponent as UsFlagIcon } from "./flag-us.svg?react";
+import { ReactComponent as FrFlagIcon } from "./flag-fr.svg?react";
 
 export {
   DeFlagIcon,
   EsFlagIcon,
   SaFlagIcon,
   UsFlagIcon,
+  FrFlagIcon,
   ShareIcon,
   StackIcon,
   AspectIcon,

@@ -92,6 +92,13 @@ export interface DashboardStats {
     documents: number;
     videos: number;
   };
+  galleries?: GrowthMetric & {
+    total: number;
+    photos: number;
+    videos: number;
+    published: number;
+  };
+  galleries_count?: number;
   contact_messages: GrowthMetric & {
     total: number;
     new: number;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Camera, Video } from 'lucide-react';
 import PageMeta from '@/components/common/PageMeta';
 import PublicNavbar from '@/components/public/PublicNavbar';
 import PublicFooter from '@/components/public/PublicFooter';
@@ -120,9 +121,11 @@ export default function Gallery() {
                               />
                             ) : (
                               <div className="flex size-full items-center justify-center bg-gradient-to-br from-purple-900 to-purple-600">
-                                <span className="text-4xl text-white/50">
-                                  {gallery.gallery_type === 'VIDEO' ? '🎥' : '📷'}
-                                </span>
+                                {gallery.gallery_type === 'VIDEO' ? (
+                                  <Video className="size-16 text-white/50" />
+                                ) : (
+                                  <Camera className="size-16 text-white/50" />
+                                )}
                               </div>
                             )}
                           </div>
@@ -142,12 +145,14 @@ export default function Gallery() {
                           {/* Badge */}
                           <div className="absolute right-3 top-3">
                             {gallery.gallery_type === 'PHOTOS' ? (
-                              <span className="rounded-full bg-[#9800BF] px-3 py-1 text-xs font-semibold text-white">
-                                📷 {gallery.photos_count ?? 0} photo(s)
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#9800BF] px-3 py-1 text-xs font-semibold text-white">
+                                <Camera className="size-3" />
+                                {gallery.photos_count ?? 0} photo(s)
                               </span>
                             ) : (
-                              <span className="rounded-full bg-[#FFC000] px-3 py-1 text-xs font-semibold text-gray-900">
-                                🎥 Vidéo
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFC000] px-3 py-1 text-xs font-semibold text-gray-900">
+                                <Video className="size-3" />
+                                Vidéo
                               </span>
                             )}
                           </div>
