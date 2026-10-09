@@ -1,8 +1,44 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import PageMeta from "@/components/common/PageMeta";
 import { useAuth } from "@/context/AuthContext";
+import { dashboardService, type EditorStats } from "@/services/dashboard.service";
 
 export default function EditorDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<EditorStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoadingStats(true);
+        setError(null);
+        const data = await dashboardService.getEditorStats();
+        setStats(data);
+      } catch (err: any) {
+        console.error('Failed to load editor stats:', err);
+        setError('Impossible de charger les statistiques');
+        setStats(null);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const renderStatValue = (value: number | undefined) => {
+    if (loadingStats) {
+      return <span className="inline-block h-7 w-8 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />;
+    }
+    if (error || value === undefined) {
+      return '--';
+    }
+    return value;
+  };
 
   return (
     <>
@@ -15,7 +51,7 @@ export default function EditorDashboard() {
         {/* Header */}
         <div>
           <h1 className="text-title-lg font-semibold text-gray-900 dark:text-white">
-            Bienvenue, {user?.first_name} ! 👋
+            Bienvenue, {user?.first_name} !
           </h1>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Gérez vos contenus et suivez leur statut de publication
@@ -31,7 +67,7 @@ export default function EditorDashboard() {
                   Brouillons
                 </p>
                 <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
-                  --
+                  {renderStatValue(stats?.draft_count)}
                 </p>
               </div>
               <div className="flex size-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
@@ -62,7 +98,7 @@ export default function EditorDashboard() {
                   En attente
                 </p>
                 <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
-                  --
+                  {renderStatValue(stats?.pending_count)}
                 </p>
               </div>
               <div className="flex size-12 items-center justify-center rounded-lg bg-warning-100 dark:bg-warning-900/30">
@@ -93,7 +129,7 @@ export default function EditorDashboard() {
                   Publiés
                 </p>
                 <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
-                  --
+                  {renderStatValue(stats?.published_count)}
                 </p>
               </div>
               <div className="flex size-12 items-center justify-center rounded-lg bg-success-100 dark:bg-success-900/30">
@@ -124,7 +160,7 @@ export default function EditorDashboard() {
                   Total
                 </p>
                 <p className="mt-2 text-title-md font-semibold text-gray-900 dark:text-white">
-                  --
+                  {renderStatValue(stats?.total_count)}
                 </p>
               </div>
               <div className="flex size-12 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/30">
@@ -155,8 +191,8 @@ export default function EditorDashboard() {
             Actions rapides
           </h2>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <a
-              href="/trainings/create"
+            <button
+              onClick={() => navigate('/admin/trainings/create')}
               className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
             >
               <div className="flex size-10 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-900/30">
@@ -182,10 +218,10 @@ export default function EditorDashboard() {
                   Créer une formation
                 </p>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/blog/create"
+            <button
+              onClick={() => navigate('/admin/blog/posts/create')}
               className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
             >
               <div className="flex size-10 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-900/30">
@@ -211,10 +247,10 @@ export default function EditorDashboard() {
                   Rédiger un article
                 </p>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/events/create"
+            <button
+              onClick={() => navigate('/admin/events/create')}
               className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
             >
               <div className="flex size-10 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-900/30">
@@ -240,10 +276,10 @@ export default function EditorDashboard() {
                   Créer un événement
                 </p>
               </div>
-            </a>
+            </button>
 
-            <a
-              href="/services/create"
+            <button
+              onClick={() => navigate('/admin/services/create')}
               className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
             >
               <div className="flex size-10 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-900/30">
@@ -269,7 +305,7 @@ export default function EditorDashboard() {
                   Ajouter un service
                 </p>
               </div>
-            </a>
+            </button>
           </div>
         </div>
 

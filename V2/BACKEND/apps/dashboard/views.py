@@ -106,7 +106,7 @@ def dashboard_stats(request):
     from apps.testimonials.models import Testimonial
     from apps.partners.models import Partner
     from apps.accounts.models import User
-    from apps.media.models import MediaFile
+    from apps.media.models import MediaFile, Gallery
     from apps.services.models import Service
     from apps.offers.models import Offer
     from .models import ActivityLog
@@ -168,6 +168,7 @@ def dashboard_stats(request):
     blog_posts_qs = BlogPost.objects.all()
     events_qs = Event.objects.filter(is_deleted=False)
     media_qs = MediaFile.objects.all()
+    galleries_qs = Gallery.objects.all()
     contact_qs = ContactMessage.objects.all()
     newsletter_qs = NewsletterSubscriber.objects.all()
     testimonials_qs = Testimonial.objects.all()
@@ -181,6 +182,7 @@ def dashboard_stats(request):
     blog_posts_total = blog_posts_qs.count()
     events_total = events_qs.count()
     media_total = media_qs.count()
+    galleries_total = galleries_qs.count()
     contact_total = contact_qs.count()
     newsletter_total = newsletter_qs.count()
     testimonials_total = testimonials_qs.count()
@@ -194,6 +196,7 @@ def dashboard_stats(request):
     blog_growth = compute_growth(blog_posts_qs, date_field='created_at')
     events_growth = compute_growth(events_qs, date_field='created_at')
     media_growth = compute_growth(media_qs, date_field='created_at')
+    galleries_growth = compute_growth(galleries_qs, date_field='created_at')
     contact_growth = compute_growth(contact_qs, date_field='created_at')
     newsletter_growth = compute_growth(newsletter_qs, date_field='created_at')
 
@@ -204,6 +207,7 @@ def dashboard_stats(request):
         'blog_posts_count': blog_posts_total,
         'events_count': events_total,
         'media_files_count': media_total,
+        'galleries_count': galleries_total,
         'contact_messages_count': contact_total,
         'testimonials_count': testimonials_total,
         'partners_count': partners_total,
@@ -247,6 +251,13 @@ def dashboard_stats(request):
             'images': media_qs.filter(media_type='IMAGE').count(),
             'documents': media_qs.filter(media_type='DOCUMENT').count(),
             'videos': media_qs.filter(media_type='VIDEO').count(),
+        },
+        'galleries': {
+            'total': galleries_total,
+            **galleries_growth,
+            'photos': galleries_qs.filter(gallery_type='PHOTOS').count(),
+            'videos': galleries_qs.filter(gallery_type='VIDEO').count(),
+            'published': galleries_qs.filter(is_published=True).count(),
         },
         'contact_messages': {
             'total': contact_total,
@@ -350,6 +361,66 @@ def _get_activity_by_day(start_date, end_date):
 
 @api_view(['GET'])
 @permission_classes([IsStaffOrEditorUser])
+def editor_stats(request):
+    """
+    Get editor-specific dashboard statistics.
+    Returns count of content items (trainings, blog posts, events, services)
+    created by the authenticated user, grouped by status.
+    """
+    from apps.trainings.models import Training
+    from apps.blog.models import BlogPost
+    from apps.events.models import Event
+    from apps.services.models import Service
+    
+    user = request.user
+    
+    # Get trainings created by this user
+    trainings_qs = Training.objects.filter(created_by=user, is_deleted=False)
+    trainings_draft = trainings_qs.filter(status='DRAFT').count()
+    trainings_published = trainings_qs.filter(status='PUBLISHED').count()
+    trainings_total = trainings_qs.count()
+    
+    # Get blog posts created by this user (uses 'author' field)
+    blog_qs = BlogPost.objects.filter(author=user)
+    blog_draft = blog_qs.filter(status='DRAFT').count()
+    blog_published = blog_qs.filter(status='PUBLISHED').count()
+    blog_total = blog_qs.count()
+    
+    # Get events created by this user
+    events_qs = Event.objects.filter(created_by=user, is_deleted=False)
+    events_draft = events_qs.filter(status='DRAFT').count()
+    events_published = events_qs.filter(status='PUBLISHED').count()
+    events_total = events_qs.count()
+    
+    # Get services created by this user
+    services_qs = Service.objects.filter(created_by=user, is_deleted=False)
+    services_draft = services_qs.filter(status='DRAFT').count()
+    services_published = services_qs.filter(status='PUBLISHED').count()
+    services_total = services_qs.count()
+    
+    # Aggregate counts
+    draft_count = trainings_draft + blog_draft + events_draft + services_draft
+    published_count = trainings_published + blog_published + events_published + services_published
+    total_count = trainings_total + blog_total + events_total + services_total
+    
+    # "Pending" count: editors create as DRAFT, waiting for admin approval
+    # So pending = draft in this context
+    pending_count = draft_count
+    
+    return Response({
+        'success': True,
+        'message': 'Statistiques de l\'éditeur récupérées avec succès',
+        'data': {
+            'draft_count': draft_count,
+            'pending_count': pending_count,
+            'published_count': published_count,
+            'total_count': total_count,
+        }
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsStaffOrEditorUser])
 def global_analytics(request):
     """
     Comprehensive global platform analytics:
@@ -368,7 +439,7 @@ def global_analytics(request):
     from apps.trainings.models import Training
     from apps.blog.models import BlogPost
     from apps.events.models import Event
-    from apps.media.models import MediaFile
+    from apps.media.models import MediaFile, Gallery
     from apps.contact.models import ContactMessage, NewsletterSubscriber
     from apps.services.models import Service
     from apps.offers.models import Offer
@@ -438,9 +509,10 @@ def global_analytics(request):
     services_count = Service.objects.count()
     offers_count = Offer.objects.count()
     media_count = MediaFile.objects.count()
+    galleries_count = Gallery.objects.count()
     
-    content_series = [trainings_count, blog_count, events_count, services_count, offers_count, media_count]
-    content_labels = ["Formations", "Articles", "Événements", "Services", "Offres", "Médias"]
+    content_series = [trainings_count, blog_count, events_count, services_count, offers_count, media_count, galleries_count]
+    content_labels = ["Formations", "Articles", "Événements", "Services", "Offres", "Fichiers Média", "Galeries"]
     
     # Activity logs breakdown by action
     logs_by_action = dict(
@@ -468,7 +540,7 @@ def global_analytics(request):
             'total_trainings': trainings_count,
             'total_blog_posts': blog_count,
             'total_events': events_count,
-            'total_media': media_count,
+            'total_media': galleries_count,  # Affiche le nombre de galeries (médiathèque)
             'total_messages': ContactMessage.objects.count(),
             'total_subscribers': NewsletterSubscriber.objects.count(),
             'total_services': services_count,
