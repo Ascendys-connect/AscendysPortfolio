@@ -39,14 +39,26 @@ export default function HeroSection() {
 
       {/* ── DECORATIVE ELEMENTS ──────────────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
-        {/* Gold accent line — top left */}
-        <motion.div
-          className="absolute left-0 top-32 h-px w-32 md:w-64"
-          style={{ background: "linear-gradient(90deg, #FFC000, transparent)" }}
-          initial={{ scaleX: 0, originX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, delay: 0.8 }}
-        />
+        {/* Gold accent line & Slogan — top left */}
+        <div className="absolute left-0 top-24 md:top-24">
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mb-2 pl-4 md:pl-8"
+          >
+            <span className="text-xs font-semibold tracking-wide text-[#FFC000] md:text-sm">
+              Pour plus de valeur
+            </span>
+          </motion.div>
+          <motion.div
+            className="h-px w-36 md:w-64"
+            style={{ background: "linear-gradient(90deg, #FFC000, transparent)" }}
+            initial={{ scaleX: 0, originX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, delay: 0.8 }}
+          />
+        </div>
         {/* Floating hex — top right */}
         <motion.div
           className="absolute right-12 top-24 opacity-25 md:right-24"

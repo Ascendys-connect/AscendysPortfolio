@@ -50,16 +50,15 @@ export default function PublicNavbar() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 transition-all duration-300">
       <div className={`transition-all duration-300 ${navBg}`}>
-        <div className="container-xl">
+        <div className="container-xl px-4 md:px-8">
           <nav className="flex h-16 items-center justify-between md:h-18">
             {/* Logo */}
             <Link to="/" className="flex flex-shrink-0 items-center">
               <img
                 src="/ascendys_logo-removebg-preview.png"
                 alt="ASCENDYS CONNECT"
-                className={`h-[120px] w-auto transition-all duration-300 ${
-                  isHome && !scrolled ? "brightness-0 invert" : "brightness-100"
-                }`}
+                className={`h-[28px] w-auto transition-all duration-300 ${isHome && !scrolled ? "brightness-0 invert" : "brightness-100"
+                  }`}
               />
             </Link>
 
@@ -71,9 +70,8 @@ export default function PublicNavbar() {
                   <li key={link.href}>
                     <Link
                       to={link.href}
-                      className={`rounded-md px-4 py-2 text-base font-medium transition-colors duration-200 ${
-                        isActive ? activeLinkColor : linkColor
-                      }`}
+                      className={`rounded-md px-4 py-2 text-base font-medium transition-colors duration-200 ${isActive ? activeLinkColor : linkColor
+                        }`}
                     >
                       {link.label}
                     </Link>
@@ -95,11 +93,10 @@ export default function PublicNavbar() {
             {/* Mobile toggle */}
             <button
               onClick={() => setOpen(!open)}
-              className={`rounded-md p-2 transition-colors md:hidden ${
-                isHome && !scrolled
-                  ? "text-white hover:bg-white/10"
-                  : "text-[#1A1A1A] hover:bg-gray-100"
-              }`}
+              className={`rounded-md p-2 transition-colors md:hidden ${isHome && !scrolled
+                ? "text-white hover:bg-white/10"
+                : "text-[#1A1A1A] hover:bg-gray-100"
+                }`}
               aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
             >
               {open ? <X size={22} /> : <Menu size={22} />}
@@ -118,11 +115,10 @@ export default function PublicNavbar() {
                     <li key={link.href}>
                       <Link
                         to={link.href}
-                        className={`block rounded-lg px-4 py-3 text-base font-medium transition-colors ${
-                          isActive
-                            ? "bg-purple-50 text-[#9800BF] font-semibold"
-                            : "text-[#1A1A1A]/80 hover:bg-gray-50"
-                        }`}
+                        className={`block rounded-lg px-4 py-3 text-base font-medium transition-colors ${isActive
+                          ? "bg-purple-50 text-[#9800BF] font-semibold"
+                          : "text-[#1A1A1A]/80 hover:bg-gray-50"
+                          }`}
                       >
                         {link.label}
                       </Link>
@@ -146,11 +142,10 @@ export default function PublicNavbar() {
       {/* Barre À la une (AnnouncementTicker) : apparaît au même moment que la navbar devient opaque au scroll */}
       {isHome && (
         <div
-          className={`transition-all duration-500 ease-in-out overflow-hidden shadow-lg ${
-            scrolled
-              ? "max-h-16 opacity-100 translate-y-0"
-              : "max-h-0 opacity-0 -translate-y-2 pointer-events-none"
-          }`}
+          className={`transition-all duration-500 ease-in-out overflow-hidden shadow-lg ${scrolled
+            ? "max-h-16 opacity-100 translate-y-0"
+            : "max-h-0 opacity-0 -translate-y-2 pointer-events-none"
+            }`}
         >
           <AnnouncementTicker />
         </div>

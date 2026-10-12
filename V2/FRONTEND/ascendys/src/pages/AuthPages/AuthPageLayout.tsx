@@ -27,9 +27,6 @@ export default function AuthLayout({
                 />
               </Link>
 
-              <h2 className="mb-3 text-center text-title-md font-semibold text-white">
-                Ascendys Connect
-              </h2>
               <p className="text-center text-sm text-gray-300 dark:text-white/70">
                 Plateforme d&apos;administration pour la gestion de vos formations, services et contenus digitaux
               </p>
