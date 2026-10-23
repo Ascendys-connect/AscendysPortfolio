@@ -28,7 +28,7 @@ export default function AboutSection() {
     { number: "10+", label: "Ans d'expérience" },
     { number: "500+", label: "Apprenants formés" },
     { number: "50+", label: "Formations disponibles" },
-    { number: "20+", label: "Partenaires certifiés" },
+    { number: "5+", label: "Partenaires certifiés" },
   ];
 
   return (
@@ -57,19 +57,19 @@ export default function AboutSection() {
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
               Notre Mission
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Depuis plus de 10 ans, nous accompagnons les particuliers et les
-              entreprises dans leur transformation digitale et leur montée en
-              compétences. Notre mission est de rendre la formation
-              professionnelle accessible à tous, avec des programmes de qualité
-              reconnus par l'État et nos partenaires.
-            </p>
-            <p className="text-gray-600 dark:text-gray-400">
-              Nous croyons fermement que l'éducation est la clé du succès
-              professionnel. C'est pourquoi nous mettons tout en œuvre pour
-              offrir des formations pratiques, orientées vers l'emploi et
-              dispensées par des experts reconnus dans leur domaine.
-            </p>
+              <p className="text-justify text-gray-600 dark:text-gray-400">
+                Nous accompagnons les particuliers et les entreprises dans leur
+                transformation digitale et leur montée en compétences. Notre mission
+                est de rendre la formation professionnelle accessible à tous, avec
+                des programmes de qualité reconnus par l'État et nos partenaires.
+              </p>
+
+              <p className="text-justify text-gray-600 dark:text-gray-400">
+                Nous croyons fermement que l'éducation est la clé du succès
+                professionnel. C'est pourquoi nous mettons tout en œuvre pour
+                offrir des formations pratiques, orientées vers l'emploi et
+                dispensées par des experts reconnus dans leur domaine.
+              </p>
 
             {/* Achievements */}
             <div className="grid grid-cols-2 gap-6 pt-6">

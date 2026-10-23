@@ -110,7 +110,7 @@ export default function TestimonialsSection() {
               </svg>
 
               {/* Content */}
-              <p className="mb-6 text-gray-600 dark:text-gray-400">
+              <p className=" text-justify  mb-6 text-gray-600 dark:text-gray-400">
                 {testimonial.content || 
                   `Excellent service ! Je recommande vivement Ascendys Connect pour la qualité de leurs formations et l'accompagnement personnalisé. Une expérience très enrichissante.`}
               </p>

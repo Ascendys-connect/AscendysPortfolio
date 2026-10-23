@@ -164,3 +164,32 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
   SERVICE_UNAVAILABLE: 503,
 } as const;
+
+// Public (unauthenticated) API resources.
+// Requests to these routes never need a token, so a stale/invalid token can
+// not break them. Staff sessions still send their token because the backend
+// uses it to return additional (draft/inactive) data.
+export const PUBLIC_API_PREFIXES = [
+  '/services',
+  '/trainings',
+  '/offers',
+  '/blog',
+  '/events',
+  '/testimonials',
+  '/partners',
+  '/company',
+  '/contact',
+  '/search',
+  '/media/galleries',
+] as const;
+
+/**
+ * Whether an API endpoint targets a public resource.
+ * Matches the prefix itself and any nested path (e.g. `/services/featured/`).
+ */
+export function isPublicApiEndpoint(endpoint: string): boolean {
+  const path = endpoint.split('?')[0];
+  return PUBLIC_API_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`)
+  );
+}

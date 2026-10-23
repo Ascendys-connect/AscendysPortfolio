@@ -145,7 +145,7 @@ export default function Services() {
                           >
                             {service.title}
                           </h2>
-                          <p className="mb-7 leading-relaxed text-[#6B6B6B]">
+                          <p className="mb-7 text-justify leading-relaxed text-[#6B6B6B]">
                             {service.short_description}
                           </p>
                           <ul className="flex flex-col gap-3">
@@ -199,7 +199,7 @@ export default function Services() {
                               </h3>
                             </div>
                             <p
-                              className={`text-sm leading-relaxed ${
+                              className={`text-justify text-sm leading-relaxed ${
                                 i % 2 === 0 ? "text-white/65" : "text-[#6B6B6B]"
                               }`}
                             >

@@ -91,7 +91,7 @@ export default function PublicFooter() {
                 className="h-16 w-auto brightness-0 invert"
               />
             </Link>
-            <p className="mb-6 text-sm leading-relaxed text-gray-300">
+            <p className=" text-justify mb-6 text-sm leading-relaxed text-gray-300">
               {company?.short_description ||
                 company?.description ||
                 "Votre partenaire de confiance pour la formation professionnelle et les solutions IT & Digitales."}

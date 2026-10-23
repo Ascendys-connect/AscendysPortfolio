@@ -98,7 +98,7 @@ export default function ServicesSection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                  <p className=" text-justify mb-4 text-sm text-gray-600 dark:text-gray-400">
                     {service.short_description || service.description}
                   </p>
 

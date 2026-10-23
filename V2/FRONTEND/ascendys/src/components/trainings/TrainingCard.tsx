@@ -84,7 +84,7 @@ export default function TrainingCard({ training, showEnrollButton = true }: Trai
         </h3>
 
         {/* Description */}
-        <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mb-4 line-clamp-2 text-justify text-sm text-gray-600 dark:text-gray-400">
           {training.short_description}
         </p>
 

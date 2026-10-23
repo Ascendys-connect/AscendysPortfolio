@@ -6,9 +6,10 @@ import { getMediaUrl, formatPrice } from "@/utils/media";
 export default function TrainingsSection() {
   const [activeCategory, setActiveCategory] = useState("all");
 
-  // Fetch trainings from API
+  // Fetch all published trainings (same source as the trainings list page) so
+  // the displayed count matches the real number of published trainings.
   const { data: trainings, isLoading, error, refetch } = useApi<Training[]>(
-    "/trainings/?status=PUBLISHED&page_size=6",
+    "/trainings/?status=PUBLISHED",
     { defaultValue: [] }
   );
 
@@ -59,8 +60,9 @@ export default function TrainingsSection() {
             <span className="text-brand-600 dark:text-brand-400">vous convient</span>
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Plus de 50 formations certifiantes dans le digital, le management et
-            bien plus encore
+            {trainings.length} formation{trainings.length > 1 ? "s" : ""}{" "}
+            certifiante{trainings.length > 1 ? "s" : ""} dans le digital, le
+            management et bien plus encore
           </p>
         </div>
 
@@ -148,7 +150,7 @@ export default function TrainingsSection() {
                 <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
                   {training.title}
                 </h3>
-                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mb-4 text-justify text-sm text-gray-600 dark:text-gray-400">
                   {training.short_description}
                 </p>
 

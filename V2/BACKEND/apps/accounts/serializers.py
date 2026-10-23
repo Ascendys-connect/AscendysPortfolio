@@ -2,8 +2,14 @@
 Serializers for user authentication and management.
 """
 from rest_framework import serializers
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
@@ -246,6 +252,38 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         return data
 
+
+class ActiveUserTokenRefreshSerializer(TokenRefreshSerializer):
+    """
+    Token refresh serializer that refuses to renew tokens for accounts that
+    have been deactivated.
+
+    SimpleJWT's default refresh flow does not re-check ``is_active``: a
+    disabled account could therefore keep refreshing an access token forever,
+    even though every authenticated API call would then be rejected with
+    ``user_inactive`` (which is exactly what caused an infinite refresh loop
+    on the frontend).
+    """
+
+    def validate(self, attrs):
+        token = RefreshToken(attrs['refresh'])
+
+        try:
+            user_id = token[settings.SIMPLE_JWT['USER_ID_CLAIM']]
+        except KeyError:
+            raise AuthenticationFailed(
+                'Token invalide.', code='token_not_valid'
+            )
+
+        user = User.objects.filter(pk=user_id).first()
+
+        if user is None or not user.is_active:
+            raise AuthenticationFailed(
+                'Ce compte a été désactivé. Veuillez contacter un administrateur.',
+                code='user_inactive',
+            )
+
+        return super().validate(attrs)
 
 
 class VerifyOTPSerializer(serializers.Serializer):

@@ -75,7 +75,7 @@ export default function ClientsSection() {
 
               {/* Bottom Section - White with Description */}
               <div className="p-4">
-                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
+                <p className="text-justify text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   {client.description}
                 </p>
               </div>

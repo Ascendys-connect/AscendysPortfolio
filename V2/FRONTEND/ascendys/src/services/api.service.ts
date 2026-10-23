@@ -3,14 +3,26 @@
  * Handles HTTP requests with authentication
  */
 
-import { API_BASE_URL, API_CONFIG, HTTP_STATUS } from '@/config/api';
-import type { ApiResponse, ApiError, QueryParams } from '@/types/api.types';
+import { API_BASE_URL, API_CONFIG, HTTP_STATUS, isPublicApiEndpoint } from '@/config/api';
+import type { ApiResponse, QueryParams } from '@/types/api.types';
+
+export interface RequestOptions {
+  /**
+   * Force skipping the Authorization header for this request.
+   * Public endpoints are already called anonymously for non-staff visitors;
+   * this lets a caller opt out explicitly.
+   */
+  skipAuth?: boolean;
+}
+
+// Roles that need an authenticated session to read admin-only data (draft /
+// inactive items) from otherwise public endpoints.
+const STAFF_ROLES = ['ADMIN', 'SUPER_ADMIN', 'EDITOR'];
 
 class ApiService {
   private baseURL: string;
   private defaultHeaders: HeadersInit;
-  private isRefreshing: boolean = false;
-  private refreshSubscribers: Array<(token: string) => void> = [];
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.baseURL = API_BASE_URL;
@@ -32,26 +44,37 @@ class ApiService {
   }
 
   /**
-   * Add subscriber to wait for token refresh
+   * Whether the current visitor has a staff session (admin/editor).
+   * Staff sessions still send their token to public endpoints because the
+   * backend returns extra data (draft/inactive items) to authenticated staff.
    */
-  private subscribeTokenRefresh(callback: (token: string) => void): void {
-    this.refreshSubscribers.push(callback);
+  private hasStaffSession(): boolean {
+    try {
+      const raw = localStorage.getItem('user');
+      if (!raw) return false;
+      const user = JSON.parse(raw);
+      return STAFF_ROLES.includes(user?.role);
+    } catch {
+      return false;
+    }
   }
 
   /**
-   * Notify all subscribers when token is refreshed
+   * Refresh the access token, deduplicating concurrent calls so that token
+   * rotation (ROTATE_REFRESH_TOKENS) cannot invalidate an in-flight refresh.
    */
-  private onTokenRefreshed(token: string): void {
-    this.refreshSubscribers.forEach((callback) => callback(token));
-    this.refreshSubscribers = [];
+  private refreshAccessToken(): Promise<string | null> {
+    if (!this.refreshPromise) {
+      this.refreshPromise = this.requestNewAccessToken().finally(() => {
+        this.refreshPromise = null;
+      });
+    }
+    return this.refreshPromise;
   }
 
-  /**
-   * Refresh the access token using refresh token
-   */
-  private async refreshAccessToken(): Promise<string | null> {
+  private async requestNewAccessToken(): Promise<string | null> {
     const refreshToken = this.getRefreshToken();
-    
+
     if (!refreshToken) {
       return null;
     }
@@ -66,7 +89,7 @@ class ApiService {
       });
 
       if (!response.ok) {
-        throw new Error('Refresh token expired');
+        return null;
       }
 
       const data = await response.json();
@@ -89,18 +112,48 @@ class ApiService {
   }
 
   /**
-   * Get request headers with authentication
+   * Clear the session and send the visitor to the sign-in page.
+   * Called once a 401 is definitive (refresh failed, or the retried request
+   * was rejected again).
    */
-  private getHeaders(customHeaders: HeadersInit = {}, isFormData: boolean = false): HeadersInit {
+  private handleAuthFailure(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+
+    if (!window.location.pathname.includes('/signin')) {
+      window.location.href = '/signin';
+    }
+  }
+
+  /**
+   * Get request headers with authentication.
+   *
+   * The Authorization header is omitted:
+   * - when the caller explicitly sets `skipAuth`, or
+   * - on public endpoints for non-staff visitors.
+   *
+   * This prevents a stale/invalid token from breaking public pages.
+   */
+  private getHeaders(
+    endpoint: string,
+    customHeaders: HeadersInit = {},
+    isFormData: boolean = false,
+    options: RequestOptions = {}
+  ): HeadersInit {
     const token = this.getAuthToken();
-    
+
     // Don't include Content-Type for FormData - let browser set it with boundary
     const headers: HeadersInit = isFormData
       ? { ...customHeaders }
       : { ...this.defaultHeaders, ...customHeaders };
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    const skipAuth =
+      options.skipAuth === true ||
+      (isPublicApiEndpoint(endpoint) && !this.hasStaffSession());
+
+    if (token && !skipAuth) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
     }
 
     return headers;
@@ -125,8 +178,15 @@ class ApiService {
 
   /**
    * Handle API response
+   *
+   * A 401 triggers at most ONE refresh + retry. Any further 401 (or a failed
+   * refresh) clears the session instead of looping forever.
    */
-  private async handleResponse<T>(response: Response, originalRequest?: () => Promise<Response>): Promise<ApiResponse<T>> {
+  private async handleResponse<T>(
+    response: Response,
+    originalRequest?: () => Promise<Response>,
+    isRetry: boolean = false
+  ): Promise<ApiResponse<T>> {
     const contentType = response.headers.get('content-type');
     const isJson = contentType?.includes('application/json');
 
@@ -139,53 +199,28 @@ class ApiService {
     }
 
     if (!response.ok) {
-      // Handle authentication errors - try to refresh token
-      if (response.status === HTTP_STATUS.UNAUTHORIZED && originalRequest) {
-        // Don't try to refresh if this is already a refresh request
-        if (!response.url.includes('/auth/refresh/')) {
-          // If already refreshing, wait for it
-          if (this.isRefreshing) {
-            return new Promise((resolve) => {
-              this.subscribeTokenRefresh(async (token: string) => {
-                try {
-                  const retryResponse = await originalRequest();
-                  const retryData = await this.handleResponse<T>(retryResponse);
-                  resolve(retryData);
-                } catch (error) {
-                  throw error;
-                }
-              });
-            });
-          }
+      const isRefreshRequest = response.url.includes('/auth/refresh/');
 
-          // Try to refresh the token
-          this.isRefreshing = true;
-          const newToken = await this.refreshAccessToken();
-          this.isRefreshing = false;
+      // Handle authentication errors - try to refresh the token exactly once
+      if (
+        response.status === HTTP_STATUS.UNAUTHORIZED &&
+        originalRequest &&
+        !isRetry &&
+        !isRefreshRequest
+      ) {
+        const newToken = await this.refreshAccessToken();
 
-          if (newToken) {
-            // Notify all waiting requests
-            this.onTokenRefreshed(newToken);
-            
-            // Retry the original request with new token
-            try {
-              const retryResponse = await originalRequest();
-              return this.handleResponse<T>(retryResponse, originalRequest);
-            } catch (error) {
-              throw error;
-            }
-          }
+        if (newToken) {
+          // Retry the request once with the fresh token. No further refresh:
+          // a second 401 is a definitive auth failure.
+          const retryResponse = await originalRequest();
+          return this.handleResponse<T>(retryResponse, originalRequest, true);
         }
+      }
 
-        // If refresh failed or this is a refresh request, logout
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        
-        // Redirect to login (only if not already on signin page)
-        if (!window.location.pathname.includes('/signin')) {
-          window.location.href = '/signin';
-        }
+      // Refresh failed or the retried request was rejected again -> logout
+      if (response.status === HTTP_STATUS.UNAUTHORIZED) {
+        this.handleAuthFailure();
       }
 
       // Create a detailed error object with response information
@@ -206,14 +241,14 @@ class ApiService {
   /**
    * GET request
    */
-  async get<T>(endpoint: string, params?: QueryParams): Promise<ApiResponse<T>> {
+  async get<T>(endpoint: string, params?: QueryParams, options: RequestOptions = {}): Promise<ApiResponse<T>> {
     try {
       const url = this.buildURL(endpoint, params);
       
       const makeRequest = async () => {
         return fetch(url, {
           method: 'GET',
-          headers: this.getHeaders(),
+          headers: this.getHeaders(endpoint, undefined, false, options),
         });
       };
 
@@ -236,7 +271,7 @@ class ApiService {
   /**
    * POST request
    */
-  async post<T>(endpoint: string, data?: any, customHeaders?: HeadersInit): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: any, customHeaders?: HeadersInit, options: RequestOptions = {}): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
       const isFormData = data instanceof FormData;
@@ -244,7 +279,7 @@ class ApiService {
       const makeRequest = async () => {
         return fetch(url, {
           method: 'POST',
-          headers: this.getHeaders(customHeaders, isFormData),
+          headers: this.getHeaders(endpoint, customHeaders, isFormData, options),
           body: isFormData ? data : JSON.stringify(data),
         });
       };
@@ -268,7 +303,7 @@ class ApiService {
   /**
    * PUT request
    */
-  async put<T>(endpoint: string, data: any, customHeaders?: HeadersInit): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data: any, customHeaders?: HeadersInit, options: RequestOptions = {}): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
       const isFormData = data instanceof FormData;
@@ -276,7 +311,7 @@ class ApiService {
       const makeRequest = async () => {
         return fetch(url, {
           method: 'PUT',
-          headers: this.getHeaders(customHeaders, isFormData),
+          headers: this.getHeaders(endpoint, customHeaders, isFormData, options),
           body: isFormData ? data : JSON.stringify(data),
         });
       };
@@ -300,7 +335,7 @@ class ApiService {
   /**
    * PATCH request
    */
-  async patch<T>(endpoint: string, data: any, customHeaders?: HeadersInit): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, data: any, customHeaders?: HeadersInit, options: RequestOptions = {}): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
       const isFormData = data instanceof FormData;
@@ -308,7 +343,7 @@ class ApiService {
       const makeRequest = async () => {
         return fetch(url, {
           method: 'PATCH',
-          headers: this.getHeaders(customHeaders, isFormData),
+          headers: this.getHeaders(endpoint, customHeaders, isFormData, options),
           body: isFormData ? data : JSON.stringify(data),
         });
       };
@@ -332,14 +367,14 @@ class ApiService {
   /**
    * DELETE request
    */
-  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+  async delete<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
       
       const makeRequest = async () => {
         return fetch(url, {
           method: 'DELETE',
-          headers: this.getHeaders(),
+          headers: this.getHeaders(endpoint, undefined, false, options),
         });
       };
 
@@ -368,7 +403,8 @@ class ApiService {
     onProgress?: (progress: number) => void
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = this.getAuthToken();
+    const skipAuth = isPublicApiEndpoint(endpoint) && !this.hasStaffSession();
+    const token = skipAuth ? null : this.getAuthToken();
 
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();

@@ -5,6 +5,7 @@ import PublicNavbar from '@/components/public/PublicNavbar';
 import PublicFooter from '@/components/public/PublicFooter';
 import WhatsAppButton from '@/components/public/WhatsAppButton';
 import { useApi } from '@/hooks/useApi';
+import VideoThumbnail from '@/components/common/VideoThumbnail';
 import type { Gallery } from '@/types/content.types';
 
 export default function Gallery() {
@@ -34,13 +35,16 @@ export default function Gallery() {
 
         <main className="pt-20">
           {/* Hero Section */}
-          <section
-            className="py-16 text-white"
-            style={{
-              background: 'linear-gradient(135deg, #0d0025 0%, #1a0050 40%, #9800BF 100%)',
-            }}
-          >
-            <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <section className="relative overflow-hidden py-16 text-white lg:py-20">
+            {/* Image de fond */}
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: 'url(/gallery-background.jpg)' }}
+            />
+            {/* Voile sombre pour la lisibilité du texte */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/65" />
+
+            <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
               <h1 className="mb-4 text-4xl font-bold">Notre Médiathèque</h1>
               <p className="text-xl text-white/80">
                 Découvrez nos formations, événements et moments forts en images
@@ -111,9 +115,15 @@ export default function Gallery() {
                             setPhotoIndex(0);
                           }}
                         >
-                          {/* Image couverture */}
+                          {/* Image couverture / aperçu vidéo */}
                           <div className="aspect-[4/3]">
-                            {gallery.cover_image_url ? (
+                            {gallery.gallery_type === 'VIDEO' && gallery.video_url ? (
+                              <VideoThumbnail
+                                src={gallery.video_url}
+                                poster={gallery.cover_image_url}
+                                className="size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              />
+                            ) : gallery.cover_image_url ? (
                               <img
                                 src={gallery.cover_image_url}
                                 alt={gallery.title}
@@ -121,11 +131,7 @@ export default function Gallery() {
                               />
                             ) : (
                               <div className="flex size-full items-center justify-center bg-gradient-to-br from-purple-900 to-purple-600">
-                                {gallery.gallery_type === 'VIDEO' ? (
-                                  <Video className="size-16 text-white/50" />
-                                ) : (
-                                  <Camera className="size-16 text-white/50" />
-                                )}
+                                <Camera className="size-16 text-white/50" />
                               </div>
                             )}
                           </div>

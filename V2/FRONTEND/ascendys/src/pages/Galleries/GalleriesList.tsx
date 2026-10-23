@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import PageMeta from "@/components/common/PageMeta";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
+import VideoThumbnail from "@/components/common/VideoThumbnail";
 import { useApi } from "@/hooks/useApi";
 import { galleryService } from "@/services/gallery.service";
 import { useToast } from "@/context/ToastContext";
 import type { Gallery } from "@/types/content.types";
+
+type EditPhotoSlot = {
+  file: File | null;
+  previewUrl: string | null;
+  existingUrl: string | null;
+  removed: boolean;
+};
+
+const emptyEditPhotoSlots = (): EditPhotoSlot[] =>
+  Array.from({ length: 5 }, () => ({
+    file: null,
+    previewUrl: null,
+    existingUrl: null,
+    removed: false,
+  }));
 
 export default function GalleriesList() {
   const navigate = useNavigate();
@@ -25,6 +41,11 @@ export default function GalleriesList() {
     description: "",
     is_published: false,
   });
+  const [editPhotos, setEditPhotos] = useState<EditPhotoSlot[]>(emptyEditPhotoSlots);
+  const [editVideo, setEditVideo] = useState<File | null>(null);
+  const [editVideoPreview, setEditVideoPreview] = useState<string | null>(null);
+  const editPhotoInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const editVideoInputRef = useRef<HTMLInputElement | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -73,7 +94,55 @@ export default function GalleriesList() {
       description: gallery.description,
       is_published: gallery.is_published,
     });
+    setEditPhotos(
+      emptyEditPhotoSlots().map((slot, i) => ({
+        ...slot,
+        existingUrl:
+          (gallery[`photo_${i + 1}_url` as keyof Gallery] as string | null) ?? null,
+      }))
+    );
+    setEditVideo(null);
+    setEditVideoPreview(null);
   };
+
+  // Edit modal: replace/add a photo
+  const handleEditPhotoChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setEditPhotos(prev => {
+      const next = [...prev];
+      const previous = next[index];
+      if (previous.previewUrl) URL.revokeObjectURL(previous.previewUrl);
+      next[index] = { ...previous, file, previewUrl: url, removed: false };
+      return next;
+    });
+  };
+
+  // Edit modal: remove a photo (existing or freshly picked)
+  const handleEditPhotoRemove = (index: number) => {
+    setEditPhotos(prev => {
+      const next = [...prev];
+      const slot = next[index];
+      if (slot.previewUrl) URL.revokeObjectURL(slot.previewUrl);
+      next[index] = { ...slot, file: null, previewUrl: null, removed: true };
+      return next;
+    });
+    if (editPhotoInputRefs.current[index]) editPhotoInputRefs.current[index]!.value = "";
+  };
+
+  // Edit modal: pick a replacement video
+  const handleEditVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (editVideoPreview) URL.revokeObjectURL(editVideoPreview);
+    setEditVideo(file);
+    setEditVideoPreview(URL.createObjectURL(file));
+  };
+
+  const editPhotoCount = editPhotos.filter(
+    slot => slot.file || (slot.existingUrl && !slot.removed)
+  ).length;
 
   // Submit edit modal
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -85,18 +154,52 @@ export default function GalleriesList() {
       return;
     }
 
+    const isPhotos = editGallery.gallery_type === "PHOTOS";
+    if (isPhotos && editPhotoCount === 0) {
+      showError("Validation", "Conservez ou ajoutez au moins une photo.");
+      return;
+    }
+    if (!isPhotos && !editVideo && !editGallery.video_url) {
+      showError("Validation", "Ajoutez une vidéo.");
+      return;
+    }
+
     setIsUpdating(true);
     try {
-      await galleryService.update(editGallery.id, {
-        title: editForm.title.trim(),
-        description: editForm.description.trim(),
-        is_published: editForm.is_published,
-      });
+      const formData = new FormData();
+      formData.append("title", editForm.title.trim());
+      formData.append("description", editForm.description.trim());
+      formData.append("is_published", String(editForm.is_published));
+
+      if (isPhotos) {
+        editPhotos.forEach((slot, i) => {
+          const key = `photo_${i + 1}`;
+          if (slot.file) {
+            formData.append(key, slot.file);
+          } else if (slot.removed && slot.existingUrl) {
+            // Empty string tells the API to clear this slot.
+            formData.append(key, "");
+          }
+        });
+      } else if (editVideo) {
+        formData.append("video", editVideo);
+      }
+
+      await galleryService.update(editGallery.id, formData);
       showSuccess("Médiathèque modifiée", `"${editForm.title}" a été mise à jour avec succès.`);
       setEditGallery(null);
       refetch();
-    } catch {
-      showError("Erreur", "Une erreur est survenue lors de la mise à jour.");
+    } catch (err: any) {
+      const data = err?.response?.data;
+      let msg = "Une erreur est survenue lors de la mise à jour.";
+      if (typeof data?.message === "string") msg = data.message;
+      else if (typeof data?.detail === "string") msg = data.detail;
+      else if (data && typeof data === "object") {
+        const first = Object.values(data)[0];
+        if (Array.isArray(first) && typeof first[0] === "string") msg = first[0];
+        else if (typeof first === "string") msg = first;
+      }
+      showError("Erreur", msg);
     } finally {
       setIsUpdating(false);
     }
@@ -300,19 +403,17 @@ export default function GalleriesList() {
                         </svg>
                       </div>
                     )
+                  ) : gallery.video_url ? (
+                    <VideoThumbnail
+                      src={gallery.video_url}
+                      poster={gallery.cover_image_url}
+                      className="h-44 w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
                   ) : (
                     <div className="relative flex h-44 items-center justify-center bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-950/20 dark:to-violet-950/20">
                       <svg className="size-12 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 transition group-hover:opacity-100">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-600/90 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-sm">
-                          <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          </svg>
-                          Voir la vidéo
-                        </span>
-                      </div>
                     </div>
                   )}
 
@@ -453,7 +554,7 @@ export default function GalleriesList() {
           onClick={() => setEditGallery(null)}
         >
           <div
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
@@ -521,6 +622,128 @@ export default function GalleriesList() {
                   required
                 />
               </div>
+
+              {/* Media editing */}
+              {editGallery.gallery_type === "PHOTOS" ? (
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <Label>
+                      Photos <span className="ml-1 text-gray-400">({editPhotoCount}/5)</span>
+                    </Label>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Survolez une photo pour la remplacer ou la supprimer
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {editPhotos.map((slot, i) => {
+                      const preview = slot.previewUrl || (!slot.removed ? slot.existingUrl : null);
+                      return (
+                        <div key={i} className="relative">
+                          {preview ? (
+                            <div className="group relative overflow-hidden rounded-xl border-2 border-brand-300 bg-gray-100 dark:bg-gray-800">
+                              <img src={preview} alt={`Photo ${i + 1}`} className="h-28 w-full object-cover" />
+                              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/45 opacity-0 transition group-hover:opacity-100">
+                                <button
+                                  type="button"
+                                  onClick={() => editPhotoInputRefs.current[i]?.click()}
+                                  className="rounded-full bg-white/90 p-1.5 text-gray-800 hover:bg-white"
+                                  title="Remplacer la photo"
+                                >
+                                  <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0L8 8m4-4l4 4" />
+                                  </svg>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditPhotoRemove(i)}
+                                  className="rounded-full bg-error-500 p-1.5 text-white hover:bg-error-600"
+                                  title="Supprimer la photo"
+                                >
+                                  <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </div>
+                              <span className="absolute bottom-1 left-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+                                {slot.file ? "Nouvelle" : `Photo ${i + 1}`}
+                              </span>
+                              <input
+                                ref={el => { editPhotoInputRefs.current[i] = el; }}
+                                type="file"
+                                accept="image/*"
+                                onChange={e => handleEditPhotoChange(i, e)}
+                                className="hidden"
+                              />
+                            </div>
+                          ) : (
+                            <label className="flex h-28 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-brand-400 hover:bg-brand-50/50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-brand-600">
+                              <svg className="mb-1 size-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                              </svg>
+                              <span className="text-xs text-gray-500">Photo {i + 1}</span>
+                              <input
+                                ref={el => { editPhotoInputRefs.current[i] = el; }}
+                                type="file"
+                                accept="image/*"
+                                onChange={e => handleEditPhotoChange(i, e)}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Formats acceptés : JPG, PNG, WEBP. Taille max. 10 MB par photo.
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <Label>Vidéo</Label>
+                  <div className="mt-1.5">
+                    {editVideoPreview || editGallery.video_url ? (
+                      <div className="relative">
+                        <video
+                          src={editVideoPreview || editGallery.video_url || undefined}
+                          controls
+                          className="w-full rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => editVideoInputRef.current?.click()}
+                          className="absolute top-2 end-2 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-brand-700"
+                        >
+                          Remplacer la vidéo
+                        </button>
+                        {editVideo && (
+                          <span className="absolute bottom-2 left-2 rounded-md bg-brand-600 px-2 py-0.5 text-[10px] text-white">
+                            Nouvelle vidéo
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                        <svg className="mb-2 size-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                        </svg>
+                        <p className="text-sm text-gray-500">Cliquer pour télécharger une vidéo</p>
+                      </label>
+                    )}
+                    <input
+                      ref={editVideoInputRef}
+                      type="file"
+                      accept="video/*"
+                      onChange={handleEditVideoChange}
+                      className="hidden"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Sélectionnez un nouveau fichier pour remplacer la vidéo actuelle.
+                  </p>
+                </div>
+              )}
 
               {/* Status Switch */}
               <div className="flex items-center justify-between rounded-xl border border-gray-200 p-3.5 dark:border-gray-800">

@@ -227,7 +227,7 @@ export default function Trainings() {
                         <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
                           {training.title}
                         </h3>
-                        <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                        <p className="mb-4 line-clamp-2 text-justify text-sm text-gray-600 dark:text-gray-400">
                           {training.short_description || training.description}
                         </p>
 
